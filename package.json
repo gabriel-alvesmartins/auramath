@@ -2,12 +2,14 @@
   "name": "auramath-workspace",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Auramath Monorepo - Cognitive mental math platform",
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
   "scripts": {
+    "dev": "vite",
     "test": "npm run test --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present"
