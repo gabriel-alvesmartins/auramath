@@ -1,24 +1,17 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
-  Sparkles, Flame, Award, Trophy, Volume2, VolumeX, Smartphone, Monitor
+  Compass, Zap, Swords, Shapes, User, Flame, Star, Volume2, VolumeX,
+  Wifi, Battery, Sparkles
 } from 'lucide-react';
 import { audioSynth } from './services/audioSynth';
-import { LearningTrackView } from './views/LearningTrackView';
-import { ArenaView } from './views/ArenaView';
-import { SplitBattleView } from './views/SplitBattleView';
-import { ShadowRacingView } from './views/ShadowRacingView';
-import { DailyChallengeView } from './views/DailyChallengeView';
-import { FlashAnzanView } from './views/FlashAnzanView';
-import { FlowZenView } from './views/FlowZenView';
-import { BossBattleView } from './views/BossBattleView';
-import { TactileGeometryLabView } from './views/TactileGeometryLabView';
-import { ProfileRadarView } from './views/ProfileRadarView';
-import { TeacherHubView } from './views/TeacherHubView';
-import { SettingsView } from './views/SettingsView';
+import { TrackView } from './views/TrackView';
+import { TrainHubView } from './views/TrainHubView';
+import { DuelHubView } from './views/DuelHubView';
+import { LabView } from './views/LabView';
+import { ProfileHubView } from './views/ProfileHubView';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>('track');
-  const [isMobileFrame, setIsMobileFrame] = useState(false);
+  const [activeTab, setActiveTab] = useState<'track' | 'train' | 'duels' | 'lab' | 'profile'>('track');
   const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
@@ -36,228 +29,225 @@ export default function App() {
   }, []);
 
   const toggleSound = () => {
-    const nextMuted = !isMuted;
-    setIsMuted(nextMuted);
-    audioSynth.setMuted(nextMuted);
+    const next = !isMuted;
+    setIsMuted(next);
+    audioSynth.setMuted(next);
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#07090E', color: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
-      {/* Top Header */}
-      <header style={{
-        backgroundColor: 'rgba(13, 17, 26, 0.95)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-        backdropFilter: 'blur(12px)',
-        padding: '10px 20px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '10px',
-            background: 'linear-gradient(135deg, #00F2FE 0%, #8A2BE2 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 0 15px rgba(0, 242, 254, 0.5)'
-          }}>
-            <Sparkles size={20} color="#07090E" />
-          </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontWeight: 800, fontSize: '1.2rem', letterSpacing: '-0.02em', background: 'linear-gradient(to right, #00F2FE, #C084FC)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                AURAMATH
-              </span>
-              <span style={{ fontSize: '0.65rem', padding: '2px 6px', borderRadius: '4px', backgroundColor: 'rgba(0, 242, 254, 0.15)', color: '#00F2FE', fontWeight: 700, border: '1px solid rgba(0, 242, 254, 0.3)' }}>
-                COGNITIVE ENGINE v1.0
-              </span>
-            </div>
-            <p style={{ fontSize: '0.75rem', color: '#64748B', margin: 0 }}>Cálculo Mental de Alta Velocidade & Fluxo Esquerda-Direita</p>
-          </div>
-        </div>
-
-        {/* Global User Stats Bar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-            <Flame size={16} color="#FB7185" />
-            <span style={{ fontWeight: 700, color: '#FB7185' }}>18</span>
-            <span style={{ color: '#64748B', fontSize: '0.75rem' }}>dias</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-            <Award size={16} color="#FACC15" />
-            <span style={{ fontWeight: 700, color: '#FACC15' }}>48</span>
-            <span style={{ color: '#64748B', fontSize: '0.75rem' }}>★</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}>
-            <Trophy size={16} color="#38BDF8" />
-            <span style={{ fontWeight: 700, color: '#38BDF8' }}>1,540</span>
-            <span style={{ color: '#64748B', fontSize: '0.75rem' }}>Elo</span>
-          </div>
-
-          <div style={{ height: '24px', width: '1px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
-
-          <button
-            onClick={toggleSound}
-            title={isMuted ? "Ativar Áudio Procedural" : "Silenciar"}
-            style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              color: isMuted ? '#64748B' : '#00F2FE',
-              borderRadius: '8px',
-              padding: '6px 10px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '0.8rem'
-            }}
-          >
-            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-            <span>{isMuted ? 'Mudo' : 'Som 0ms'}</span>
-          </button>
-
-          <button
-            onClick={() => setIsMobileFrame(!isMobileFrame)}
-            title={isMobileFrame ? "Modo Tela Cheia" : "Modo Smartphone"}
-            style={{
-              background: isMobileFrame ? 'rgba(0, 242, 254, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-              border: isMobileFrame ? '1px solid #00F2FE' : '1px solid rgba(255, 255, 255, 0.1)',
-              color: isMobileFrame ? '#00F2FE' : '#94A3B8',
-              borderRadius: '8px',
-              padding: '6px 10px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '0.8rem'
-            }}
-          >
-            {isMobileFrame ? <Monitor size={16} /> : <Smartphone size={16} />}
-            <span>{isMobileFrame ? 'Expandir' : 'Frame Mobile'}</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Navigation Sub-bar */}
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#030407',
+      backgroundImage: 'radial-gradient(ellipse at top, rgba(138, 43, 226, 0.15), transparent 60%), radial-gradient(ellipse at bottom, rgba(0, 242, 254, 0.08), transparent 70%)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      color: '#F8FAFC'
+    }}>
+      {/* Centered Mobile Device Frame */}
       <div style={{
-        backgroundColor: '#0B0F19',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-        padding: '6px 16px',
-        overflowX: 'auto',
+        width: '100%',
+        maxWidth: '430px',
+        minHeight: '100vh',
+        backgroundColor: '#07090E',
+        borderLeft: '1px solid rgba(255, 255, 255, 0.06)',
+        borderRight: '1px solid rgba(255, 255, 255, 0.06)',
+        boxShadow: '0 0 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 242, 254, 0.1)',
         display: 'flex',
-        gap: '8px',
-        whiteSpace: 'nowrap'
+        flexDirection: 'column',
+        position: 'relative'
       }}>
-        {[
-          { id: 'track', label: '🗺️ Trilha de Graus' },
-          { id: 'arena', label: '⚡ Arena Solo' },
-          { id: 'blitz', label: '⏱️ Blitz (60s)' },
-          { id: 'sudden', label: '💀 Morte Súbita' },
-          { id: 'split', label: '🤼 Split 2P' },
-          { id: 'shadow', label: '👻 Shadow Racing' },
-          { id: 'daily', label: '📅 Desafio Diário' },
-          { id: 'anzan', label: '👁️ Flash Anzan' },
-          { id: 'zen', label: '🧘 Flow Zen' },
-          { id: 'boss', label: '👑 Arcanum Boss' },
-          { id: 'lab', label: '📐 Lab Geometria' },
-          { id: 'profile', label: '🧬 DNA Cognitivo' },
-          { id: 'teacher', label: '🏫 Turma B2B' },
-          { id: 'settings', label: '⚙️ Ajustes' },
-        ].map(item => (
-          <button
-            key={item.id}
-            onClick={() => {
-              setActiveTab(item.id);
-              audioSynth.playKeypressTick();
-            }}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '8px',
-              fontSize: '0.82rem',
-              fontWeight: activeTab === item.id ? 700 : 500,
-              backgroundColor: activeTab === item.id ? 'rgba(0, 242, 254, 0.15)' : 'transparent',
-              color: activeTab === item.id ? '#00F2FE' : '#94A3B8',
-              border: activeTab === item.id ? '1px solid rgba(0, 242, 254, 0.4)' : '1px solid transparent',
-              cursor: 'pointer',
-              transition: 'all 0.15s'
-            }}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Main Content Area */}
-      <main style={{
-        flex: 1,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        padding: isMobileFrame ? '20px 0' : '20px',
-        overflowY: 'auto'
-      }}>
-        {isMobileFrame ? (
+        {/* iOS Native Status Bar */}
+        <div style={{
+          height: '44px',
+          padding: '0 20px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontSize: '0.82rem',
+          fontWeight: 700,
+          color: '#F8FAFC',
+          zIndex: 40,
+          backgroundColor: '#07090E'
+        }}>
+          <span>9:41</span>
+          {/* Dynamic Island Pill */}
           <div style={{
-            width: '390px',
-            minHeight: '780px',
-            maxHeight: '844px',
-            backgroundColor: '#07090E',
-            borderRadius: '40px',
-            border: '8px solid #1E293B',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 242, 254, 0.15)',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            position: 'relative'
-          }}>
-            {/* Notch */}
+            width: '110px',
+            height: '24px',
+            backgroundColor: '#000',
+            borderRadius: '12px',
+            boxShadow: '0 0 8px rgba(0, 0, 0, 0.8)'
+          }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Wifi size={14} />
+            <Battery size={16} />
+          </div>
+        </div>
+
+        {/* Mobile App Header */}
+        <header style={{
+          padding: '8px 16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          backgroundColor: 'rgba(7, 9, 14, 0.95)',
+          backdropFilter: 'blur(10px)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 30
+        }}>
+          {/* Left Avatar & Level */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{
-              width: '120px',
-              height: '24px',
-              backgroundColor: '#000',
+              width: '34px',
+              height: '34px',
               borderRadius: '12px',
-              margin: '8px auto 4px auto',
-              zIndex: 30,
-              flexShrink: 0
-            }} />
-            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
-              <RenderActiveTab tab={activeTab} />
+              overflow: 'hidden',
+              border: '1.5px solid #00F2FE',
+              boxShadow: '0 0 10px rgba(0, 242, 254, 0.4)'
+            }}>
+              <img src="/assets/aura_spark.jpg" alt="Aura" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.82rem', fontWeight: 800, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ color: '#00F2FE' }}>AURA</span>MATH
+              </div>
+              <span style={{ fontSize: '0.65rem', color: '#8A2BE2', fontWeight: 700 }}>Nv. 14</span>
             </div>
           </div>
-        ) : (
-          <div style={{ width: '100%', maxWidth: '1080px' }}>
-            <RenderActiveTab tab={activeTab} />
+
+          {/* Right Metrics & Audio Toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              backgroundColor: 'rgba(251, 113, 133, 0.12)',
+              border: '1px solid rgba(251, 113, 133, 0.3)',
+              borderRadius: '12px',
+              padding: '4px 8px',
+              fontSize: '0.78rem',
+              fontWeight: 800,
+              color: '#FB7185'
+            }}>
+              <Flame size={14} fill="#FB7185" />
+              <span>18</span>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              backgroundColor: 'rgba(250, 204, 21, 0.12)',
+              border: '1px solid rgba(250, 204, 21, 0.3)',
+              borderRadius: '12px',
+              padding: '4px 8px',
+              fontSize: '0.78rem',
+              fontWeight: 800,
+              color: '#FACC15'
+            }}>
+              <Star size={13} fill="#FACC15" />
+              <span>48</span>
+            </div>
+
+            <button
+              onClick={toggleSound}
+              style={{
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: isMuted ? '#64748B' : '#00F2FE',
+                borderRadius: '10px',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+            </button>
           </div>
-        )}
-      </main>
+        </header>
+
+        {/* Viewport Content */}
+        <main style={{ flex: 1, overflowY: 'auto' }}>
+          {activeTab === 'track' && <TrackView onStartDrill={() => setActiveTab('train')} />}
+          {activeTab === 'train' && <TrainHubView />}
+          {activeTab === 'duels' && <DuelHubView />}
+          {activeTab === 'lab' && <LabView />}
+          {activeTab === 'profile' && <ProfileHubView />}
+        </main>
+
+        {/* Native Mobile Bottom Tab Bar */}
+        <nav style={{
+          position: 'fixed',
+          bottom: 0,
+          width: '100%',
+          maxWidth: '430px',
+          height: '68px',
+          backgroundColor: 'rgba(11, 15, 25, 0.96)',
+          backdropFilter: 'blur(16px)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          display: 'flex',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+          padding: '0 8px',
+          zIndex: 50,
+          boxSizing: 'border-box'
+        }}>
+          {[
+            { id: 'track', label: 'Trilha', icon: Compass },
+            { id: 'train', label: 'Treino', icon: Zap },
+            { id: 'duels', label: 'Duelos', icon: Swords },
+            { id: 'lab', label: 'Lab', icon: Shapes },
+            { id: 'profile', label: 'Perfil', icon: User },
+          ].map(tab => {
+            const Icon = tab.icon;
+            const isSel = activeTab === tab.id;
+
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id as any);
+                  audioSynth.playKeypressTick();
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '3px',
+                  cursor: 'pointer',
+                  padding: '6px 12px',
+                  borderRadius: '16px',
+                  color: isSel ? '#00F2FE' : '#64748B',
+                  transition: 'all 0.12s'
+                }}
+              >
+                <div style={{
+                  padding: '4px 14px',
+                  borderRadius: '12px',
+                  backgroundColor: isSel ? 'rgba(0, 242, 254, 0.15)' : 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Icon size={20} strokeWidth={isSel ? 2.6 : 1.8} />
+                </div>
+                <span style={{ fontSize: '0.68rem', fontWeight: isSel ? 800 : 500 }}>
+                  {tab.label}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
     </div>
   );
 }
-
-function RenderActiveTab({ tab }: { tab: string }) {
-  switch (tab) {
-    case 'track': return <LearningTrackView />;
-    case 'arena': return <ArenaView mode="arena" />;
-    case 'blitz': return <ArenaView mode="blitz" />;
-    case 'sudden': return <ArenaView mode="sudden" />;
-    case 'split': return <SplitBattleView />;
-    case 'shadow': return <ShadowRacingView />;
-    case 'daily': return <DailyChallengeView />;
-    case 'anzan': return <FlashAnzanView />;
-    case 'zen': return <FlowZenView />;
-    case 'boss': return <BossBattleView />;
-    case 'lab': return <TactileGeometryLabView />;
-    case 'profile': return <ProfileRadarView />;
-    case 'teacher': return <TeacherHubView />;
-    case 'settings': return <SettingsView />;
-    default: return <LearningTrackView />;
-  }
-}
-
-
