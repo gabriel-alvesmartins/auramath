@@ -1,0 +1,24 @@
+{
+  "name": "auramath-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Auramath Monorepo - Cognitive mental math platform",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "keywords": [
+    "mental-math",
+    "cognitive-scaffolding",
+    "react-native",
+    "expo",
+    "gamification"
+  ],
+  "author": "Auramath Team",
+  "license": "MIT"
+}
