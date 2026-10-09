@@ -18,6 +18,11 @@ async function runComplianceAudit() {
   let engineLoaded = false;
   let trackGrades = [];
   try {
+    const engineDist = path.resolve(rootDir, 'packages/engine/dist/index.js');
+    if (!fs.existsSync(engineDist)) {
+      const { execSync } = await import('child_process');
+      execSync('npm run build --workspace=@auramath/engine', { stdio: 'pipe' });
+    }
     const engineModule = await import('../packages/engine/dist/index.js');
     trackGrades = engineModule.TRACK_GRADES || [];
     engineLoaded = true;
