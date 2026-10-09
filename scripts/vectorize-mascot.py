@@ -101,22 +101,80 @@ def vectorize_image(image_path: Path, output_path: Path) -> bool:
         return False
 
 
+def find_concept_file(query: str):
+    """
+    Localiza um arquivo de conceito por caminho absoluto, relativo ou apenas o nome da pose.
+    Ex: 'prisma-idle', 'prisma-idle.jpg', 'public/mascot/concepts/prisma-idle.jpg'
+    """
+    # 1. Caminho direto
+    direct = Path(query)
+    if direct.exists() and direct.is_file():
+        return direct.resolve()
+
+    # 2. Busca na pasta de conceitos por nome exato
+    concept_exact = CONCEPTS_DIR / query
+    if concept_exact.exists() and concept_exact.is_file():
+        return concept_exact.resolve()
+
+    # 3. Busca por stem (sem extensão)
+    valid_exts = [".jpg", ".jpeg", ".png", ".webp"]
+    for ext in valid_exts:
+        candidate = CONCEPTS_DIR / f"{query}{ext}"
+        if candidate.exists():
+            return candidate.resolve()
+
+    # 4. Busca se o usuário passou com prefixo public/
+    rel_path = ROOT_DIR / query
+    if rel_path.exists() and rel_path.is_file():
+        return rel_path.resolve()
+
+    return None
+
+
 def main():
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     CONCEPTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    if len(sys.argv) > 1:
-        target = Path(sys.argv[1]).resolve()
-        if not target.exists():
-            print(f"❌ Arquivo não encontrado: {target}")
+    args = sys.argv[1:]
+
+    # Help
+    if any(arg in ["-h", "--help"] for arg in args):
+        print("🦎 Pipeline de Vetorização do Mascote — Auramath")
+        print("\nUso:")
+        print("  npm run mascot:vectorize -- <nome-da-pose>   # Vetoriza SOMENTE uma imagem individual")
+        print("  npm run mascot:vectorize                    # Modo seguro incremental (só processa imagens novas)")
+        print("  npm run mascot:vectorize -- --force         # Força a regeração de todas as poses")
+        print("\nExemplos:")
+        print("  npm run mascot:vectorize -- prisma-eureka")
+        print("  npm run mascot:vectorize -- prisma-nova-pose.png")
+        sys.exit(0)
+
+    force_all = any(arg in ["--force", "-f"] for arg in args)
+    target_args = [arg for arg in args if arg not in ["--force", "-f"]]
+
+    # 1. Modo Individual: usuário especificou uma imagem individual para vetorizar
+    if target_args:
+        target_query = target_args[0]
+        found_file = find_concept_file(target_query)
+
+        if not found_file:
+            print(f"❌ Imagem não encontrada: '{target_query}'")
+            print(f"💡 Verifique se o arquivo está na pasta {CONCEPTS_DIR}")
+            print(f"   Arquivos disponíveis:")
+            for p in sorted(CONCEPTS_DIR.iterdir()):
+                if p.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp"]:
+                    print(f"   - {p.stem} ({p.name})")
             sys.exit(1)
 
-        dest_name = target.stem + ".svg"
+        dest_name = found_file.stem + ".svg"
         dest_path = OUTPUT_DIR / dest_name
-        success = vectorize_image(target, dest_path)
+        print(f"🎯 Modo Individual: Vetorizando apenas '{found_file.name}' (as demais poses permanecerão intocadas)...")
+        success = vectorize_image(found_file, dest_path)
+        if success:
+            print(f"✅ Concluído! O arquivo '{dest_name}' foi gerado/atualizado com sucesso.")
         sys.exit(0 if success else 1)
 
-    # Modo em lote: busca todas as imagens em public/mascot/concepts/
+    # 2. Modo em Lote / Incremental
     valid_exts = {".jpg", ".jpeg", ".png", ".webp"}
     images = [p for p in CONCEPTS_DIR.iterdir() if p.suffix.lower() in valid_exts]
 
@@ -125,15 +183,29 @@ def main():
         print("💡 Coloque suas imagens (JPG/PNG) nessa pasta e execute novamente!")
         sys.exit(0)
 
-    print(f"🚀 Iniciando vetorização automática de {len(images)} imagens...")
-    count = 0
+    print(f"🔍 Verificando {len(images)} imagens conceituais...")
+    count_generated = 0
+    count_skipped = 0
+
     for img in sorted(images):
         svg_name = img.stem + ".svg"
         out_svg = OUTPUT_DIR / svg_name
-        if vectorize_image(img, out_svg):
-            count += 1
 
-    print(f"\n🎉 Pipeline finalizado: {count}/{len(images)} SVGs gerados e prontos em /public/mascot/")
+        # Proteção contra sobrescrita: se o SVG já existe e não foi passado --force, pula!
+        if out_svg.exists() and not force_all:
+            print(f"🛡️  [PRESERVADO] {svg_name} já existe e está protegido. Pulei para não alterar.")
+            count_skipped += 1
+            continue
+
+        if vectorize_image(img, out_svg):
+            count_generated += 1
+
+    print("\n📊 Resumo do Pipeline:")
+    print(f"   ✨ SVGs novos/atualizados: {count_generated}")
+    print(f"   🛡️  SVGs preservados intactos: {count_skipped}")
+    if count_skipped > 0:
+        print("💡 Dica: Para atualizar uma pose específica sem tocar nas outras, use:")
+        print("   npm run mascot:vectorize -- <nome-da-pose> (ex: npm run mascot:vectorize -- prisma-idle)")
 
 
 if __name__ == "__main__":

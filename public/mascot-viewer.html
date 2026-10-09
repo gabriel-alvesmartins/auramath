@@ -1148,14 +1148,17 @@
             <div class="step-card">
               <div class="step-badge">2</div>
               <div class="step-content">
-                <h4>Execute o Comando de Vetorização</h4>
+                <h4>Execute o Comando (Individual ou Seguro)</h4>
                 <p>
-                  Rode no terminal do projeto (em 2 segundos todas as imagens são processadas):
+                  <strong>🎯 Modo Individual (Recomendado):</strong> Para vetorizar <em>apenas</em> a imagem nova sem tocar nas que já estão perfeitas:
                 </p>
-                <div class="terminal-box">
-                  <button class="copy-cmd-btn" onclick="copyCommand('npm run mascot:vectorize')">Copiar</button>
-                  $ <span class="cmd">npm run mascot:vectorize</span>
+                <div class="terminal-box" style="margin-bottom: 8px;">
+                  <button class="copy-cmd-btn" onclick="copyCommand('npm run mascot:vectorize -- prisma-minha-pose')">Copiar</button>
+                  $ <span class="cmd">npm run mascot:vectorize -- [nome-da-pose]</span>
                 </div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+                  <strong>🛡️ Modo Incremental Seguro:</strong> Se rodar <code class="code-pill">npm run mascot:vectorize</code> sem argumentos, ele <strong>protege e pula automaticamente</strong> todos os SVGs que já existem, processando apenas os novos.
+                </p>
               </div>
             </div>
 
