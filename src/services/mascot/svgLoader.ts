@@ -1,3 +1,5 @@
+import { getAssetUrl } from './animationRegistry';
+
 /**
  * SVG In-Memory Cache and Asynchronous Loader
  * Provides non-blocking fetching of SVG assets with 0ms cache hits.
@@ -10,7 +12,8 @@ class MascotSvgLoader {
   /**
    * Loads an SVG from URL or returns cached content immediately.
    */
-  async loadSvg(url: string): Promise<string> {
+  async loadSvg(rawUrl: string): Promise<string> {
+    const url = getAssetUrl(rawUrl);
     if (this.cache.has(url)) {
       return this.cache.get(url)!;
     }
@@ -27,6 +30,9 @@ class MascotSvgLoader {
         }
         const text = await response.text();
         this.cache.set(url, text);
+        if (rawUrl !== url) {
+          this.cache.set(rawUrl, text);
+        }
         this.pending.delete(url);
         return text;
       } catch (err) {
@@ -43,8 +49,9 @@ class MascotSvgLoader {
   /**
    * Synchronously checks if an SVG is already present in cache.
    */
-  getCachedSvg(url: string): string | null {
-    return this.cache.get(url) || null;
+  getCachedSvg(rawUrl: string): string | null {
+    const url = getAssetUrl(rawUrl);
+    return this.cache.get(url) || this.cache.get(rawUrl) || null;
   }
 
   /**
@@ -57,8 +64,12 @@ class MascotSvgLoader {
   /**
    * Manually sets an SVG in cache (useful for tests or inline templates).
    */
-  setCache(url: string, content: string): void {
+  setCache(rawUrl: string, content: string): void {
+    const url = getAssetUrl(rawUrl);
     this.cache.set(url, content);
+    if (rawUrl !== url) {
+      this.cache.set(rawUrl, content);
+    }
   }
 
   /**

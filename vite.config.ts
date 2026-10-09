@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig({
-  base: './',
+  base: process.env.NODE_ENV === 'production' ? '/auramath/' : '/',
   plugins: [react()],
   resolve: {
     alias: {

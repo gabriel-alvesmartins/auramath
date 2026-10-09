@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getMascotConfig, PrismaMascotState, resolvePrismaState } from '../services/mascot/animationRegistry';
+import { getMascotConfig, PrismaMascotState, resolvePrismaState, getAssetUrl } from '../services/mascot/animationRegistry';
 import { svgLoader } from '../services/mascot/svgLoader';
 
 export interface UseMascotAnimationOptions {
@@ -49,15 +49,16 @@ export function useMascotAnimation({
   useEffect(() => {
     let isCurrent = true;
     const config = getMascotConfig(activeState);
+    const assetUrl = getAssetUrl(config.svgPath);
 
     // Verificação rápida no cache síncrono
-    const cached = svgLoader.getCachedSvg(config.svgPath);
+    const cached = svgLoader.getCachedSvg(assetUrl);
     if (cached) {
       setSvgContent(cached);
       setIsLoading(false);
     } else {
       setIsLoading(true);
-      svgLoader.loadSvg(config.svgPath).then((content) => {
+      svgLoader.loadSvg(assetUrl).then((content) => {
         if (isCurrent) {
           setSvgContent(content);
           setIsLoading(false);

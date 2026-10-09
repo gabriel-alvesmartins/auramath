@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getMascotConfig, resolvePrismaState, PrismaMascotState } from '../services/mascot/animationRegistry';
+import { getMascotConfig, resolvePrismaState, PrismaMascotState, getAssetUrl } from '../services/mascot/animationRegistry';
 import { svgLoader } from '../services/mascot/svgLoader';
 
 export interface PrismaMascotWebProps {
@@ -44,14 +44,15 @@ export const PrismaMascotWeb: React.FC<PrismaMascotWebProps> = ({
 }) => {
   const resolvedState = resolvePrismaState(state);
   const config = getMascotConfig(resolvedState);
+  const assetUrl = getAssetUrl(config.svgPath);
 
   const [svgContent, setSvgContent] = useState<string | null>(() => {
-    return svgLoader.getCachedSvg(config.svgPath);
+    return svgLoader.getCachedSvg(assetUrl);
   });
 
   useEffect(() => {
     let isMounted = true;
-    svgLoader.loadSvg(config.svgPath).then((content) => {
+    svgLoader.loadSvg(assetUrl).then((content) => {
       if (isMounted && content) {
         setSvgContent(content);
       }
@@ -59,7 +60,7 @@ export const PrismaMascotWeb: React.FC<PrismaMascotWebProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [config.svgPath]);
+  }, [assetUrl]);
 
   // Compute combo energy level for glow enhancement
   const glowIntensity = Math.min(1, Math.max(0, (combo - 1) / 15));
@@ -334,10 +335,10 @@ export const PrismaMascotWeb: React.FC<PrismaMascotWebProps> = ({
           />
         ) : (
           <img
-            src={config.svgPath}
+            src={assetUrl}
             alt={config.title}
             style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-            loading="lazy"
+            loading="eager"
           />
         )}
       </div>

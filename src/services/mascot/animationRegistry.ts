@@ -98,3 +98,28 @@ export function getMascotConfig(state?: string): MascotAnimationConfig {
   const resolved = resolvePrismaState(state);
   return PRISMA_ANIMATIONS[resolved] || PRISMA_ANIMATIONS.idle;
 }
+
+/**
+ * Resolves an asset path taking into account subpath hosting (such as GitHub Pages /auramath/).
+ */
+export function getAssetUrl(path: string): string {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  const cleanPath = path.replace(/^\//, '');
+
+  // 1. In browser, check if pathname starts with /auramath
+  if (typeof window !== 'undefined' && window.location?.pathname?.startsWith('/auramath')) {
+    return `/auramath/${cleanPath}`;
+  }
+
+  // 2. Vite compile-time BASE_URL if configured
+  const viteBase = typeof import.meta !== 'undefined' && (import.meta as any).env?.BASE_URL;
+  if (viteBase && viteBase !== './' && viteBase !== '/') {
+    const baseWithSlash = viteBase.endsWith('/') ? viteBase : `${viteBase}/`;
+    return `${baseWithSlash}${cleanPath}`;
+  }
+
+  return `/${cleanPath}`;
+}
