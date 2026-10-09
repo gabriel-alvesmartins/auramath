@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, radii, typography } from '../../../../src/theme/tokens';
 import { generateFlashAnzanSequence } from '@auramath/engine';
-import { Numpad } from '../../../../src/components/Numpad';
+import { Numpad } from '../../src/components/Numpad';
 
 export default function FlashAnzanScreen() {
   const router = useRouter();

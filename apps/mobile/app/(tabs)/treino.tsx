@@ -81,13 +81,13 @@ export default function TreinoHubScreen() {
       tag: 'MEDITATIVO',
     },
     {
-      id: 'boss',
-      title: 'Batalha de Chefe Arcano',
-      subtitle: 'Enfrente os guardiões dos 6 Graus com barra de HP e ataques',
-      icon: '👑',
+      id: 'mastery',
+      title: 'Desafio de Maestria da Unidade',
+      subtitle: 'Prove fluência estrutural e obtenha selos de certificação sem cronômetros punitivos',
+      icon: '🎓',
       route: '/game/boss',
-      color: '#A855F7',
-      tag: 'BOSS FIGHT',
+      color: '#10B981',
+      tag: 'CERTIFICAÇÃO',
     },
   ];
 

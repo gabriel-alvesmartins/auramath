@@ -4,8 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { colors, spacing, radii, typography } from '../../../../src/theme/tokens';
 import { generateQuestion, Question } from '@auramath/engine';
-import { Numpad } from '../../../../src/components/Numpad';
-import { EquationDisplay } from '../../../../src/components/EquationDisplay';
+import { Numpad } from '../../src/components/Numpad';
+import { EquationDisplay } from '../../src/components/EquationDisplay';
 
 export default function FlowZenScreen() {
   const router = useRouter();

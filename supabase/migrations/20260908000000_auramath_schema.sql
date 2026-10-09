@@ -15,7 +15,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- 1.1 Curriculum Grades Table
 CREATE TABLE IF NOT EXISTS grades (
-    grade_level INT PRIMARY KEY CHECK (grade_level BETWEEN 1 AND 6),
+    grade_level INT PRIMARY KEY CHECK (grade_level BETWEEN 1 AND 7),
     title TEXT NOT NULL,
     subtitle TEXT NOT NULL,
     description TEXT NOT NULL,
@@ -23,13 +23,13 @@ CREATE TABLE IF NOT EXISTS grades (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 1.2 Aura Cosmetic Skins Catalog
-CREATE TABLE IF NOT EXISTS aura_skins (
+-- 1.2 Mastery Badges Catalog
+CREATE TABLE IF NOT EXISTS mastery_badges (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
+    title TEXT NOT NULL,
     description TEXT NOT NULL,
-    rarity TEXT NOT NULL CHECK (rarity IN ('common', 'rare', 'epic', 'legendary')),
-    unlocked_by_default BOOLEAN DEFAULT FALSE,
+    grade_level INT NOT NULL REFERENCES grades(grade_level) ON DELETE CASCADE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -43,12 +43,11 @@ CREATE TABLE IF NOT EXISTS profiles (
     username TEXT UNIQUE NOT NULL,
     display_name TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('student', 'teacher', 'admin')),
-    current_grade_level INT DEFAULT 1 CHECK (current_grade_level BETWEEN 1 AND 6),
+    current_grade_level INT DEFAULT 1 CHECK (current_grade_level BETWEEN 1 AND 7),
     total_xp BIGINT DEFAULT 0 CHECK (total_xp >= 0),
     aura_level INT DEFAULT 1 CHECK (aura_level >= 1),
     current_streak_days INT DEFAULT 0 CHECK (current_streak_days >= 0),
     highest_blitz_score INT DEFAULT 0 CHECK (highest_blitz_score >= 0),
-    active_skin_id TEXT DEFAULT 'skin_aura_default' REFERENCES aura_skins(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -65,13 +64,13 @@ CREATE TABLE IF NOT EXISTS user_node_progress (
     UNIQUE (user_id, node_id)
 );
 
--- 2.3 Unlocked Aura Skins per User
-CREATE TABLE IF NOT EXISTS user_unlocked_skins (
+-- 2.3 Unlocked Mastery Badges per User
+CREATE TABLE IF NOT EXISTS user_unlocked_badges (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-    skin_id TEXT NOT NULL REFERENCES aura_skins(id) ON DELETE CASCADE,
+    badge_id TEXT NOT NULL REFERENCES mastery_badges(id) ON DELETE CASCADE,
     unlocked_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE (user_id, skin_id)
+    UNIQUE (user_id, badge_id)
 );
 
 -- 2.4 Cognitive Radar History (DNA Matemático)
@@ -95,7 +94,7 @@ CREATE TABLE IF NOT EXISTS cognitive_radars (
 CREATE TABLE IF NOT EXISTS match_records (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-    game_mode TEXT NOT NULL CHECK (game_mode IN ('blitz', 'sudden_death', 'duel_1v1', 'zen', 'flash_anzan', 'daily_challenge', 'boss')),
+    game_mode TEXT NOT NULL CHECK (game_mode IN ('blitz', 'precision_streak', 'sudden_death', 'duel_1v1', 'zen', 'flash_anzan', 'daily_challenge', 'mastery_challenge', 'boss')),
     seed TEXT NOT NULL,
     score INT NOT NULL,
     max_streak INT NOT NULL DEFAULT 0,
@@ -142,15 +141,17 @@ CREATE TABLE IF NOT EXISTS daily_challenge_submissions (
     UNIQUE (challenge_date, user_id)
 );
 
--- 3.5 Boss Battles
-CREATE TABLE IF NOT EXISTS boss_battles (
-    id TEXT PRIMARY KEY, -- e.g. 'BOSS_GRADE_1', 'BOSS_GRADE_2'
+-- 3.5 Mastery Challenges
+CREATE TABLE IF NOT EXISTS mastery_challenges (
+    id TEXT PRIMARY KEY, -- e.g. 'MASTERY_GRADE_1', 'MASTERY_GRADE_2'
     grade_level INT NOT NULL REFERENCES grades(grade_level) ON DELETE CASCADE,
-    name TEXT NOT NULL,
     title TEXT NOT NULL,
-    max_hp INT NOT NULL CHECK (max_hp > 0),
-    attack_timeout_ms INT NOT NULL CHECK (attack_timeout_ms > 0),
-    reward_skin_id TEXT NOT NULL REFERENCES aura_skins(id) ON DELETE CASCADE,
+    subtitle TEXT NOT NULL,
+    description TEXT NOT NULL,
+    questions_count INT NOT NULL DEFAULT 5 CHECK (questions_count > 0),
+    target_techniques TEXT[] NOT NULL DEFAULT '{}',
+    badge_id TEXT NOT NULL REFERENCES mastery_badges(id) ON DELETE CASCADE,
+    xp_reward INT NOT NULL DEFAULT 250 CHECK (xp_reward >= 0),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -224,32 +225,32 @@ CREATE INDEX IF NOT EXISTS idx_cognitive_radars_user ON cognitive_radars(user_id
 
 -- Enable RLS on all tables
 ALTER TABLE grades ENABLE ROW LEVEL SECURITY;
-ALTER TABLE aura_skins ENABLE ROW LEVEL SECURITY;
+ALTER TABLE mastery_badges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_node_progress ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_unlocked_skins ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_unlocked_badges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cognitive_radars ENABLE ROW LEVEL SECURITY;
 ALTER TABLE match_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ghost_runs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_challenges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_challenge_submissions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE boss_battles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE mastery_challenges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE classrooms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE classroom_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE assignments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE assignment_submissions ENABLE ROW LEVEL SECURITY;
 
--- 6.1 Grades & Skins (Public Read-Only)
+-- 6.1 Grades & Badges (Public Read-Only)
 CREATE POLICY "Grades viewable by all authenticated and anon users"
     ON grades FOR SELECT
     USING (true);
 
-CREATE POLICY "Aura skins viewable by all authenticated and anon users"
-    ON aura_skins FOR SELECT
+CREATE POLICY "Mastery badges viewable by all authenticated and anon users"
+    ON mastery_badges FOR SELECT
     USING (true);
 
-CREATE POLICY "Boss battles viewable by all"
-    ON boss_battles FOR SELECT
+CREATE POLICY "Mastery challenges viewable by all"
+    ON mastery_challenges FOR SELECT
     USING (true);
 
 CREATE POLICY "Daily challenges viewable by all"
@@ -298,14 +299,14 @@ CREATE POLICY "Users can update their own node progress"
     USING (auth.uid() = user_id)
     WITH CHECK (auth.uid() = user_id);
 
--- 6.4 User Unlocked Skins
-CREATE POLICY "Users can view their unlocked skins"
-    ON user_unlocked_skins FOR SELECT
+-- 6.4 User Unlocked Badges
+CREATE POLICY "Users can view their unlocked badges"
+    ON user_unlocked_badges FOR SELECT
     TO authenticated
     USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can unlock skins"
-    ON user_unlocked_skins FOR INSERT
+CREATE POLICY "Users can unlock badges"
+    ON user_unlocked_badges FOR INSERT
     TO authenticated
     WITH CHECK (auth.uid() = user_id);
 
@@ -557,13 +558,6 @@ BEGIN
     )
     ON CONFLICT (id) DO NOTHING;
 
-    -- Grant default unlocked Aura skins
-    INSERT INTO public.user_unlocked_skins (user_id, skin_id)
-    SELECT NEW.id, id
-    FROM public.aura_skins
-    WHERE unlocked_by_default = TRUE
-    ON CONFLICT (user_id, skin_id) DO NOTHING;
-
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -632,7 +626,7 @@ BEGIN
     END IF;
 
     -- Validate input game mode
-    IF p_game_mode NOT IN ('blitz', 'sudden_death', 'duel_1v1', 'zen', 'flash_anzan', 'daily_challenge', 'boss') THEN
+    IF p_game_mode NOT IN ('blitz', 'precision_streak', 'sudden_death', 'duel_1v1', 'zen', 'flash_anzan', 'daily_challenge', 'mastery_challenge', 'boss') THEN
         RETURN jsonb_build_object(
             'success', false,
             'rejected', true,
@@ -843,6 +837,13 @@ VALUES
     'Grau VI: Visuoespacialidade e Validação Instantânea',
     'O ápice da fluência mental: projeções ultra-rápidas do Flash Anzan visuoespacial sem subvocalização e checagem de erros a 0ms através da Prova dos Noves e dos Onzes.',
     ARRAY['FLASH_ANZAN_SUM', 'CASTING_OUT_NINES', 'CASTING_OUT_ELEVENS', 'TRANSCENDENT_MIX']
+),
+(
+    7,
+    'Porcentagens & Geometria do Cotidiano',
+    'Grau VII: Pivôs Decimais, Simetria Mágica & Frações Ocultas',
+    'Domínio do cálculo mental de porcentagens do mundo real: gorjetas de 15%, deslocamento decimal de 10% e 1%, acréscimos/descontos e o teorema de simetria x% de y = y% de x.',
+    ARRAY['PERCENT_PIVOT_10_1', 'PERCENT_TIP_15', 'PERCENT_FRIENDLY_FRACTIONS', 'PERCENT_SYMMETRY', 'PERCENT_DISCOUNT_ADD']
 )
 ON CONFLICT (grade_level) DO UPDATE
 SET
@@ -851,137 +852,155 @@ SET
     description = EXCLUDED.description,
     target_techniques = EXCLUDED.target_techniques;
 
--- 8.2 Seed Default Aura Skins Catalog
-INSERT INTO public.aura_skins (id, name, description, rarity, unlocked_by_default)
+-- 8.2 Seed Default Mastery Badges Catalog
+INSERT INTO public.mastery_badges (id, name, title, description, grade_level)
 VALUES
 (
-    'skin_aura_default',
-    'Centelha Primordial (Spark)',
-    'Aura bioluminescente original com flutuação senoidal translúcida e tons ciano e violeta.',
-    'common',
-    TRUE
+    'BADGE_DECOMPOSITION',
+    'Decomposição Posicional',
+    'Selo de Decomposição Posicional',
+    'Dominou adição estrutural da esquerda para a direita e complementos de 100.',
+    1
 ),
 (
-    'skin_aura_zen',
-    'Orbe Zen Lofi',
-    'Aura meditativa serena com vibração harmônica contínua, otimizada para o Modo Zen.',
-    'common',
-    TRUE
+    'BADGE_FACTORS',
+    'Fatores & Simetria',
+    'Selo de Fatores e Simetria',
+    'Dominou atalhos de multiplicação por 11, 25 e diferença simétrica de quadrados.',
+    2
 ),
 (
-    'skin_chronos_shifter',
-    'Chrono Shifter',
-    'Fragmento temporal cristalizado, conquistado ao derrotar Chronos, o Devorador de Dígitos.',
-    'rare',
-    FALSE
+    'BADGE_GEOMETRY',
+    'Geometria Mental',
+    'Selo de Geometria Mental',
+    'Dominou desdobramento de produtos notáveis (a+b)² e o pivô 25 próximo de 50.',
+    3
 ),
 (
-    'skin_quantum_surge',
-    'Pulso de Plasma Quântico',
-    'Asas luminosas com aceleração eletromagnética, forjadas no domínio dos Fatores Notáveis.',
-    'rare',
-    FALSE
+    'BADGE_VEDIC',
+    'Cruzamento Védico',
+    'Selo do Cruzamento Védico',
+    'Dominou Urdhva-Tiryagbhyam 2x2 e divisões aceleradas por 4, 5 e 25.',
+    4
 ),
 (
-    'skin_overdrive_vector',
-    'Vórtice Hipersônico',
-    'Anéis giroscópicos em rotação contínua com rastro cromático do Grau III de Geometria.',
-    'epic',
-    FALSE
+    'BADGE_OPERATIONAL',
+    'Mestria Operacional',
+    'Selo de Mestria Operacional',
+    'Dominou o método de Trachtenberg e multiplicações de base 100 (Yavadunam).',
+    5
 ),
 (
-    'skin_supernova_core',
-    'Núcleo de Supernova',
-    'Portal de geometria sagrada radiante com brilho estelar, concedido no Olho de Fermi.',
-    'epic',
-    FALSE
+    'BADGE_AXIOMATIC',
+    'Visão Axiomática',
+    'Selo da Visão Axiomática',
+    'Alcançou o ápice do cálculo mental puro: raízes cúbicas e Flash Anzan.',
+    6
 ),
 (
-    'skin_vedic_lotus',
-    'Lótus Harmônica Védica',
-    'Mandalas entrelaçadas de cálculo transcendental derivadas dos sutras de Urdhva-Tiryagbhyam.',
-    'epic',
-    FALSE
-),
-(
-    'skin_singularity_godmode',
-    'Singularidade Quântica (Godmode)',
-    'Disco de acreção prismático definitivo. O ápice visual dos mestres do Grau VI.',
-    'legendary',
-    FALSE
+    'BADGE_PERCENTAGES',
+    'Maestria Financeira',
+    'Selo de Maestria Financeira & Porcentagens',
+    'Dominou cálculo de gorjetas, pivôs de 10%/1% e o teorema de simetria x% de y = y% de x.',
+    7
 )
 ON CONFLICT (id) DO UPDATE
 SET
     name = EXCLUDED.name,
+    title = EXCLUDED.title,
     description = EXCLUDED.description,
-    rarity = EXCLUDED.rarity,
-    unlocked_by_default = EXCLUDED.unlocked_by_default;
+    grade_level = EXCLUDED.grade_level;
 
--- 8.3 Seed Boss Battles (First Boss Battle & Grades 2 to 6)
-INSERT INTO public.boss_battles (id, grade_level, name, title, max_hp, attack_timeout_ms, reward_skin_id)
+-- 8.3 Seed Mastery Challenges (Grades 1 to 7)
+INSERT INTO public.mastery_challenges (id, grade_level, title, subtitle, description, questions_count, target_techniques, badge_id, xp_reward)
 VALUES
 (
-    'BOSS_GRADE_1',
+    'MASTERY_GRADE_1',
     1,
-    'Chronos, o Devorador de Dígitos',
-    'Arconte da Magnitude e Fluxo Esquerda-Direita',
-    100,
-    3500,
-    'skin_chronos_shifter'
-),
-(
-    'BOSS_GRADE_2',
-    2,
-    'Fractal, o Mestre dos Fatores',
-    'Tecelão da Simetria e Decomposição Decimal',
-    150,
-    3000,
-    'skin_quantum_surge'
-),
-(
-    'BOSS_GRADE_3',
-    3,
-    'Axioma, o Guardião da Geometria',
-    'Soberano dos Quadrados e Produtos Notáveis',
-    200,
-    2800,
-    'skin_overdrive_vector'
-),
-(
-    'BOSS_GRADE_4',
-    4,
-    'Singular, a Mente de Fermi',
-    'Oráculo das Grandes Ordens de Magnitude',
-    250,
-    2500,
-    'skin_supernova_core'
-),
-(
-    'BOSS_GRADE_5',
+    'Mestre da Decomposição Posicional',
+    'Prova de Maestria · Grau I',
+    'Demonstre fluência posicional e complementos de 100 resolvendo a cadeia estrutural.',
     5,
-    'Brahma, o Arquiteto Védico',
-    'Mestre Supremo da Mecânica Cruzada e Trachtenberg',
-    300,
-    2200,
-    'skin_vedic_lotus'
+    ARRAY['ADD_LEFT_RIGHT', 'SUB_COMPENSATION', 'COMPLEMENT_100'],
+    'BADGE_DECOMPOSITION',
+    250
 ),
 (
-    'BOSS_GRADE_6',
+    'MASTERY_GRADE_2',
+    2,
+    'Mestre dos Fatores Estruturais',
+    'Prova de Maestria · Grau II',
+    'Aplique propriedades de fatores 5, 25, 11 e diferença de quadrados sem contas armadas.',
+    5,
+    ARRAY['DIFF_OF_SQUARES', 'MULT_5_50', 'MULT_11', 'MULT_25'],
+    'BADGE_FACTORS',
+    300
+),
+(
+    'MASTERY_GRADE_3',
+    3,
+    'Mestre da Geometria Mental',
+    'Prova de Maestria · Grau III',
+    'Projete as áreas de produtos notáveis e quadrados próximos a 50 instantaneamente.',
+    5,
+    ARRAY['EXPAND_ALGEBRAIC', 'ANTYAYOREVA', 'SQUARES_ENDING_5', 'SQUARES_NEAR_50'],
+    'BADGE_GEOMETRY',
+    350
+),
+(
+    'MASTERY_GRADE_4',
+    4,
+    'Mestre do Cruzamento Védico',
+    'Prova de Maestria · Grau IV',
+    'Execute a multiplicação cruzada 2x2 e divisões aceleradas por 4, 5 e 25.',
+    5,
+    ARRAY['VEDIC_CROSS', 'DIV_5', 'DIV_25', 'DIV_4'],
+    'BADGE_VEDIC',
+    400
+),
+(
+    'MASTERY_GRADE_5',
+    5,
+    'Mestre dos Sutras e Trachtenberg',
+    'Prova de Maestria · Grau V',
+    'Multiplique colado à base 100 e decodifique produtos por 12 e 99 em passada única.',
+    5,
+    ARRAY['YAVADUNAM_BASE_100', 'TRACHTENBERG_12', 'MULT_9_99'],
+    'BADGE_OPERATIONAL',
+    450
+),
+(
+    'MASTERY_GRADE_6',
     6,
-    'Aether, o Lorde da Transcendência',
-    'Avatar Supremo do Flash Anzan e Aritmética Modular',
-    400,
-    1800,
-    'skin_singularity_godmode'
+    'Mestre da Visão Axiomática',
+    'Prova de Maestria · Grau VI',
+    'Decodifique raízes cúbicas perfeitas instantaneamente e calcule ordens de grandeza de Fermi.',
+    5,
+    ARRAY['FERMI_ESTIMATE', 'CUBE_ROOT_PERFECT', 'RULE_OF_72'],
+    'BADGE_AXIOMATIC',
+    500
+),
+(
+    'MASTERY_GRADE_7',
+    7,
+    'Mestre das Porcentagens & Cotidiano',
+    'Prova de Maestria · Grau VII',
+    'Calcule gorjetas, pivôs de 10%/1% e inverta operações com a simetria x% de y instantaneamente.',
+    5,
+    ARRAY['PERCENT_PIVOT_10_1', 'PERCENT_TIP_15', 'PERCENT_FRIENDLY_FRACTIONS', 'PERCENT_SYMMETRY', 'PERCENT_DISCOUNT_ADD'],
+    'BADGE_PERCENTAGES',
+    550
 )
 ON CONFLICT (id) DO UPDATE
 SET
     grade_level = EXCLUDED.grade_level,
-    name = EXCLUDED.name,
     title = EXCLUDED.title,
-    max_hp = EXCLUDED.max_hp,
-    attack_timeout_ms = EXCLUDED.attack_timeout_ms,
-    reward_skin_id = EXCLUDED.reward_skin_id;
+    subtitle = EXCLUDED.subtitle,
+    description = EXCLUDED.description,
+    questions_count = EXCLUDED.questions_count,
+    target_techniques = EXCLUDED.target_techniques,
+    badge_id = EXCLUDED.badge_id,
+    xp_reward = EXCLUDED.xp_reward;
 
 -- ==============================================================================
 -- END OF MIGRATION

@@ -43,6 +43,8 @@ export interface IAudioSynthesizer {
   playErrorSoftRelease(): void;
   playKeypressTick(): void;
   playBossHit(damagePercent?: number): void;
+  playVictoryFanfare(): void;
+  playChestReward(): void;
   startZenMode(): void;
   stopZenMode(): void;
   updateZenStreak(streak: number): void;
@@ -405,6 +407,41 @@ export class AudioSynthesizer implements IAudioSynthesizer {
 
     osc.start(now);
     osc.stop(now + duration);
+  }
+
+  /**
+   * Duolingo-style triumphant cosmic victory fanfare.
+   * Plays an ascending majestic major pentatonic fanfare ending in a sustained sparkling chord.
+   */
+  public playVictoryFanfare(): void {
+    if (!this.ensureReady() || !this.ctx || !this.sfxGain) return;
+
+    // Arpeggio chords in quick sequence: C5 -> E5 -> G5 -> B5 -> C6
+    const notes = [523.25, 659.25, 783.99, 987.77, 1046.5];
+    notes.forEach((freq, idx) => {
+      setTimeout(() => {
+        this.playChord([freq, freq * 1.5], 0.45, 0.28);
+      }, idx * 110);
+    });
+
+    // Grand final resonance chord
+    setTimeout(() => {
+      this.playChord([523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98], 1.4, 0.35);
+    }, 600);
+  }
+
+  /**
+   * Cosmic Chest opening reward sound (sparkle chime cascade).
+   */
+  public playChestReward(): void {
+    if (!this.ensureReady() || !this.ctx || !this.sfxGain) return;
+
+    const sparkleFreqs = [783.99, 880.0, 987.77, 1174.66, 1318.51, 1567.98, 1760.0, 2093.0];
+    sparkleFreqs.forEach((freq, idx) => {
+      setTimeout(() => {
+        this.playChord([freq], 0.35, 0.2);
+      }, idx * 60);
+    });
   }
 
   // ============================================================================

@@ -5,10 +5,10 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, radii, typography } from '../../../../src/theme/tokens';
 import { generateQuestion, Question } from '@auramath/engine';
-import { Numpad } from '../../../../src/components/Numpad';
-import { EquationDisplay } from '../../../../src/components/EquationDisplay';
-import { AuraMascot } from '../../../../src/components/AuraMascot';
-import { ComboHUD } from '../../../../src/components/ComboHUD';
+import { Numpad } from '../../src/components/Numpad';
+import { EquationDisplay } from '../../src/components/EquationDisplay';
+import { AuraMascot } from '../../src/components/AuraMascot';
+import { ComboHUD } from '../../src/components/ComboHUD';
 
 export default function ArenaScreen() {
   const router = useRouter();

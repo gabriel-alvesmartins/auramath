@@ -2,19 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing, radii, typography, glows } from '../../../../src/theme/tokens';
-import { MOCK_USER_PROFILE, AURA_SKINS, SkinData } from '@auramath/engine';
-import { RadarChart } from '../../../../src/components/RadarChart';
-import { AuraMascot } from '../../../../src/components/AuraMascot';
+import { MOCK_USER_PROFILE, MASTERY_BADGES, MasteryBadgeData } from '@auramath/engine';
+import { RadarChart } from '../../src/components/RadarChart';
+import { AuraMascot } from '../../src/components/AuraMascot';
 
 export default function ProfileScreen() {
   const [user, setUser] = useState(MOCK_USER_PROFILE);
-  const [skins, setSkins] = useState<SkinData[]>(AURA_SKINS);
-  const [equippedSkinId, setEquippedSkinId] = useState(user.equippedSkinId);
-
-  const handleEquipSkin = (skin: SkinData) => {
-    if (!skin.unlocked) return;
-    setEquippedSkinId(skin.id);
-  };
+  const [badges, setBadges] = useState<MasteryBadgeData[]>(MASTERY_BADGES);
 
   const xpProgress = Math.round((user.currentXp / user.nextLevelXp) * 100);
 
@@ -63,11 +57,11 @@ export default function ProfileScreen() {
           <RadarChart radar={user.radar} size={300} />
         </View>
 
-        {/* Section: Cosméticos & Skins da Aura */}
+        {/* Section: Selos de Maestria da Trilha */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Skins & Cosméticos da Aura</Text>
+          <Text style={styles.sectionTitle}>Selos de Maestria da Trilha</Text>
           <Text style={styles.sectionSubtitle}>
-            Desbloqueie formas cósmicas derrotando Chefes de Graus
+            Certificados oficiais obtidos ao concluir as Provas de Maestria de cada Unidade
           </Text>
         </View>
 
@@ -76,62 +70,57 @@ export default function ProfileScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.skinsCarousel}
         >
-          {skins.map((skin) => {
-            const isEquipped = equippedSkinId === skin.id;
-
+          {badges.map((badge) => {
             return (
-              <TouchableOpacity
-                key={skin.id}
+              <View
+                key={badge.id}
                 style={[
                   styles.skinCard,
-                  isEquipped && styles.skinCardEquipped,
-                  !skin.unlocked && styles.skinCardLocked,
+                  !badge.unlocked && styles.skinCardLocked,
                 ]}
-                activeOpacity={0.8}
-                onPress={() => handleEquipSkin(skin)}
               >
                 <View
                   style={[
                     styles.skinPreviewCircle,
                     {
-                      backgroundColor: `${skin.previewColor}25`,
-                      borderColor: skin.previewColor,
+                      backgroundColor: `${badge.previewColor}25`,
+                      borderColor: badge.previewColor,
                     },
                   ]}
                 >
                   <Text style={{ fontSize: 24 }}>
-                    {skin.unlocked ? '✨' : '🔒'}
+                    {badge.unlocked ? badge.iconSymbol || '📜' : '🔒'}
                   </Text>
                 </View>
 
                 <View style={styles.skinRarityBadge}>
-                  <Text style={[styles.skinRarityText, { color: skin.previewColor }]}>
-                    {skin.rarity.toUpperCase()}
+                  <Text style={[styles.skinRarityText, { color: badge.previewColor }]}>
+                    GRAU {badge.grade}
                   </Text>
                 </View>
 
-                <Text style={styles.skinName}>{skin.name}</Text>
+                <Text style={styles.skinName}>{badge.name}</Text>
                 <Text style={styles.skinDesc} numberOfLines={2}>
-                  {skin.unlocked ? skin.description : skin.unlockCondition}
+                  {badge.unlocked ? badge.description : badge.unlockCondition}
                 </Text>
 
                 <View
                   style={[
                     styles.equipBtn,
-                    isEquipped && styles.equipBtnActive,
-                    !skin.unlocked && styles.equipBtnLocked,
+                    badge.unlocked && styles.equipBtnActive,
+                    !badge.unlocked && styles.equipBtnLocked,
                   ]}
                 >
                   <Text
                     style={[
                       styles.equipBtnText,
-                      isEquipped && { color: colors.bgObsidian, fontWeight: '800' },
+                      badge.unlocked && { color: colors.bgObsidian, fontWeight: '800' },
                     ]}
                   >
-                    {isEquipped ? 'EQUIPADO' : skin.unlocked ? 'EQUIPAR' : 'BLOQUEADO'}
+                    {badge.unlocked ? 'CERTIFICADO' : 'NÃO CONCLUÍDO'}
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </View>
             );
           })}
         </ScrollView>

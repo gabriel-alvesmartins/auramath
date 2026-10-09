@@ -1,20 +1,24 @@
-﻿<!DOCTYPE html>
-<html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Auramath | Cálculo Mental Cósmico de Alta Velocidade</title>
+    <title>Auramath | Não calcule. Veja.</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
     <style>
       :root {
-        --color-bg: #07090E;
-        --color-card: rgba(13, 17, 26, 0.85);
-        --color-cyan: #00F2FE;
-        --color-violet: #8A2BE2;
-        --color-coral: #FB7185;
-        --color-gold: #FACC15;
+        --color-bg: #F7F4EA;
+        --color-card: #FFFDF6;
+        --color-paper: #F7F4EA;
+        --color-cream: #FFFDF6;
+        --color-ink: #202522;
+        --color-verdigris: #176B5B;
+        --color-marigold: #F2B84B;
+        --color-coral: #E76F61;
+        --color-iris: #6E5AA6;
       }
       * {
         box-sizing: border-box;
@@ -23,8 +27,8 @@
         -webkit-tap-highlight-color: transparent;
       }
       body {
-        background-color: var(--color-bg);
-        color: #F8FAFC;
+        background-color: #F7F4EA;
+        color: #202522;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         overflow-x: hidden;
         min-height: 100vh;
@@ -43,28 +47,21 @@
         height: 6px;
       }
       ::-webkit-scrollbar-track {
-        background: #07090E;
+        background: #F7F4EA;
       }
       ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.15);
+        background: #D9D5C8;
         border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 242, 254, 0.4);
+        background: #C2BDAE;
       }
       @keyframes float {
         0%, 100% { transform: translateY(0px); }
         50% { transform: translateY(-8px); }
       }
-      @keyframes pulseGlow {
-        0%, 100% { filter: drop-shadow(0 0 16px rgba(0, 242, 254, 0.4)); }
-        50% { filter: drop-shadow(0 0 28px rgba(138, 43, 226, 0.6)); }
-      }
       .animate-float {
         animation: float 3s ease-in-out infinite;
-      }
-      .animate-glow {
-        animation: pulseGlow 2.5s ease-in-out infinite;
       }
     </style>
   </head>

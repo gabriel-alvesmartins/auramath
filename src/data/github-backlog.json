@@ -1,0 +1,141 @@
+[
+  {
+    "title": "[Futuro] 1v1 Online Realtime WebSocket",
+    "column": "Backlog",
+    "labels": [
+      "multiplayer",
+      "websocket",
+      "future"
+    ],
+    "body": "Implementar confrontos síncronos 1v1 remotos via WebSocket com pareamento por ELO cognitivo e árbitro Aura em tempo real (Fase Final da plataforma)."
+  },
+  {
+    "title": "[Futuro] Auditoria Anti-Cheat Criptográfica",
+    "column": "Backlog",
+    "labels": [
+      "security",
+      "anti-cheat",
+      "future"
+    ],
+    "body": "Auditoria de telemetria motora e validação criptográfica de sementes para comprovação de autenticidade dos tempos de resolução."
+  },
+  {
+    "title": "[Futuro] Módulo Escolar e Gestão de Turmas",
+    "column": "Backlog",
+    "labels": [
+      "education",
+      "classroom",
+      "future"
+    ],
+    "body": "Construir painel docente, geração de código de convite para turmas e diagnóstico automatizado de pontos cegos pedagógicos dos alunos."
+  },
+  {
+    "title": "[Futuro] Teclado Gestual Tátil Mobile",
+    "column": "Backlog",
+    "labels": [
+      "mobile",
+      "gestures",
+      "future"
+    ],
+    "body": "Refinar entrada por swipe gestual e feedback háptico na versão mobile após estabilização completa da versão web."
+  },
+  {
+    "title": "[Futuro] Laboratório Tátil de Geometria Mental",
+    "column": "Backlog",
+    "labels": [
+      "lab",
+      "visual-geometry",
+      "future"
+    ],
+    "body": "Expandir o laboratório com manipulação de áreas de produtos notáveis e corte de retângulos (conceito reformulado em elaboração)."
+  },
+  {
+    "title": "[Concluído] Reconciliação Curricular de 7 Graus Cognitivos",
+    "column": "Done",
+    "labels": [
+      "engine",
+      "curriculum",
+      "spec-anchored"
+    ],
+    "body": "Oficializados os 7 Graus (I a VII) em @auramath/engine e especificações, incluindo o nó de raízes digitais mod 9 e 11."
+  },
+  {
+    "title": "[Concluído] Calibração de Dificuldade em 3 Tiers (1★, 2★, 3★)",
+    "column": "Done",
+    "labels": [
+      "engine",
+      "procedural",
+      "spec-anchored"
+    ],
+    "body": "Motor procedural gera questões calibradas em 3 níveis (fácil, médio, difícil) para todos os módulos."
+  },
+  {
+    "title": "[Concluído] Bateria de 10 Questões e 3 Andaimes Guiados por Nó",
+    "column": "Done",
+    "labels": [
+      "drill",
+      "scaffolding",
+      "pedagogy"
+    ],
+    "body": "Eliminado o limite incorreto de 5 questões; estabelecidas 10 questões procedurais e 3 etapas de andaime obrigatórias."
+  },
+  {
+    "title": "[Concluído] Limiar de Retenção de 80% e Tela de Revisão",
+    "column": "Done",
+    "labels": [
+      "retention",
+      "gamification",
+      "spec-anchored"
+    ],
+    "body": "Bloqueio de avanço para acurácia <80%, exigindo revisão de retenção para fixação na memória de trabalho."
+  },
+  {
+    "title": "[Concluído] Eliminação de Chefes, Skins e Duelo Fantasma",
+    "column": "Done",
+    "labels": [
+      "cleanup",
+      "legacy-removal"
+    ],
+    "body": "Cancelamento e expurgo completo de mecânicas legadas do código, tipos e especificações."
+  },
+  {
+    "title": "[Concluído] Batalha Split-Screen Local Síncrona",
+    "column": "Done",
+    "labels": [
+      "tabletop",
+      "2p",
+      "spec-anchored"
+    ],
+    "body": "Interface de mesa com tela dividida/invertida compartilhando a mesma equação simultânea para ambos os competidores."
+  },
+  {
+    "title": "[Concluído] Desafio Diário Determinístico por Data com Emojis",
+    "column": "Done",
+    "labels": [
+      "daily",
+      "prng",
+      "social"
+    ],
+    "body": "Mulberry32 PRNG determinístico para 20 questões diárias e cópia de grade emoji sem spoilers."
+  },
+  {
+    "title": "[Concluído] Design System Rebrand 01.1 e Emblema da Coruja Aura",
+    "column": "Done",
+    "labels": [
+      "rebrand",
+      "tokens",
+      "ui"
+    ],
+    "body": "Adoção uniforme das cores táteis Verdigris, Marigold, Coral e Paper, substituindo o símbolo Delta pelo emblema da Coruja Aura."
+  },
+  {
+    "title": "[Concluído] Tela Dev de Conformidade e Script de Auditoria",
+    "column": "Done",
+    "labels": [
+      "dev-tools",
+      "spec-anchored",
+      "ci"
+    ],
+    "body": "Criação da tela interativa /dev e comando npm run spec:check com relatório automático de conformidade."
+  }
+]

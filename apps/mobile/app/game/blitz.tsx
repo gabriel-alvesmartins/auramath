@@ -6,8 +6,8 @@ import Svg, { Circle } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, radii, typography } from '../../../../src/theme/tokens';
 import { generateQuestion, Question } from '@auramath/engine';
-import { Numpad } from '../../../../src/components/Numpad';
-import { EquationDisplay } from '../../../../src/components/EquationDisplay';
+import { Numpad } from '../../src/components/Numpad';
+import { EquationDisplay } from '../../src/components/EquationDisplay';
 
 export default function BlitzScreen() {
   const router = useRouter();

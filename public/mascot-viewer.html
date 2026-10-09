@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prisma Mascote — Estúdio de Animações e Vetorização | AuraMath</title>
+  <style>
+    :root {
+      --bg-canvas: #FAF8F5;
+      --panel-bg: #FFFFFF;
+      --border-color: #E2DBD0;
+      --border-dark: #C9BFA8;
+      --text-main: #1C2C27;
+      --text-muted: #62726B;
+      --brand-teal: #176B5B;
+      --brand-teal-light: #378F79;
+      --brand-teal-subtle: #E6F3EF;
+      --brand-yellow: #F1AF32;
+      --brand-yellow-subtle: #FEF7E6;
+      --brand-dark: #1C2C27;
+      --shadow-sm: 0 2px 8px rgba(28, 44, 39, 0.05);
+      --shadow-md: 0 6px 20px rgba(28, 44, 39, 0.08);
+      --shadow-lg: 0 12px 32px rgba(28, 44, 39, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg-canvas);
+      color: var(--text-main);
+      padding: 24px;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* Header */
+    header {
+      max-width: 1400px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 18px;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .title-group h1 {
+      font-size: 26px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--brand-dark);
+      letter-spacing: -0.5px;
+    }
+
+    .badge {
+      background: var(--brand-teal);
+      color: #FFF;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    /* Main Navigation Tabs */
+    .nav-tabs {
+      max-width: 1400px;
+      margin: 0 auto 24px auto;
+      display: flex;
+      gap: 8px;
+      background: var(--panel-bg);
+      padding: 8px;
+      border-radius: 14px;
+      border: 1.5px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-tab-btn {
+      flex: 1;
+      padding: 12px 18px;
+      border-radius: 10px;
+      border: 1.5px solid transparent;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab-btn:hover {
+      color: var(--brand-dark);
+      background: #F7F3EA;
+    }
+
+    .nav-tab-btn.active {
+      background: var(--brand-teal);
+      color: #FFFFFF;
+      border-color: var(--brand-teal);
+      box-shadow: 0 4px 12px rgba(23, 107, 91, 0.25);
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Tab Contents */
+    .tab-section {
+      display: none;
+    }
+
+    .tab-section.active {
+      display: block;
+    }
+
+    /* Card Panels */
+    .panel-card {
+      background: var(--panel-bg);
+      border: 1.5px solid var(--border-color);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 24px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom: 1.5px solid var(--border-color);
+      padding-bottom: 16px;
+    }
+
+    .panel-header h2 {
+      font-size: 20px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--brand-dark);
+    }
+
+    /* ========================================================================== */
+    /* Animações CSS do Prisma (Espelhadas do PrismaMascotWeb.tsx)                */
+    /* ========================================================================== */
+    @keyframes prismaBreathing {
+      0%, 100% {
+        transform: scaleY(1) scaleX(1);
+      }
+      50% {
+        transform: scaleY(1.03) scaleX(0.985);
+      }
+    }
+
+    @keyframes prismaBlink {
+      0%, 94%, 98%, 100% {
+        filter: brightness(1);
+      }
+      96% {
+        filter: brightness(0.9);
+      }
+    }
+
+    @keyframes prismaEurekaJump {
+      0% {
+        transform: translateY(0) scale(1, 1);
+      }
+      15% {
+        transform: translateY(6px) scale(1.15, 0.85); /* Squash */
+      }
+      45% {
+        transform: translateY(-34px) scale(0.88, 1.18); /* Stretch no ar */
+      }
+      65% {
+        transform: translateY(3px) scale(1.12, 0.94); /* Squash pouso */
+      }
+      82% {
+        transform: translateY(-6px) scale(0.98, 1.02); /* Amortecimento */
+      }
+      100% {
+        transform: translateY(0) scale(1, 1);
+      }
+    }
+
+    @keyframes prismaHaloSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes prismaHintPulse {
+      0%, 100% {
+        transform: scale(1) translateX(0);
+        opacity: 0.6;
+      }
+      50% {
+        transform: scale(1.1) translateX(8px);
+        opacity: 1;
+      }
+    }
+
+    @keyframes prismaThinkingSway {
+      0%, 100% { transform: rotate(0deg); }
+      30% { transform: rotate(-4deg); }
+      70% { transform: rotate(4deg); }
+    }
+
+    @keyframes prismaCamouflagedFade {
+      0%, 100% { opacity: 0.85; }
+      50% { opacity: 0.55; }
+    }
+
+    /* Container e Wrappers do Mascote */
+    .prisma-live-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 420px;
+      padding: 30px;
+      border-radius: 16px;
+      border: 1.5px solid var(--border-color);
+      background: #FFFFFF;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s ease;
+    }
+
+    .prisma-live-stage.theme-cream { background: #FFFDF6; }
+    .prisma-live-stage.theme-dark { background: #15221E; }
+
+    .prisma-mascot-container {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      user-select: none;
+      transition: transform 0.2s ease;
+    }
+
+    .prisma-mascot-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: filter 0.3s ease, width 0.2s ease, height 0.2s ease;
+      transform-origin: bottom center;
+    }
+
+    /* Mapeamento de Classes e Estados */
+    .state-idle .prisma-mascot-wrapper {
+      animation: prismaBreathing 3.6s ease-in-out infinite, prismaBlink 4s ease-in-out infinite;
+    }
+
+    .state-eureka .prisma-mascot-wrapper.trigger-jump {
+      animation: prismaEurekaJump 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    .state-supernova .prisma-mascot-wrapper {
+      animation: prismaBreathing 2.4s ease-in-out infinite;
+    }
+
+    .state-thinking .prisma-mascot-wrapper {
+      animation: prismaThinkingSway 2.8s ease-in-out infinite;
+    }
+
+    .state-hint .prisma-mascot-wrapper {
+      animation: prismaBreathing 3s ease-in-out infinite;
+    }
+
+    .state-camouflaged .prisma-mascot-wrapper {
+      animation: prismaCamouflagedFade 3s ease-in-out infinite;
+    }
+
+    /* Efeitos de Camadas Especiais */
+    .prisma-supernova-halo-ring {
+      position: absolute;
+      width: 130%;
+      height: 130%;
+      top: -15%;
+      left: -15%;
+      border-radius: 50%;
+      border: 3px dashed rgba(241, 175, 50, 0.7);
+      box-shadow: 0 0 32px rgba(241, 175, 50, 0.45), inset 0 0 24px rgba(241, 175, 50, 0.3);
+      animation: prismaHaloSpin 10s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .prisma-hint-vector-ray {
+      position: absolute;
+      top: 26%;
+      right: -10px;
+      width: 32px;
+      height: 32px;
+      border-top: 3px dashed #F1AF32;
+      border-right: 3px dashed #F1AF32;
+      transform: rotate(25deg);
+      animation: prismaHintPulse 1.8s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .prisma-mascot-wrapper svg,
+    .prisma-mascot-wrapper img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Balão de Fala Editorial */
+    .prisma-speech-bubble {
+      background: #FFFDF6;
+      color: #1C2C27;
+      border: 1.5px solid #E2DBD0;
+      box-shadow: 0 6px 16px rgba(28, 44, 39, 0.08);
+      border-radius: 14px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 12px;
+      position: relative;
+      white-space: nowrap;
+      z-index: 10;
+      animation: prismaBreathing 3s ease-in-out infinite;
+    }
+
+    .prisma-speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 7px 7px 0;
+      border-style: solid;
+      border-color: #FFFDF6 transparent;
+      display: block;
+      width: 0;
+    }
+
+    .prisma-speech-bubble::before {
+      content: '';
+      position: absolute;
+      bottom: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 8px 8px 0;
+      border-style: solid;
+      border-color: #E2DBD0 transparent;
+      display: block;
+      width: 0;
+    }
+
+    /* Layout da aba do Estúdio */
+    .live-studio-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .live-studio-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Painel de Controles Laterais */
+    .controls-panel {
+      background: #FAF8F5;
+      border: 1.5px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .control-group label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .control-group label span.val {
+      color: var(--brand-teal);
+      font-family: monospace;
+      font-size: 12px;
+      background: #E6F3EF;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .button-grid-states {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .state-btn {
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-color);
+      background: #FFFFFF;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .state-btn:hover {
+      border-color: var(--brand-teal);
+      background: #F0F7F5;
+    }
+
+    .state-btn.active {
+      background: var(--brand-teal);
+      color: #FFF;
+      border-color: var(--brand-teal);
+      box-shadow: 0 2px 8px rgba(23, 107, 91, 0.25);
+    }
+
+    .preset-btn-group {
+      display: flex;
+      gap: 6px;
+    }
+
+    .preset-btn {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-color);
+      background: #FFFFFF;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .preset-btn:hover {
+      border-color: var(--brand-teal);
+    }
+
+    .preset-btn.active {
+      background: var(--brand-teal);
+      color: #FFF;
+      border-color: var(--brand-teal);
+    }
+
+    .trigger-action-btn {
+      padding: 12px 18px;
+      background: linear-gradient(135deg, #F1AF32, #D9951A);
+      color: #1C2C27;
+      font-weight: 800;
+      font-size: 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(241, 175, 50, 0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .trigger-action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(241, 175, 50, 0.45);
+    }
+
+    .trigger-action-btn:active {
+      transform: translateY(1px);
+    }
+
+    .text-input {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-color);
+      font-size: 13px;
+      color: var(--text-main);
+      background: #FFFFFF;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .text-input:focus {
+      border-color: var(--brand-teal);
+    }
+
+    /* Galeria com Todos os Estados Vivos */
+    .states-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .gallery-card {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--brand-teal);
+    }
+
+    .gallery-card.active-card {
+      border-color: var(--brand-teal);
+      background: #FAFDFB;
+      box-shadow: 0 0 0 2px var(--brand-teal);
+    }
+
+    .gallery-card-title {
+      font-size: 14px;
+      font-weight: 800;
+      margin-top: 10px;
+      color: var(--brand-dark);
+    }
+
+    .gallery-card-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Comparador 1:1 Aba */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stage-box {
+      border: 1.5px solid var(--border-color);
+      border-radius: 14px;
+      background: #FFFFFF;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stage-title {
+      background: #F4EFE6;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid var(--border-color);
+    }
+
+    .canvas-container {
+      aspect-ratio: 1 / 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: #FFFFFF;
+      transition: background 0.3s;
+    }
+
+    .canvas-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tag-raster {
+      background: #FEE7C2;
+      color: #A06408;
+    }
+
+    .tag-vector {
+      background: #D5EBE4;
+      color: #176B5B;
+    }
+
+    .slider-control-bar {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #F7F3EA;
+      padding: 14px 20px;
+      border-radius: 12px;
+      flex-wrap: wrap;
+    }
+
+    .slider-control-bar input[type="range"] {
+      flex: 1;
+      accent-color: var(--brand-teal);
+      cursor: pointer;
+      min-width: 160px;
+    }
+
+    /* Pipeline de Vetorização Aba */
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 960px) {
+      .pipeline-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .step-card {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .step-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--brand-teal);
+      color: #FFF;
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-content h4 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--brand-dark);
+      margin-bottom: 4px;
+    }
+
+    .step-content p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .code-pill {
+      font-family: monospace;
+      background: #F0EDE5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #1C2C27;
+      font-weight: 600;
+    }
+
+    .terminal-box {
+      background: #15221E;
+      color: #D5EBE4;
+      font-family: "SF Mono", Monaco, Consolas, monospace;
+      padding: 16px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 10px;
+      position: relative;
+      overflow-x: auto;
+    }
+
+    .terminal-box .cmd {
+      color: #F1AF32;
+      font-weight: 700;
+    }
+
+    .copy-cmd-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFF;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .copy-cmd-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Dropzone Interativo */
+    .dropzone-box {
+      border: 2px dashed var(--brand-teal);
+      border-radius: 16px;
+      background: #FAFDFB;
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .dropzone-box:hover {
+      background: #F0F7F5;
+      border-color: var(--brand-teal-light);
+    }
+
+    .dropzone-icon {
+      font-size: 40px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+
+    .comparison-table th {
+      background: #F4EFE6;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 700;
+      color: var(--brand-dark);
+      border-bottom: 1.5px solid var(--border-color);
+    }
+
+    .comparison-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .badge-win {
+      background: #D5EBE4;
+      color: #176B5B;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    .badge-fail {
+      background: #FCE8E6;
+      color: #C5221F;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="title-group">
+      <h1>🦎 Prisma — Mascote Oficial <span class="badge">VTracer Precision</span></h1>
+      <div class="subtitle">Estúdio de Micro-Animações Vivas, Inspeção de Fidelidade 1:1 e Pipeline Automático</div>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Tema do Estúdio:</span>
+      <button class="preset-btn active" onclick="setStudioTheme('white')">Branco</button>
+      <button class="preset-btn" onclick="setStudioTheme('cream')">Marfim</button>
+      <button class="preset-btn" onclick="setStudioTheme('dark')">Ardósia Escura</button>
+    </div>
+  </header>
+
+  <!-- Main Navigation Tabs -->
+  <nav class="nav-tabs">
+    <button class="nav-tab-btn active" onclick="switchMainTab('tab-live-studio', this)">
+      <span>🎭</span> 1. Estúdio de Micro-Animações Vivas
+    </button>
+    <button class="nav-tab-btn" onclick="switchMainTab('tab-inspection-1to1', this)">
+      <span>🔬</span> 2. Inspeção de Fidelidade 1:1 (Raster vs SVG)
+    </button>
+    <button class="nav-tab-btn" onclick="switchMainTab('tab-pipeline-vector', this)">
+      <span>⚡</span> 3. Pipeline de Vetorização Automática
+    </button>
+  </nav>
+
+  <main>
+    <!-- ==================================================================== -->
+    <!-- TAB 1: ESTÚDIO DE MICRO-ANIMAÇÕES VIVAS                                -->
+    <!-- ==================================================================== -->
+    <section id="tab-live-studio" class="tab-section active">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <h2>✨ Laboratório Interativo de Comportamento do Mascote</h2>
+            <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+              Renderização idêntica ao componente React <code>PrismaMascotWeb.tsx</code> rodando ao vivo no navegador.
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="trigger-action-btn" onclick="triggerEurekaJump()">
+              <span>🚀</span> Disparar Salto Eureka (Squash & Stretch)
+            </button>
+          </div>
+        </div>
+
+        <div class="live-studio-layout">
+          <!-- Palco Central de Exibição -->
+          <div class="prisma-live-stage" id="main-live-stage">
+            <div class="prisma-mascot-container state-idle" id="live-mascot-container">
+              
+              <!-- Balão de Fala Editorial -->
+              <div class="prisma-speech-bubble" id="live-speech-bubble" role="tooltip">
+                Não calcule. Veja! 📐
+              </div>
+
+              <!-- Wrapper do Mascote com SVG e Camadas Especiais -->
+              <div class="prisma-mascot-wrapper" id="live-mascot-wrapper" style="width: 140px; height: 140px;">
+                <!-- Anel Solar de Vitória (Supernova) -->
+                <div class="prisma-supernova-halo-ring" id="live-halo-ring" style="display: none;"></div>
+                
+                <!-- Raio Vetorial Pontilhado (Hint) -->
+                <div class="prisma-hint-vector-ray" id="live-hint-ray" style="display: none;"></div>
+
+                <!-- Conteúdo SVG do Prisma -->
+                <img id="live-mascot-img" src="/mascot/prisma-idle.svg" alt="Prisma Mascote" />
+              </div>
+
+            </div>
+
+            <div style="position: absolute; bottom: 12px; left: 16px; font-size: 12px; color: var(--text-muted);">
+              Animação ativa: <strong id="lbl-active-animation" style="color: var(--brand-teal);">prismaBreathing + prismaBlink (3.6s)</strong>
+            </div>
+          </div>
+
+          <!-- Barra Lateral de Controles e Sliders -->
+          <div class="controls-panel">
+            <!-- 1. Estado Emocional / Jogo -->
+            <div class="control-group">
+              <label>Estado do Jogo (State):</label>
+              <div class="button-grid-states">
+                <button class="state-btn active" onclick="setLiveState('idle', this)">
+                  <span>🦎</span> Idle (Padrão)
+                </button>
+                <button class="state-btn" onclick="setLiveState('thinking', this)">
+                  <span>🤔</span> Thinking
+                </button>
+                <button class="state-btn" onclick="setLiveState('hint', this)">
+                  <span>✨</span> Hint (Dica)
+                </button>
+                <button class="state-btn" onclick="setLiveState('eureka', this)">
+                  <span>🎉</span> Eureka (Acerto)
+                </button>
+                <button class="state-btn" onclick="setLiveState('supernova', this)">
+                  <span>🌟</span> Supernova
+                </button>
+                <button class="state-btn" onclick="setLiveState('camouflaged', this)">
+                  <span>😢</span> Camuflado
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Tamanho / Escala do Mascote -->
+            <div class="control-group">
+              <label>Tamanho em Pixels: <span class="val" id="val-size">140px</span></label>
+              <div class="preset-btn-group">
+                <button class="preset-btn" onclick="setLiveSize(48)">48px (Barra)</button>
+                <button class="preset-btn" onclick="setLiveSize(90)">90px (Padrão)</button>
+                <button class="preset-btn" onclick="setLiveSize(120)">120px (Trilha)</button>
+                <button class="preset-btn" onclick="setLiveSize(200)">200px (Vitória)</button>
+              </div>
+              <input type="range" id="slider-size" min="40" max="280" value="140" oninput="setLiveSize(this.value)">
+            </div>
+
+            <!-- 3. Combo Streak Glow -->
+            <div class="control-group">
+              <label>Streak Combo Glow: <span class="val" id="val-combo">Combo 1x</span></label>
+              <input type="range" id="slider-combo" min="1" max="20" value="1" oninput="setLiveCombo(this.value)">
+              <div style="font-size: 11px; color: var(--text-muted);">
+                Adiciona aura luminescente dourada baseada na precisão e acertos consecutivos.
+              </div>
+            </div>
+
+            <!-- 4. Balão de Fala Editorial -->
+            <div class="control-group">
+              <label>Texto do Balão Editorial:</label>
+              <input type="text" class="text-input" id="input-speech" value="Não calcule. Veja! 📐" oninput="updateSpeechText(this.value)">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                <span style="font-size: 12px; color: var(--text-muted);">Exibir Balão:</span>
+                <input type="checkbox" id="toggle-speech" checked onchange="toggleSpeechBubble(this.checked)" style="accent-color: var(--brand-teal);">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Mural: Galeria de Todos os Estados Vivos Lado a Lado -->
+        <div style="margin-top: 36px; border-top: 1.5px solid var(--border-color); padding-top: 24px;">
+          <h3 style="font-size: 16px; font-weight: 800; color: var(--brand-dark); margin-bottom: 12px;">
+            🌐 Todas as 6 Poses Vivas em Tempo Real (Ecossistema Completo)
+          </h3>
+          <div class="states-gallery-grid">
+            <!-- 1. Idle -->
+            <div class="gallery-card active-card" onclick="selectStateFromGallery('idle')">
+              <div class="state-idle" style="width: 90px; height: 90px; display: flex; align-items: center; justify-content: center;">
+                <div class="prisma-mascot-wrapper" style="width: 80px; height: 80px;">
+                  <img src="/mascot/prisma-idle.svg" alt="Idle" />
+                </div>
+              </div>
+              <div class="gallery-card-title">1. Idle (Padrão)</div>
+              <div class="gallery-card-desc">Respiração peitoral e piscar a cada 4s</div>
+            </div>
+
+            <!-- 2. Thinking -->
+            <div class="gallery-card" onclick="selectStateFromGallery('thinking')">
+              <div class="state-thinking" style="width: 90px; height: 90px; display: flex; align-items: center; justify-content: center;">
+                <div class="prisma-mascot-wrapper" style="width: 80px; height: 80px;">
+                  <img src="/mascot/prisma-thinking.svg" alt="Thinking" />
+                </div>
+              </div>
+              <div class="gallery-card-title">2. Thinking</div>
+              <div class="gallery-card-desc">Balanço pendular e dúvida investigativa</div>
+            </div>
+
+            <!-- 3. Hint -->
+            <div class="gallery-card" onclick="selectStateFromGallery('hint')">
+              <div class="state-hint" style="width: 90px; height: 90px; display: flex; align-items: center; justify-content: center;">
+                <div class="prisma-mascot-wrapper" style="width: 80px; height: 80px; position: relative;">
+                  <div class="prisma-hint-vector-ray" style="right: -4px; top: 18px; width: 22px; height: 22px;"></div>
+                  <img src="/mascot/prisma-hint.svg" alt="Hint" />
+                </div>
+              </div>
+              <div class="gallery-card-title">3. Hint (Dica)</div>
+              <div class="gallery-card-desc">Vetor luminoso pontilhado pulsando</div>
+            </div>
+
+            <!-- 4. Eureka -->
+            <div class="gallery-card" onclick="selectStateFromGallery('eureka')">
+              <div class="state-eureka" style="width: 90px; height: 90px; display: flex; align-items: center; justify-content: center;">
+                <div class="prisma-mascot-wrapper trigger-jump" style="width: 80px; height: 80px;">
+                  <img src="/mascot/prisma-eureka.svg" alt="Eureka" />
+                </div>
+              </div>
+              <div class="gallery-card-title">4. Eureka</div>
+              <div class="gallery-card-desc">Salto amortecido (squash & stretch)</div>
+            </div>
+
+            <!-- 5. Supernova -->
+            <div class="gallery-card" onclick="selectStateFromGallery('supernova')">
+              <div class="state-supernova" style="width: 90px; height: 90px; display: flex; align-items: center; justify-content: center;">
+                <div class="prisma-mascot-wrapper" style="width: 80px; height: 80px; position: relative;">
+                  <div class="prisma-supernova-halo-ring"></div>
+                  <img src="/mascot/prisma-supernova.svg" alt="Supernova" />
+                </div>
+              </div>
+              <div class="gallery-card-title">5. Supernova</div>
+              <div class="gallery-card-desc">Auréola solar contínua 360°</div>
+            </div>
+
+            <!-- 6. Camouflaged -->
+            <div class="gallery-card" onclick="selectStateFromGallery('camouflaged')">
+              <div class="state-camouflaged" style="width: 90px; height: 90px; display: flex; align-items: center; justify-content: center;">
+                <div class="prisma-mascot-wrapper" style="width: 80px; height: 80px;">
+                  <img src="/mascot/prisma-camouflaged.svg" alt="Camouflaged" />
+                </div>
+              </div>
+              <div class="gallery-card-title">6. Camuflado</div>
+              <div class="gallery-card-desc">Dissolução sutil em tons de ardósia</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- TAB 2: INSPEÇÃO DE FIDELIDADE 1:1 (RASTER VS SVG)                      -->
+    <!-- ==================================================================== -->
+    <section id="tab-inspection-1to1" class="tab-section">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <h2 id="inspection-title">🔬 Comparação: <code>prisma-idle</code> (1. Idle Padrão)</h2>
+            <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+              Vetorizado com splines cúbicas de alta precisão via VTracer (Rust/Béziers determinísticos)
+            </div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button class="preset-btn active" onclick="selectInspectState('prisma-idle', '1. Idle', this)">Idle</button>
+            <button class="preset-btn" onclick="selectInspectState('prisma-thinking', '2. Thinking', this)">Thinking</button>
+            <button class="preset-btn" onclick="selectInspectState('prisma-hint', '3. Hint', this)">Hint</button>
+            <button class="preset-btn" onclick="selectInspectState('prisma-eureka', '4. Eureka', this)">Eureka</button>
+            <button class="preset-btn" onclick="selectInspectState('prisma-supernova', '5. Supernova', this)">Supernova</button>
+            <button class="preset-btn" onclick="selectInspectState('prisma-camouflaged', '6. Camuflado', this)">Camuflado</button>
+          </div>
+        </div>
+
+        <div class="comparison-grid">
+          <!-- 1. Original Concept JPG -->
+          <div class="stage-box">
+            <div class="stage-title">
+              <span>📷 Imagem Conceito Original (JPG)</span>
+              <span class="status-tag tag-raster">Raster IA (Base)</span>
+            </div>
+            <div class="canvas-container" id="inspect-container-left">
+              <img id="inspect-jpg" src="/mascot/concepts/prisma-idle.jpg" alt="Conceito JPG" />
+            </div>
+          </div>
+
+          <!-- 2. Reconstructed SVG -->
+          <div class="stage-box">
+            <div class="stage-title">
+              <span>⚡ SVG Vetorial Reconstruído</span>
+              <span class="status-tag tag-vector">100% Vetor Puro</span>
+            </div>
+            <div class="canvas-container" id="inspect-container-right">
+              <img id="inspect-svg" src="/mascot/prisma-idle.svg" alt="SVG Vetorial" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Slider de Modo Sobreposição 1:1 -->
+        <div class="slider-control-bar">
+          <label style="font-weight: 700; font-size: 14px; min-width: 170px;">
+            🔀 Sobreposição Transparente:
+          </label>
+          <span style="font-size: 12px; color: var(--text-muted);">Raster (0%)</span>
+          <input type="range" id="crossfade-slider" min="0" max="100" value="50" oninput="updateCrossfade(this.value)">
+          <span style="font-size: 12px; color: var(--text-muted);">Vetor (100%)</span>
+          <button class="preset-btn" style="flex: none; padding: 8px 14px;" onclick="toggleOverlayModal()">
+            Alternar Visor de Alinhamento
+          </button>
+        </div>
+
+        <!-- Visor de Alinhamento Absoluto -->
+        <div id="overlay-inspector" style="display: none; margin-top: 20px; border: 1.5px solid var(--border-color); border-radius: 14px; padding: 20px; background: #FFF;">
+          <h3 style="font-size: 15px; font-weight: 800; margin-bottom: 12px;">Sobreposição Transparente 1:1 (Alinhamento Anatômico)</h3>
+          <div style="position: relative; width: 440px; height: 440px; margin: 0 auto; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; background: #FFF;">
+            <img id="overlay-jpg" src="/mascot/concepts/prisma-idle.jpg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain;" />
+            <img id="overlay-svg" src="/mascot/prisma-idle.svg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.5;" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- TAB 3: PIPELINE DE VETORIZAÇÃO AUTOMÁTICA                              -->
+    <!-- ==================================================================== -->
+    <section id="tab-pipeline-vector" class="tab-section">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <h2>⚡ Pipeline Automatizado: Como Adicionar Novas Poses em Segundos</h2>
+            <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+              Fluxo automatizado para transformar conceitos raster (PNG/JPG) em SVGs prontos para a produção
+            </div>
+          </div>
+        </div>
+
+        <div class="pipeline-grid">
+          <!-- Coluna 1: Como Funciona o Fluxo Passo a Passo -->
+          <div>
+            <div class="step-card">
+              <div class="step-badge">1</div>
+              <div class="step-content">
+                <h4>Salve a Nova Imagem Conceito</h4>
+                <p>
+                  Gere a ilustração (via Midjourney, DALL-E, Flux ou designer humano) e salve em:
+                  <br>
+                  <code class="code-pill">public/mascot/concepts/[nome-da-pose].jpg</code>
+                  <br>
+                  <em>Exemplos: <code>prisma-celebration.png</code>, <code>prisma-running.jpg</code>.</em>
+                </p>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-badge">2</div>
+              <div class="step-content">
+                <h4>Execute o Comando de Vetorização</h4>
+                <p>
+                  Rode no terminal do projeto (em 2 segundos todas as imagens são processadas):
+                </p>
+                <div class="terminal-box">
+                  <button class="copy-cmd-btn" onclick="copyCommand('npm run mascot:vectorize')">Copiar</button>
+                  $ <span class="cmd">npm run mascot:vectorize</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-badge">3</div>
+              <div class="step-content">
+                <h4>O SVG Está Pronto e Otimizado!</h4>
+                <p>
+                  O motor VTracer gera automaticamente o arquivo em <code class="code-pill">public/mascot/[nome-da-pose].svg</code>,
+                  já sem fundo branco, com <code class="code-pill">viewBox="0 0 1024 1024"</code> responsivo e pronto para as micro-animações CSS.
+                </p>
+              </div>
+            </div>
+
+            <div class="step-card">
+              <div class="step-badge">4</div>
+              <div class="step-content">
+                <h4>Registrar no Componente (Opcional)</h4>
+                <p>
+                  Adicione o novo estado em <code class="code-pill">src/services/mascot/animationRegistry.ts</code> para que o jogo
+                  saiba quando acionar a nova animação nas lições.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coluna 2: Análise Técnica — IA vs Algoritmo Determinístico -->
+          <div>
+            <div style="background: #FAF8F5; border: 1.5px solid var(--border-color); border-radius: 16px; padding: 22px;">
+              <h3 style="font-size: 16px; font-weight: 800; color: var(--brand-dark); margin-bottom: 8px;">
+                🧠 IA Gerando SVG vs Vetorização Automática (VTracer)
+              </h3>
+              <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                Por que você <strong>não deve</strong> pedir para uma IA gerar código SVG diretamente para ilustrações complexas:
+              </p>
+
+              <table class="comparison-table">
+                <thead>
+                  <tr>
+                    <th>Critério</th>
+                    <th>VTracer Automático</th>
+                    <th>IA Digitando SVG</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Fidelidade Visual</strong></td>
+                    <td><span class="badge-win">100% Idêntica</span></td>
+                    <td><span class="badge-fail">Deformada (Sem Olhos)</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tempo de Execução</strong></td>
+                    <td><span class="badge-win">0.4 segundos</span></td>
+                    <td><span class="badge-fail">30-60s (Streaming)</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Custo de API</strong></td>
+                    <td><span class="badge-win">$0.00 (Local Rust)</span></td>
+                    <td><span class="badge-fail">Consome Tokens</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Estilo e Cores</strong></td>
+                    <td><span class="badge-win">Preservação Exata</span></td>
+                    <td><span class="badge-fail">Inconsistente</span></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style="margin-top: 18px; padding: 14px; background: #FFFDF6; border: 1px solid var(--border-color); border-radius: 10px; font-size: 12px; color: var(--brand-dark); line-height: 1.45;">
+                <strong>💡 O Fluxo Ideal Recomendado:</strong>
+                <br>
+                1. <strong>Criação Artística:</strong> Use ferramentas de IA generativa (Midjourney, Flux, etc.) para criar o visual.
+                <br>
+                2. <strong>Vetorização:</strong> Use o comando automatizado <code class="code-pill">npm run mascot:vectorize</code> para traçar as curvas matemáticas perfeitas.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Estado Global da Aplicação
+    let currentLiveState = 'idle';
+    let currentLiveSize = 140;
+    let currentCombo = 1;
+    let currentInspectStateKey = 'prisma-idle';
+
+    // Navegação Principal de Abas
+    function switchMainTab(tabId, btnElem) {
+      document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      btnElem.classList.add('active');
+    }
+
+    // Configuração de Estados do Estúdio Vivo
+    const stateMeta = {
+      idle: {
+        file: '/mascot/prisma-idle.svg',
+        animLabel: 'prismaBreathing + prismaBlink (3.6s loop)',
+        hasHalo: false,
+        hasRay: false,
+        speech: 'Não calcule. Veja! 📐'
+      },
+      thinking: {
+        file: '/mascot/prisma-thinking.svg',
+        animLabel: 'prismaThinkingSway (balanço pendular 2.8s)',
+        hasHalo: false,
+        hasRay: false,
+        speech: 'Investigando a melhor decomposição... 🤔'
+      },
+      hint: {
+        file: '/mascot/prisma-hint.svg',
+        animLabel: 'prismaHintPulse (vetor pontilhado luminoso)',
+        hasHalo: false,
+        hasRay: true,
+        speech: 'Dica: o esquadro aponta para o complemento! ✨'
+      },
+      eureka: {
+        file: '/mascot/prisma-eureka.svg',
+        animLabel: 'prismaEurekaJump (squash & stretch jump)',
+        hasHalo: false,
+        hasRay: false,
+        speech: 'Exato! Decomposição perfeita! 🎉'
+      },
+      supernova: {
+        file: '/mascot/prisma-supernova.svg',
+        animLabel: 'prismaHaloSpin (auréola solar 360° contínua)',
+        hasHalo: true,
+        hasRay: false,
+        speech: 'SUPERNOVA! 5 acertos seguidos! 🌟'
+      },
+      camouflaged: {
+        file: '/mascot/prisma-camouflaged.svg',
+        animLabel: 'prismaCamouflagedFade (dissolução ardósia)',
+        hasHalo: false,
+        hasRay: false,
+        speech: 'Atenção ao streak! Mantenha a calma. 🛡️'
+      }
+    };
+
+    function setLiveState(stateName, btnElem) {
+      currentLiveState = stateName;
+      
+      // Atualiza botões
+      document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+      if (btnElem) btnElem.classList.add('active');
+
+      const meta = stateMeta[stateName] || stateMeta.idle;
+      const container = document.getElementById('live-mascot-container');
+      const wrapper = document.getElementById('live-mascot-wrapper');
+      const img = document.getElementById('live-mascot-img');
+      const halo = document.getElementById('live-halo-ring');
+      const ray = document.getElementById('live-hint-ray');
+      const animLbl = document.getElementById('lbl-active-animation');
+      const speechInput = document.getElementById('input-speech');
+      const speechBubble = document.getElementById('live-speech-bubble');
+
+      // Remove classes anteriores
+      container.className = 'prisma-mascot-container state-' + stateName;
+      wrapper.classList.remove('trigger-jump');
+
+      // Troca SVG
+      img.src = meta.file;
+
+      // Camadas especiais
+      halo.style.display = meta.hasHalo ? 'block' : 'none';
+      ray.style.display = meta.hasRay ? 'block' : 'none';
+
+      // Animação descritiva
+      animLbl.textContent = meta.animLabel;
+
+      // Se for eureka, dispara o salto automaticamente
+      if (stateName === 'eureka') {
+        setTimeout(() => {
+          wrapper.classList.add('trigger-jump');
+        }, 10);
+      }
+
+      // Atualiza balão de fala sugerido
+      speechInput.value = meta.speech;
+      speechBubble.textContent = meta.speech;
+
+      // Atualiza destaque na galeria inferior
+      document.querySelectorAll('.gallery-card').forEach(c => c.classList.remove('active-card'));
+    }
+
+    function selectStateFromGallery(stateName) {
+      // Encontra o botão correspondente e aciona
+      const buttons = document.querySelectorAll('.state-btn');
+      buttons.forEach(btn => {
+        if (btn.textContent.toLowerCase().includes(stateName)) {
+          setLiveState(stateName, btn);
+        }
+      });
+      // Scroll suave até o palco
+      document.getElementById('main-live-stage').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function triggerEurekaJump() {
+      // Se não estiver em Eureka, muda para eureka
+      if (currentLiveState !== 'eureka') {
+        const eurekaBtn = Array.from(document.querySelectorAll('.state-btn')).find(b => b.textContent.includes('Eureka'));
+        setLiveState('eureka', eurekaBtn);
+      } else {
+        const wrapper = document.getElementById('live-mascot-wrapper');
+        wrapper.classList.remove('trigger-jump');
+        void wrapper.offsetWidth; // Força re-flow
+        wrapper.classList.add('trigger-jump');
+      }
+    }
+
+    function setLiveSize(val) {
+      currentLiveSize = parseInt(val, 10);
+      const wrapper = document.getElementById('live-mascot-wrapper');
+      wrapper.style.width = currentLiveSize + 'px';
+      wrapper.style.height = currentLiveSize + 'px';
+      document.getElementById('val-size').textContent = currentLiveSize + 'px';
+      document.getElementById('slider-size').value = currentLiveSize;
+
+      // Atualiza botões preset
+      document.querySelectorAll('.preset-btn-group .preset-btn').forEach(b => {
+        if (b.textContent.startsWith(currentLiveSize + 'px')) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
+      });
+    }
+
+    function setLiveCombo(val) {
+      currentCombo = parseInt(val, 10);
+      document.getElementById('val-combo').textContent = 'Combo ' + currentCombo + 'x';
+      
+      const wrapper = document.getElementById('live-mascot-wrapper');
+      const intensity = Math.min(1, Math.max(0, (currentCombo - 1) / 15));
+
+      if (intensity > 0 || currentLiveState === 'supernova') {
+        const blurRadius = 8 + intensity * 20;
+        const alpha = 0.45 + intensity * 0.45;
+        wrapper.style.filter = `drop-shadow(0 0 ${blurRadius}px rgba(241, 175, 50, ${alpha}))`;
+      } else {
+        wrapper.style.filter = 'none';
+      }
+    }
+
+    function updateSpeechText(val) {
+      document.getElementById('live-speech-bubble').textContent = val;
+    }
+
+    function toggleSpeechBubble(checked) {
+      document.getElementById('live-speech-bubble').style.display = checked ? 'block' : 'none';
+    }
+
+    function setStudioTheme(theme) {
+      const stage = document.getElementById('main-live-stage');
+      stage.className = 'prisma-live-stage theme-' + theme;
+
+      const containers = [document.getElementById('inspect-container-left'), document.getElementById('inspect-container-right')];
+      containers.forEach(c => {
+        if (c) c.style.background = theme === 'dark' ? '#15221E' : theme === 'cream' ? '#FFFDF6' : '#FFFFFF';
+      });
+    }
+
+    // Inspeção 1:1
+    function selectInspectState(stateKey, title, btnElem) {
+      currentInspectStateKey = stateKey;
+      document.querySelectorAll('#tab-inspection-1to1 .preset-btn').forEach(b => b.classList.remove('active'));
+      if (btnElem) btnElem.classList.add('active');
+
+      document.getElementById('inspection-title').innerHTML = '🔬 Comparação: <code>' + stateKey + '</code> (' + title + ')';
+      document.getElementById('inspect-jpg').src = '/mascot/concepts/' + stateKey + '.jpg';
+      document.getElementById('inspect-svg').src = '/mascot/' + stateKey + '.svg';
+      document.getElementById('overlay-jpg').src = '/mascot/concepts/' + stateKey + '.jpg';
+      document.getElementById('overlay-svg').src = '/mascot/' + stateKey + '.svg';
+    }
+
+    function updateCrossfade(val) {
+      const svg = document.getElementById('overlay-svg');
+      if (svg) {
+        svg.style.opacity = val / 100;
+      }
+    }
+
+    function toggleOverlayModal() {
+      const box = document.getElementById('overlay-inspector');
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function copyCommand(cmd) {
+      navigator.clipboard.writeText(cmd).then(() => {
+        alert('Comando copiado para a área de transferência: ' + cmd);
+      });
+    }
+
+    // Leitura de parâmetros de URL para controle direto e screenshots
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const stateParam = params.get('state');
+      const sizeParam = params.get('size');
+      const comboParam = params.get('combo');
+      const tabParam = params.get('tab');
+      const themeParam = params.get('theme');
+
+      if (themeParam) setStudioTheme(themeParam);
+      if (sizeParam) setLiveSize(parseInt(sizeParam, 10));
+      if (comboParam) setLiveCombo(parseInt(comboParam, 10));
+      if (stateParam) {
+        const btn = Array.from(document.querySelectorAll('.state-btn')).find(b => b.textContent.toLowerCase().includes(stateParam.toLowerCase()));
+        setLiveState(stateParam, btn);
+      }
+      if (tabParam === 'inspection') {
+        const btn = document.querySelectorAll('.nav-tab-btn')[1];
+        switchMainTab('tab-inspection-1to1', btn);
+      } else if (tabParam === 'pipeline') {
+        const btn = document.querySelectorAll('.nav-tab-btn')[2];
+        switchMainTab('tab-pipeline-vector', btn);
+      }
+    });
+  </script>
+</body>
+</html>

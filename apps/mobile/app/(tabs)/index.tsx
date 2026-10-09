@@ -4,7 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { colors, spacing, radii, typography, glows } from '../../../../src/theme/tokens';
 import { TRACK_GRADES, MOCK_USER_PROFILE, TrackNodeData } from '@auramath/engine';
-import { TrackNode } from '../../../../src/components/TrackNode';
+import { TrackNode } from '../../src/components/TrackNode';
+import { AuraMascot } from '../../src/components/AuraMascot';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -98,34 +99,73 @@ export default function HomeScreen() {
               <Text style={styles.gradeSubtitle}>{gradeData.subtitle}</Text>
             </View>
 
-            {/* Nodes Sequence */}
+            {/* Nodes Sequence com Caminho Serpenteado Duolingo */}
             <View style={styles.nodesTree}>
-              {gradeData.nodes.map((node, nIndex) => (
-                <View key={node.id} style={styles.nodeWrapper}>
-                  {nIndex > 0 && <View style={styles.connectorLine} />}
-                  <TrackNode
-                    node={node}
-                    onPress={handleNodePress}
-                    isActive={node.order === 1}
-                  />
-                </View>
-              ))}
+              {gradeData.nodes.map((node, nIndex) => {
+                const offsets = [0, 42, 0, -42];
+                const xOffset = offsets[nIndex % 4];
 
-              {/* Boss Fight Node */}
+                return (
+                  <React.Fragment key={node.id}>
+                    <View
+                      style={[
+                        styles.nodeWrapper,
+                        { transform: [{ translateX: xOffset }] },
+                      ]}
+                    >
+                      {nIndex > 0 && <View style={styles.connectorLine} />}
+
+                      {/* Floating Aura Mascot beside the active node in Grade 1 */}
+                      {gIndex === 0 && nIndex === 0 && (
+                        <View style={styles.auraFloatingCompanion}>
+                          <AuraMascot size={52} state="idle" />
+                          <View style={styles.auraSpeechPill}>
+                            <Text style={styles.auraSpeechText}>Vamos treinar!</Text>
+                          </View>
+                        </View>
+                      )}
+
+                      <TrackNode
+                        node={node}
+                        onPress={handleNodePress}
+                        isActive={node.order === 1}
+                      />
+                    </View>
+
+                    {/* Baú de Recompensa Cósmica Intercalado */}
+                    {nIndex === 1 && (
+                      <View style={styles.chestWrapper}>
+                        <TouchableOpacity
+                          style={styles.chestButton}
+                          activeOpacity={0.8}
+                          onPress={() => {
+                            // Quick chest interaction
+                          }}
+                        >
+                          <Text style={styles.chestEmoji}>📦</Text>
+                          <Text style={styles.chestLabel}>Caixa de Descobertas (+50 Gotas)</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+
+              {/* Mastery Challenge Node */}
               <View style={styles.nodeWrapper}>
                 <View style={styles.connectorLine} />
                 <TouchableOpacity
                   style={styles.bossCard}
                   activeOpacity={0.8}
-                  onPress={() => handleBossPress(gradeData.bossId)}
+                  onPress={() => handleBossPress(gradeData.masteryChallengeId || gradeData.bossId)}
                 >
                   <View style={styles.bossIconBox}>
-                    <Text style={styles.bossSkull}>⚔️</Text>
+                    <Text style={styles.bossSkull}>🎓</Text>
                   </View>
                   <View style={styles.bossTextBox}>
-                    <Text style={styles.bossTag}>CHEFE ARCANO</Text>
-                    <Text style={styles.bossName}>Guardião do Grau {gradeData.grade}</Text>
-                    <Text style={styles.bossReward}>Recompensa: Skin Rara da Aura</Text>
+                    <Text style={styles.bossTag}>DESAFIO DE MAESTRIA</Text>
+                    <Text style={styles.bossName}>Prova Estrutural: Grau {gradeData.grade}</Text>
+                    <Text style={styles.bossReward}>Recompensa: Selo de Maestria e +250 XP</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -370,6 +410,49 @@ const styles = StyleSheet.create({
   bossReward: {
     fontSize: 11,
     color: colors.textSecondary,
+    marginTop: 2,
+  },
+  auraFloatingCompanion: {
+    position: 'absolute',
+    right: -80,
+    top: -10,
+    alignItems: 'center',
+    zIndex: 20,
+  },
+  auraSpeechPill: {
+    backgroundColor: 'rgba(13, 17, 26, 0.95)',
+    borderWidth: 1,
+    borderColor: colors.primaryCyan,
+    borderRadius: radii.full,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    marginTop: 4,
+  },
+  auraSpeechText: {
+    color: colors.primaryCyan,
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  chestWrapper: {
+    alignItems: 'center',
+    marginVertical: spacing.space3,
+  },
+  chestButton: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(250, 204, 21, 0.1)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(250, 204, 21, 0.35)',
+    borderRadius: radii.lg,
+    paddingHorizontal: spacing.space3,
+    paddingVertical: spacing.space2,
+  },
+  chestEmoji: {
+    fontSize: 24,
+  },
+  chestLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: colors.goldStellar,
     marginTop: 2,
   },
 });

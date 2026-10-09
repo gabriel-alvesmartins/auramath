@@ -1,0 +1,111 @@
+{
+  "generatedAt": "2026-10-09T21:07:37.315Z",
+  "complianceRate": "100%",
+  "summary": {
+    "total": 11,
+    "compliant": 8,
+    "future": 3,
+    "drift": 0
+  },
+  "items": [
+    {
+      "id": "grades-curriculum",
+      "domain": "Estrutura Curricular",
+      "title": "7 Graus Cognitivos Oficiais (I a VII)",
+      "specRef": "openspec/specs/progress-track/spec.md",
+      "status": "compliant",
+      "details": "7 graus configurados no motor procedural (Esperado: 7). Total de nós: 32.",
+      "evidence": "TRACK_GRADES possui Graus 1, 2, 3, 4, 5, 6, 7 completos."
+    },
+    {
+      "id": "scaffolding-count",
+      "domain": "Bateria de Andaimes",
+      "title": "3 Tarefas de Andaime Guiado por Nó",
+      "specRef": "openspec/specs/drill-scaffolding/spec.md",
+      "status": "compliant",
+      "details": "Todos os nós da trilha garantem 3 passos de andaime estruturado.",
+      "evidence": "getNodeScaffoldingTasks garante 3 tarefas intercaladas para cada nó da trilha."
+    },
+    {
+      "id": "legacy-cancellation",
+      "domain": "Mecânicas Canceladas",
+      "title": "Eliminação de Chefes, Skins e Duelo Fantasma",
+      "specRef": "openspec/specs/gameplay-modes/spec.md",
+      "status": "compliant",
+      "details": "Exports obsoletos (Bosses, Skins, GhostRun) eliminados do pacote @auramath/engine.",
+      "evidence": "BOSS_LIST, AURA_SKINS e GhostRun ausentes em index.ts."
+    },
+    {
+      "id": "daily-challenge-prng",
+      "domain": "Desafio Diário",
+      "title": "Motor Determinístico por Data (20 Questões)",
+      "specRef": "openspec/specs/daily-challenge/spec.md",
+      "status": "compliant",
+      "details": "generateDailyQuestions produz 20 questões consistentes com base na semente da data.",
+      "evidence": "20 questões geradas determinísticamente com Mulberry32 PRNG."
+    },
+    {
+      "id": "retention-rule",
+      "domain": "Regra de Retenção",
+      "title": "Limiar de 80% de Acurácia para Conclusão de Nó",
+      "specRef": "openspec/specs/retention-threshold/spec.md",
+      "status": "compliant",
+      "details": "Lição bloqueia vitória com <80% acurácia e exibe tela de Revisão de Retenção.",
+      "evidence": "DuolingoLessonView.tsx e gamificationEngine.ts aplicam retenção de 80%."
+    },
+    {
+      "id": "drill-questions-count",
+      "domain": "Bateria de Agilidade",
+      "title": "Bateria Fixada em 10 Questões Procedurais",
+      "specRef": "openspec/specs/drill-scaffolding/spec.md",
+      "status": "compliant",
+      "details": "totalQuestions configurado para 10 com calibração em 3 tiers (1★, 2★, 3★).",
+      "evidence": "totalQuestions = 10 em DuolingoLessonView.tsx."
+    },
+    {
+      "id": "split-screen-sync",
+      "domain": "Batalha Split-Screen",
+      "title": "Disputa Local Frente a Frente com Questão Síncrona",
+      "specRef": "openspec/specs/tabletop-split/spec.md",
+      "status": "compliant",
+      "details": "Ambos os jogadores resolvem a mesma equação simultânea na tela dividida.",
+      "evidence": "SplitBattleComponent utiliza currentQ idêntica para P1 e P2."
+    },
+    {
+      "id": "online-1v1-status",
+      "domain": "Multiplayer Online",
+      "title": "1v1 Online Realtime WebSocket",
+      "specRef": "openspec/specs/online-duels/spec.md",
+      "status": "future",
+      "details": "Confronto síncrono remoto postergado para a fase final da plataforma.",
+      "evidence": "Fase final pós-consolidação das bases da aplicação web."
+    },
+    {
+      "id": "anti-cheat-audit",
+      "domain": "Segurança & Integridade",
+      "title": "Auditoria Anti-Cheat Criptográfica",
+      "specRef": "openspec/specs/anti-cheat/spec.md",
+      "status": "future",
+      "details": "Validação de telemetria e latência motora planejada para fase futura.",
+      "evidence": "Postergado para fase futura pós-lançamento."
+    },
+    {
+      "id": "school-module-status",
+      "domain": "Módulo Escolar",
+      "title": "Painel do Professor e Turmas Escolares",
+      "specRef": "openspec/specs/school-hub/spec.md",
+      "status": "future",
+      "details": "Módulo de salas de aula e gestão docente aguardando conclusão das bases.",
+      "evidence": "Pendente conforme definição do usuário."
+    },
+    {
+      "id": "design-tokens-rebrand",
+      "domain": "Design System",
+      "title": "Paleta Editorial Rebrand 01.1 (Paper, Verdigris, Marigold)",
+      "specRef": "openspec/specs/rebrand-tokens/spec.md",
+      "status": "compliant",
+      "details": "Tokens táteis do Rebrand 01.1 aplicados uniformemente eliminando pretos cósmicos.",
+      "evidence": "Cores Verdigris, Marigold, Coral e Paper ativas."
+    }
+  ]
+}

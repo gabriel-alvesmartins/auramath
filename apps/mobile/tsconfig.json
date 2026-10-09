@@ -1,10 +1,14 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
+    "jsx": "react-native",
+    "moduleResolution": "bundler",
     "strict": true,
-    "baseUrl": ".",
+    "skipLibCheck": true,
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["./src/*"],
       "@auramath/engine": ["../../packages/engine/src"]
     }
   },

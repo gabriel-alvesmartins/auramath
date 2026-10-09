@@ -1,0 +1,530 @@
+/**
+ * ==============================================================================
+ * Auramath Design System — Theme & Tactile 3D Stylesheet
+ * File: src/theme/theme.css
+ * 
+ * Provides:
+ * - Semantic CSS Custom Properties for Dark Obsidian & Paper Light themes
+ * - WCAG AA/AAA compliant high-contrast color palette
+ * - Duolingo-inspired 3D tactile button physics with strict 0ms sink latency
+ * - Anti-layout shift tabular font utilities (JetBrains Mono)
+ * ==============================================================================
+ */
+
+/* -------------------------------------------------------------------------- */
+/* 1. Theme Variables: Dark Obsidian (Default & [data-theme="dark"])          */
+/* -------------------------------------------------------------------------- */
+:root,
+[data-theme="dark"] {
+  --theme-mode: dark;
+
+  /* Backgrounds & Surfaces */
+  --color-bg-base: #0B0F19;
+  --color-bg-surface: #131B2E;
+  --color-bg-elevated: #1E293B;
+
+  /* Borders & Dividers */
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-border-bold: rgba(255, 255, 255, 0.16);
+
+  /* Typography */
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+  --color-text-inverse: #0F172A;
+
+  /* Brand Accents & 3D Bevels (Sober Sky/Azure) */
+  --color-brand: #0284C7;
+  --color-brand-bevel: #0369A1;
+  --color-brand-text: #FFFFFF;
+  --color-brand-surface: rgba(2, 132, 199, 0.15);
+
+  /* Semantic Feedback & 3D Bevels */
+  --color-success: #059669;
+  --color-success-bevel: #047857;
+  --color-success-surface: rgba(5, 150, 105, 0.15);
+
+  --color-alert: #E11D48;
+  --color-alert-bevel: #9F1239;
+  --color-alert-surface: rgba(225, 29, 72, 0.15);
+
+  --color-gold: #D97706;
+  --color-gold-bevel: #B45309;
+  --color-gold-surface: rgba(217, 119, 6, 0.15);
+
+  /* Neutral 3D Button Bevel */
+  --color-neutral-bg: #1E293B;
+  --color-neutral-bevel: #0F172A;
+  --color-neutral-text: #F8FAFC;
+
+  /* Backward Compatibility Aliases */
+  --color-bg: var(--color-bg-base);
+  --color-card: var(--color-bg-surface);
+
+  /* Rebrand 01.1 — "Matemática como descoberta" (Dark Ink Mode) */
+  --color-paper: #F7F4EA;
+  --color-cream: #FFFDF6;
+  --color-ink: #F7F4EA;
+  --color-ink-secondary: #94A3B8;
+  --color-verdigris: #176B5B;
+  --color-verdigris-bevel: #104E42;
+  --color-verdigris-soft: rgba(23, 107, 91, 0.25);
+  --color-marigold: #F2B84B;
+  --color-marigold-bevel: #D49A2E;
+  --color-marigold-soft: rgba(242, 184, 75, 0.25);
+  --color-coral: #E76F61;
+  --color-coral-bevel: #C75144;
+  --color-coral-soft: rgba(231, 111, 97, 0.25);
+  --color-iris: #6E5AA6;
+  --color-iris-bevel: #524080;
+  --color-iris-soft: rgba(110, 90, 166, 0.25);
+  --color-border: rgba(247, 244, 234, 0.12);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 2. Theme Variables: Paper / Nebula Light ([data-theme="light"])            */
+/* -------------------------------------------------------------------------- */
+[data-theme="light"] {
+  --theme-mode: light;
+
+  /* Backgrounds & Surfaces */
+  --color-bg-base: #F8FAFC;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-elevated: #F1F5F9;
+
+  /* Borders & Dividers */
+  --color-border-subtle: rgba(15, 23, 42, 0.08);
+  --color-border-bold: rgba(15, 23, 42, 0.16);
+
+  /* Typography */
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748B;
+  --color-text-inverse: #F8FAFC;
+
+  /* Brand Accents & 3D Bevels (Sober Sky/Azure) */
+  --color-brand: #0284C7;
+  --color-brand-bevel: #0369A1;
+  --color-brand-text: #FFFFFF;
+  --color-brand-surface: rgba(2, 132, 199, 0.10);
+
+  /* Semantic Feedback & 3D Bevels */
+  --color-success: #059669;
+  --color-success-bevel: #047857;
+  --color-success-surface: rgba(5, 150, 105, 0.12);
+
+  --color-alert: #E11D48;
+  --color-alert-bevel: #9F1239;
+  --color-alert-surface: rgba(225, 29, 72, 0.12);
+
+  --color-gold: #D97706;
+  --color-gold-bevel: #B45309;
+  --color-gold-surface: rgba(217, 119, 6, 0.12);
+
+  /* Neutral 3D Button Bevel */
+  --color-neutral-bg: #E2E8F0;
+  --color-neutral-bevel: #CBD5E1;
+  --color-neutral-text: #0F172A;
+
+  /* Backward Compatibility Aliases */
+  --color-bg: var(--color-bg-base);
+  --color-card: var(--color-bg-surface);
+
+  /* Rebrand 01.1 — "Matemática como descoberta" (Paper & Cream) */
+  --color-paper: #F7F4EA;
+  --color-cream: #FFFDF6;
+  --color-ink: #202522;
+  --color-ink-secondary: #5C645F;
+  --color-verdigris: #176B5B;
+  --color-verdigris-bevel: #104E42;
+  --color-verdigris-soft: #DCEBE5;
+  --color-marigold: #F2B84B;
+  --color-marigold-bevel: #D49A2E;
+  --color-marigold-soft: #FFF0C9;
+  --color-coral: #E76F61;
+  --color-coral-bevel: #C75144;
+  --color-coral-soft: #F8DED9;
+  --color-iris: #6E5AA6;
+  --color-iris-bevel: #524080;
+  --color-iris-soft: #E8E3F3;
+  --color-border: #D9D5C8;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 2.1 Rebrand 01.1 Operational Theming ("Não calcule. Veja.")                */
+/* Sets Light Mode (Paper & Cream) as immediate operational :root default     */
+/* Sets Mineral Ink Dark Mode (Ink & Paper) eliminating cosmic blacks         */
+/* -------------------------------------------------------------------------- */
+:root,
+html[data-theme="light"] {
+  --theme-mode: light;
+
+  /* Surfaces & Backgrounds (Paper & Cream) */
+  --color-bg-base: #F7F4EA;        /* Paper base */
+  --color-bg-surface: #FFFDF6;     /* Cream elevated surface */
+  --color-bg-elevated: #FFFDF6;
+
+  /* Paper & Ruler Borders */
+  --color-border-subtle: #D9D5C8;  /* Ruler markings & grid dots */
+  --color-border-bold: #C2BDAE;    /* Firm pressed paper bevels */
+  --color-border: #D9D5C8;
+
+  /* Typography (Nanquim Graphite & Pencil) */
+  --color-text-primary: #202522;   /* Mineral Ink */
+  --color-text-secondary: #5C645F; /* Ink secondary / pencil */
+  --color-text-muted: #8A938E;
+  --color-text-inverse: #F7F4EA;   /* Paper */
+
+  /* Brand Accents & 3D Bevels (Verdigris Signature) */
+  --color-brand: #176B5B;          /* Verdigris signature */
+  --color-brand-bevel: #104E42;
+  --color-brand-text: #FFFFFF;
+  --color-brand-surface: #DCEBE5;  /* Verdigris soft */
+
+  /* Semantic Feedback & 3D Bevels */
+  --color-success: #176B5B;
+  --color-success-bevel: #104E42;
+  --color-success-surface: #DCEBE5;
+
+  --color-alert: #E76F61;          /* Coral */
+  --color-alert-bevel: #C75144;
+  --color-alert-surface: #F8DED9;
+
+  --color-gold: #F2B84B;           /* Marigold */
+  --color-gold-bevel: #D49A2E;
+  --color-gold-surface: #FFF0C9;
+
+  /* Neutral 3D Button Bevel (Pressed Paper) */
+  --color-neutral-bg: #FFFDF6;
+  --color-neutral-bevel: #C2BDAE;
+  --color-neutral-text: #202522;
+
+  /* Backward Compatibility Aliases */
+  --color-bg: var(--color-bg-base);
+  --color-card: var(--color-bg-surface);
+
+  /* Rebrand 01.1 direct properties */
+  --color-paper: #F7F4EA;
+  --color-cream: #FFFDF6;
+  --color-ink: #202522;
+  --color-ink-secondary: #5C645F;
+  --color-verdigris: #176B5B;
+  --color-verdigris-bevel: #104E42;
+  --color-verdigris-soft: #DCEBE5;
+  --color-marigold: #F2B84B;
+  --color-marigold-bevel: #D49A2E;
+  --color-marigold-soft: #FFF0C9;
+  --color-coral: #E76F61;
+  --color-coral-bevel: #C75144;
+  --color-coral-soft: #F8DED9;
+  --color-iris: #6E5AA6;
+  --color-iris-bevel: #524080;
+  --color-iris-soft: #E8E3F3;
+  --color-track-bg: #EFE7D5;
+  --color-paper-beige: #EFE7D5;
+  --color-bg-desktop: #E5DEC9;
+}
+
+html[data-theme="dark"] {
+  --theme-mode: dark;
+
+  /* Mineral Ink Base (eliminating cosmic blacks #030407 & #07090E) */
+  --color-bg-base: #202522;        /* Mineral Ink base */
+  --color-bg-surface: #2B312D;     /* Graphite surface */
+  --color-bg-elevated: #373F3A;
+  --color-track-bg: #202522;
+  --color-paper-beige: #202522;
+  --color-bg-desktop: #181C1A;
+
+  /* Subtle Warm Dividers */
+  --color-border-subtle: rgba(247, 244, 234, 0.12);
+  --color-border-bold: rgba(247, 244, 234, 0.22);
+  --color-border: rgba(247, 244, 234, 0.14);
+
+  /* Typography (Paper on Mineral Ink) */
+  --color-text-primary: #F7F4EA;   /* Paper text */
+  --color-text-secondary: #C2BDAE;
+  --color-text-muted: #8A938E;
+  --color-text-inverse: #202522;   /* Mineral ink */
+
+  /* Brand Accents & 3D Bevels (Verdigris Signature) */
+  --color-brand: #176B5B;
+  --color-brand-bevel: #104E42;
+  --color-brand-text: #FFFFFF;
+  --color-brand-surface: rgba(23, 107, 91, 0.25);
+
+  --color-success: #176B5B;
+  --color-success-bevel: #104E42;
+  --color-success-surface: rgba(23, 107, 91, 0.25);
+
+  --color-alert: #E76F61;          /* Coral */
+  --color-alert-bevel: #C75144;
+  --color-alert-surface: rgba(231, 111, 97, 0.25);
+
+  --color-gold: #F2B84B;           /* Marigold */
+  --color-gold-bevel: #D49A2E;
+  --color-gold-surface: rgba(242, 184, 75, 0.25);
+
+  /* Neutral 3D Button Bevel */
+  --color-neutral-bg: #2B312D;
+  --color-neutral-bevel: #1C201E;
+  --color-neutral-text: #F7F4EA;
+
+  /* Backward Compatibility Aliases */
+  --color-bg: var(--color-bg-base);
+  --color-card: var(--color-bg-surface);
+
+  /* Rebrand 01.1 direct properties */
+  --color-paper: #F7F4EA;
+  --color-cream: #FFFDF6;
+  --color-ink: #F7F4EA;
+  --color-ink-secondary: #C2BDAE;
+  --color-verdigris: #176B5B;
+  --color-verdigris-bevel: #104E42;
+  --color-verdigris-soft: rgba(23, 107, 91, 0.25);
+  --color-marigold: #F2B84B;
+  --color-marigold-bevel: #D49A2E;
+  --color-marigold-soft: rgba(242, 184, 75, 0.25);
+  --color-coral: #E76F61;
+  --color-coral-bevel: #C75144;
+  --color-coral-soft: rgba(231, 111, 97, 0.25);
+  --color-iris: #6E5AA6;
+  --color-iris-bevel: #524080;
+  --color-iris-soft: rgba(110, 90, 166, 0.25);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 3. Global Foundations & Anti-Layout Shift Typography                       */
+/* -------------------------------------------------------------------------- */
+:root {
+  /* Font Family Definitions */
+  --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* 3D Depth & Depression Standards */
+  --extrusion-sm: 3px;
+  --depression-sm: 2px;
+
+  --extrusion-md: 4px;
+  --depression-md: 3px;
+
+  --extrusion-lg: 6px;
+  --depression-lg: 4px;
+
+  /* Spring Release vs Instant Press Timing */
+  --release-spring: transform 0.08s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.08s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --press-instant: none;
+}
+
+/* Strict Anti-Layout Shift Tabular Numerals */
+.font-mono-tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 4. Duolingo-Inspired 3D Tactile Buttons                                    */
+/* -------------------------------------------------------------------------- */
+
+.aura-3d-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform, box-shadow;
+
+  /* Default sizes & extrusion */
+  --btn-extrusion: var(--extrusion-md);
+  --btn-depression: var(--depression-md);
+  --btn-bg: var(--color-brand);
+  --btn-bevel: var(--color-brand-bevel);
+  --btn-text: var(--color-brand-text);
+
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+  border-radius: 14px;
+  transform: translateY(0);
+  box-shadow: 0 var(--btn-extrusion) 0 var(--btn-bevel);
+  transition: var(--release-spring);
+}
+
+/* Desktop Hover */
+@media (hover: hover) {
+  .aura-3d-btn:hover:not(:disabled):not(:active):not(.is-active) {
+    filter: brightness(1.06);
+  }
+}
+
+/* Accessible Keyboard Focus Visible */
+.aura-3d-btn:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* Strict 0ms Press Latency (Native :active and keyboard/touch .is-active) */
+.aura-3d-btn:active:not(:disabled),
+.aura-3d-btn.is-active:not(:disabled) {
+  transform: translateY(var(--btn-depression)) !important;
+  box-shadow: 0 calc(var(--btn-extrusion) - var(--btn-depression)) 0 var(--btn-bevel) !important;
+  transition: none !important;
+}
+
+/* Disabled State */
+.aura-3d-btn:disabled,
+.aura-3d-btn.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(0) !important;
+  pointer-events: none;
+}
+
+/* --- Button Color Variants --- */
+.aura-3d-btn--brand {
+  --btn-bg: var(--color-brand);
+  --btn-bevel: var(--color-brand-bevel);
+  --btn-text: var(--color-brand-text);
+}
+
+.aura-3d-btn--success {
+  --btn-bg: var(--color-success);
+  --btn-bevel: var(--color-success-bevel);
+  --btn-text: #FFFFFF;
+}
+
+.aura-3d-btn--alert {
+  --btn-bg: var(--color-alert);
+  --btn-bevel: var(--color-alert-bevel);
+  --btn-text: #FFFFFF;
+}
+
+.aura-3d-btn--gold {
+  --btn-bg: var(--color-gold);
+  --btn-bevel: var(--color-gold-bevel);
+  --btn-text: #FFFFFF;
+}
+
+.aura-3d-btn--gold.aura-3d-btn--sm {
+  --btn-text: #0F172A;
+  color: #0F172A;
+}
+
+.aura-3d-btn--neutral {
+  --btn-bg: var(--color-neutral-bg);
+  --btn-bevel: var(--color-neutral-bevel);
+  --btn-text: var(--color-neutral-text);
+}
+
+/* --- Rebrand 01.1 Button Variants ("Não Calcule. Veja.") --- */
+.aura-3d-btn--verdigris {
+  --btn-bg: var(--color-verdigris);
+  --btn-bevel: var(--color-verdigris-bevel);
+  --btn-text: #FFFFFF;
+}
+
+.aura-3d-btn--marigold {
+  --btn-bg: var(--color-marigold);
+  --btn-bevel: var(--color-marigold-bevel);
+  --btn-text: #202522;
+}
+
+.aura-3d-btn--coral {
+  --btn-bg: var(--color-coral);
+  --btn-bevel: var(--color-coral-bevel);
+  --btn-text: #FFFFFF;
+}
+
+.aura-3d-btn--iris {
+  --btn-bg: var(--color-iris);
+  --btn-bevel: var(--color-iris-bevel);
+  --btn-text: #FFFFFF;
+}
+
+.aura-3d-btn--paper {
+  --btn-bg: var(--color-cream);
+  --btn-bevel: var(--color-border-bold);
+  --btn-text: var(--color-ink);
+}
+
+/* --- Button Sizes --- */
+.aura-3d-btn--sm {
+  height: 38px;
+  padding: 0 16px;
+  font-size: 0.82rem;
+  border-radius: 12px;
+  --btn-extrusion: var(--extrusion-sm);
+  --btn-depression: var(--depression-sm);
+}
+
+.aura-3d-btn--md {
+  height: 48px;
+  padding: 0 24px;
+  font-size: 0.92rem;
+  border-radius: 14px;
+  --btn-extrusion: var(--extrusion-md);
+  --btn-depression: var(--depression-md);
+}
+
+.aura-3d-btn--lg {
+  height: 54px;
+  padding: 0 28px;
+  font-size: 1.05rem;
+  border-radius: 16px;
+  --btn-extrusion: var(--extrusion-lg);
+  --btn-depression: var(--depression-lg);
+}
+
+.aura-3d-btn--full {
+  width: 100%;
+}
+
+/* Tactile Icon-only Button (e.g. ThemeToggle, AudioToggle) */
+.aura-3d-btn--icon-sm {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+  border-radius: 10px;
+  --btn-extrusion: var(--extrusion-sm);
+  --btn-depression: var(--depression-sm);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 5. 3D Tactile Shortcut Card (Olho Matemático & Selection Options)          */
+/* -------------------------------------------------------------------------- */
+
+.aura-3d-shortcut-card {
+  position: relative;
+  transform: translateY(0);
+  box-shadow: 0 4px 0 var(--color-border-bold);
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+
+.aura-3d-shortcut-card:active:not(:disabled),
+.aura-3d-shortcut-card.is-active:not(:disabled) {
+  transform: translateY(3px) !important;
+  box-shadow: 0 1px 0 var(--color-border-bold) !important;
+  transition: none !important;
+}
+

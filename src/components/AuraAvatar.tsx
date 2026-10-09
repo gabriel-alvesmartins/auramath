@@ -1,4 +1,5 @@
-﻿import React from 'react';
+import React from 'react';
+import { AuraMascotWeb, AuraMascotStage, AuraMascotState } from './AuraMascotWeb';
 
 interface AuraAvatarProps {
   combo?: number;
@@ -11,72 +12,82 @@ export const AuraAvatar: React.FC<AuraAvatarProps> = ({
   combo = 1,
   size = 84,
   state = 'idle',
-  showBadge = true
+  showBadge = true,
 }) => {
-  const stage = combo >= 35 ? 5 : combo >= 20 ? 4 : combo >= 10 ? 3 : combo >= 5 ? 2 : 1;
+  const stageNum: number = combo >= 35 ? 5 : combo >= 20 ? 4 : combo >= 10 ? 3 : combo >= 5 ? 2 : 1;
+  const stageMap: Record<number, AuraMascotStage> = {
+    1: 'dot',
+    2: 'line',
+    3: 'shape',
+    4: 'pattern',
+    5: 'insight',
+  };
+  const stageKey = stageMap[stageNum] || 'dot';
 
-  const stageMeta = [
-    { name: 'Spark', color: '#00F2FE', glow: 'rgba(0, 242, 254, 0.6)', img: '/assets/aura_spark.jpg' },
-    { name: 'Surge', color: '#38BDF8', glow: 'rgba(56, 189, 248, 0.6)', img: '/assets/aura_spark.jpg' },
-    { name: 'Overdrive', color: '#8A2BE2', glow: 'rgba(138, 43, 226, 0.7)', img: '/assets/aura_supernova.jpg' },
-    { name: 'Supernova', color: '#FACC15', glow: 'rgba(250, 204, 21, 0.8)', img: '/assets/aura_supernova.jpg' },
-    { name: 'Singularity', color: '#E11D48', glow: 'rgba(225, 29, 72, 0.85)', img: '/assets/aura_supernova.jpg' }
-  ][stage - 1];
+  const stageLabels: Record<number, { name: string; color: string }> = {
+    1: { name: 'Ponto', color: '#176B5B' },
+    2: { name: 'Linha', color: '#6E5AA6' },
+    3: { name: 'Forma', color: '#E76F61' },
+    4: { name: 'Padrão', color: '#F2B84B' },
+    5: { name: 'Insight', color: '#176B5B' },
+  };
+
+  const currentMeta = stageLabels[stageNum];
+  const mascotState: AuraMascotState = state === 'hit' ? 'thinking' : state === 'happy' ? 'happy' : 'idle';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <div
-        className="animate-float"
         style={{
           width: size,
           height: size,
-          borderRadius: '50%',
-          padding: '3px',
-          background: `linear-gradient(135deg, ${stageMeta.color}, rgba(13, 17, 26, 0.3))`,
-          boxShadow: `0 0 24px ${stageMeta.glow}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           position: 'relative',
-          transform: state === 'hit' ? 'scale(0.92) rotate(-4deg)' : state === 'happy' ? 'scale(1.08)' : 'scale(1)',
-          transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
         }}
       >
-        <img
-          src={stageMeta.img}
-          alt="Aura Mascot"
-          style={{
-            width: '100%',
-            height: '100%',
-            borderRadius: '50%',
-            objectFit: 'cover',
-            display: 'block'
-          }}
+        <AuraMascotWeb
+          size={size}
+          stage={stageNum as AuraMascotStage}
+          state={mascotState}
+          showTierBadge={false}
+          showSpeechBubble={false}
         />
-        {/* Pulsing ring */}
-        <div style={{
-          position: 'absolute',
-          inset: '-4px',
-          borderRadius: '50%',
-          border: `1.5px dashed ${stageMeta.color}`,
-          opacity: 0.5,
-          pointerEvents: 'none'
-        }} />
       </div>
 
       {showBadge && (
-        <div style={{
-          marginTop: '8px',
-          fontSize: '0.68rem',
-          fontWeight: 800,
-          letterSpacing: '0.06em',
-          color: stageMeta.color,
-          backgroundColor: 'rgba(13, 17, 26, 0.9)',
-          padding: '3px 10px',
-          borderRadius: '12px',
-          border: `1px solid ${stageMeta.color}40`,
-          textTransform: 'uppercase'
-        }}>
-          {stageMeta.name} {combo > 1 ? `${combo}x` : ''}
+        <div
+          style={{
+            marginTop: '8px',
+            fontSize: '0.7rem',
+            fontWeight: 800,
+            letterSpacing: '0.04em',
+            color: 'var(--color-ink, #202522)',
+            backgroundColor: 'var(--color-bg-surface, #FFFDF6)',
+            padding: '3px 10px',
+            borderRadius: '12px',
+            border: '1px solid var(--color-border-subtle, #D9D5C8)',
+            boxShadow: '0 2px 0 var(--color-border-bold, #C2BDAE)',
+            textTransform: 'uppercase',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+          }}
+        >
+          <span
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: currentMeta.color,
+              display: 'inline-block',
+            }}
+          />
+          {currentMeta.name} {combo > 1 ? `${combo}x` : ''}
         </div>
       )}
     </div>
   );
 };
+

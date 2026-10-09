@@ -1,18 +1,105 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Compass, Zap, Swords, Shapes, User, Flame, Star, Volume2, VolumeX,
-  Wifi, Battery, Sparkles
+  Wifi, Battery, BookOpen
 } from 'lucide-react';
 import { audioSynth } from './services/audioSynth';
 import { TrackView } from './views/TrackView';
 import { TrainHubView } from './views/TrainHubView';
 import { DuelHubView } from './views/DuelHubView';
-import { LabView } from './views/LabView';
 import { ProfileHubView } from './views/ProfileHubView';
+import { DuolingoLessonView } from './views/DuolingoLessonView';
+import { DevComplianceView } from './views/DevComplianceView';
+import { ThemeToggle } from './components/tactile/ThemeToggle';
+import { gamificationEngine } from './services/gamificationEngine';
+import {
+  StreakPopoverModal,
+  XpBoostBadge,
+  AchievementUnlockModal,
+  AuraNudgeToast,
+} from './components/gamification';
+
+export type AppRoute =
+  | { type: 'track' }
+  | { type: 'train' }
+  | { type: 'duels' }
+  | { type: 'profile' }
+  | { type: 'lesson'; nodeId: string }
+  | { type: 'dev' };
+
+function parseRoute(): AppRoute {
+  if (typeof window === 'undefined') {
+    return { type: 'track' };
+  }
+  const hash = (window.location?.hash || '').replace(/^#\/?/, '').trim();
+  let pathname = (window.location?.pathname || '').replace(/^\//, '').trim();
+  if (pathname.startsWith('auramath/')) {
+    pathname = pathname.slice('auramath/'.length).trim();
+  } else if (pathname === 'auramath') {
+    pathname = '';
+  }
+  const segment = hash || pathname;
+
+  if (segment === 'dev' || segment.startsWith('dev/')) {
+    return { type: 'dev' };
+  }
+  if (segment.startsWith('lesson/')) {
+    const nodeId = segment.slice('lesson/'.length).trim();
+    if (nodeId) {
+      return { type: 'lesson', nodeId };
+    }
+  }
+  if (segment === 'train' || segment.startsWith('train/')) {
+    return { type: 'train' };
+  }
+  if (segment === 'duels' || segment.startsWith('duels/')) {
+    return { type: 'duels' };
+  }
+  if (segment === 'profile' || segment.startsWith('profile/')) {
+    return { type: 'profile' };
+  }
+  return { type: 'track' };
+}
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'track' | 'train' | 'duels' | 'lab' | 'profile'>('track');
+  const [route, setRoute] = useState<AppRoute>(parseRoute);
   const [isMuted, setIsMuted] = useState(false);
+  const [gamState, setGamState] = useState(gamificationEngine.getState());
+  const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
+
+  const streak = gamState.streak.current;
+  const stars = gamState.stars;
+  const xp = gamState.xp;
+
+  useEffect(() => {
+    const onLocationChange = () => {
+      setRoute(parseRoute());
+    };
+    window.addEventListener('popstate', onLocationChange);
+    window.addEventListener('hashchange', onLocationChange);
+    return () => {
+      window.removeEventListener('popstate', onLocationChange);
+      window.removeEventListener('hashchange', onLocationChange);
+    };
+  }, []);
+
+  const navigateTo = (path: string) => {
+    if (typeof window !== 'undefined') {
+      const clean = path.replace(/^#?\/?/, '');
+      const isGhPages = window.location.pathname.startsWith('/auramath');
+      const target = isGhPages ? `/auramath/${clean}` : `/${clean}`;
+      try {
+        window.history.pushState(null, '', target);
+      } catch {}
+      setRoute(parseRoute());
+    }
+  };
+
+  useEffect(() => {
+    return gamificationEngine.subscribe((next) => {
+      setGamState(next);
+    });
+  }, []);
 
   useEffect(() => {
     const handleFirstTouch = () => {
@@ -34,26 +121,38 @@ export default function App() {
     audioSynth.setMuted(next);
   };
 
+  // ERP Mode: Accessible ONLY by URL route (/dev or #/dev)
+  if (route.type === 'dev') {
+    return (
+      <DevComplianceView
+        onReturn={() => navigateTo('/track')}
+        onStartLesson={(nodeId) => navigateTo(`/lesson/${nodeId}`)}
+      />
+    );
+  }
+
+  const isLesson = route.type === 'lesson';
+
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#030407',
-      backgroundImage: 'radial-gradient(ellipse at top, rgba(138, 43, 226, 0.15), transparent 60%), radial-gradient(ellipse at bottom, rgba(0, 242, 254, 0.08), transparent 70%)',
+      backgroundColor: 'var(--color-bg-desktop, #E5DEC9)',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      color: '#F8FAFC'
+      fontFamily: 'var(--font-body, Inter, sans-serif)',
+      color: 'var(--color-text-primary, #202522)',
+      transition: 'background-color 0.2s ease, color 0.2s ease'
     }}>
       {/* Centered Mobile Device Frame */}
       <div style={{
         width: '100%',
         maxWidth: '430px',
         minHeight: '100vh',
-        backgroundColor: '#07090E',
-        borderLeft: '1px solid rgba(255, 255, 255, 0.06)',
-        borderRight: '1px solid rgba(255, 255, 255, 0.06)',
-        boxShadow: '0 0 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 242, 254, 0.1)',
+        backgroundColor: route.type === 'track' ? 'var(--color-track-bg, #EFE7D5)' : 'var(--color-bg-base, #F7F4EA)',
+        borderLeft: '1px solid var(--color-border-subtle, #D9D5C8)',
+        borderRight: '1px solid var(--color-border-subtle, #D9D5C8)',
+        boxShadow: '0 4px 24px rgba(32, 37, 34, 0.08)',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative'
@@ -67,18 +166,19 @@ export default function App() {
           alignItems: 'center',
           fontSize: '0.82rem',
           fontWeight: 700,
-          color: '#F8FAFC',
+          color: 'var(--color-text-primary, #202522)',
           zIndex: 40,
-          backgroundColor: '#07090E'
+          backgroundColor: 'var(--color-bg-surface, #FFFDF6)',
+          borderBottom: '1px solid var(--color-border-subtle, #D9D5C8)'
         }}>
           <span>9:41</span>
           {/* Dynamic Island Pill */}
           <div style={{
             width: '110px',
             height: '24px',
-            backgroundColor: '#000',
+            backgroundColor: 'var(--color-ink, #202522)',
             borderRadius: '12px',
-            boxShadow: '0 0 8px rgba(0, 0, 0, 0.8)'
+            boxShadow: '0 1px 3px rgba(32, 37, 34, 0.2)'
           }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Wifi size={14} />
@@ -86,167 +186,280 @@ export default function App() {
           </div>
         </div>
 
-        {/* Mobile App Header */}
-        <header style={{
-          padding: '8px 16px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-          backgroundColor: 'rgba(7, 9, 14, 0.95)',
-          backdropFilter: 'blur(10px)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 30
-        }}>
-          {/* Left Avatar & Level */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: '12px',
-              overflow: 'hidden',
-              border: '1.5px solid #00F2FE',
-              boxShadow: '0 0 10px rgba(0, 242, 254, 0.4)'
-            }}>
-              <img src="/assets/aura_spark.jpg" alt="Aura" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
-            <div>
-              <div style={{ fontSize: '0.82rem', fontWeight: 800, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ color: '#00F2FE' }}>AURA</span>MATH
-              </div>
-              <span style={{ fontSize: '0.65rem', color: '#8A2BE2', fontWeight: 700 }}>Nv. 14</span>
-            </div>
-          </div>
-
-          {/* Right Metrics & Audio Toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              backgroundColor: 'rgba(251, 113, 133, 0.12)',
-              border: '1px solid rgba(251, 113, 133, 0.3)',
-              borderRadius: '12px',
-              padding: '4px 8px',
-              fontSize: '0.78rem',
-              fontWeight: 800,
-              color: '#FB7185'
-            }}>
-              <Flame size={14} fill="#FB7185" />
-              <span>18</span>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              backgroundColor: 'rgba(250, 204, 21, 0.12)',
-              border: '1px solid rgba(250, 204, 21, 0.3)',
-              borderRadius: '12px',
-              padding: '4px 8px',
-              fontSize: '0.78rem',
-              fontWeight: 800,
-              color: '#FACC15'
-            }}>
-              <Star size={13} fill="#FACC15" />
-              <span>48</span>
-            </div>
-
-            <button
-              onClick={toggleSound}
-              style={{
-                background: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: isMuted ? '#64748B' : '#00F2FE',
-                borderRadius: '10px',
+        {/* Mobile App Header (escondido durante a lição imersiva) */}
+        {!isLesson && (
+          <header style={{
+            padding: '8px 16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid var(--color-border-subtle, #D9D5C8)',
+            backgroundColor: 'var(--color-bg-surface, #FFFDF6)',
+            position: 'sticky',
+            top: 0,
+            zIndex: 30
+          }}>
+            {/* Left Avatar & Lowercase Wordmark */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {/* Observation Dot Avatar Badge */}
+              <div style={{
                 width: '32px',
                 height: '32px',
+                borderRadius: '10px',
+                backgroundColor: 'var(--color-cream, #FFFDF6)',
+                border: '1.5px solid var(--color-ink, #202522)',
+                boxShadow: '0 2px 0 var(--color-border-bold, #C2BDAE)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                cursor: 'pointer'
-              }}
-            >
-              {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-            </button>
-          </div>
-        </header>
+                overflow: 'hidden'
+              }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <ellipse cx="12" cy="13" rx="8" ry="7" fill="var(--color-cream, #FFFDF6)" stroke="var(--color-ink, #202522)" strokeWidth="1.6" />
+                  <circle cx="9.5" cy="12.5" r="1.3" fill="var(--color-ink, #202522)" />
+                  <circle cx="14.5" cy="12.5" r="1.3" fill="var(--color-ink, #202522)" />
+                  <path d="M11 15c.5.4 1.5.4 2 0" stroke="var(--color-ink, #202522)" strokeWidth="1.3" strokeLinecap="round" />
+                  <path d="M12 6v2" stroke="var(--color-ink, #202522)" strokeWidth="1.5" strokeLinecap="round" />
+                  <circle cx="12" cy="4.5" r="2.2" fill="var(--color-marigold, #F2B84B)" stroke="var(--color-ink, #202522)" strokeWidth="1.3" />
+                </svg>
+              </div>
 
-        {/* Viewport Content */}
-        <main style={{ flex: 1, overflowY: 'auto' }}>
-          {activeTab === 'track' && <TrackView onStartDrill={() => setActiveTab('train')} />}
-          {activeTab === 'train' && <TrainHubView />}
-          {activeTab === 'duels' && <DuelHubView />}
-          {activeTab === 'lab' && <LabView />}
-          {activeTab === 'profile' && <ProfileHubView />}
-        </main>
+              {/* Lowercase Wordmark with Observation Dot */}
+              <div style={{ display: 'flex', alignItems: 'baseline', letterSpacing: '-0.03em' }}>
+                <span style={{
+                  fontFamily: 'var(--font-display, "Plus Jakarta Sans", sans-serif)',
+                  fontWeight: 800,
+                  fontSize: '1.08rem',
+                  color: 'var(--color-text-primary, #202522)'
+                }}>
+                  aura
+                </span>
+                <span style={{
+                  display: 'inline-block',
+                  margin: '0 2px',
+                  fontSize: '0.78rem',
+                  color: 'var(--color-verdigris, #176B5B)',
+                  transform: 'translateY(-1px)'
+                }}>
+                  ●
+                </span>
+                <span style={{
+                  fontFamily: 'var(--font-display, "Plus Jakarta Sans", sans-serif)',
+                  fontWeight: 800,
+                  fontSize: '1.08rem',
+                  color: 'var(--color-text-primary, #202522)'
+                }}>
+                  math
+                </span>
+              </div>
+            </div>
 
-        {/* Native Mobile Bottom Tab Bar */}
-        <nav style={{
-          position: 'fixed',
-          bottom: 0,
-          width: '100%',
-          maxWidth: '430px',
-          height: '68px',
-          backgroundColor: 'rgba(11, 15, 25, 0.96)',
-          backdropFilter: 'blur(16px)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          display: 'flex',
-          justifyContent: 'space-around',
-          alignItems: 'center',
-          padding: '0 8px',
-          zIndex: 50,
-          boxSizing: 'border-box'
-        }}>
-          {[
-            { id: 'track', label: 'Trilha', icon: Compass },
-            { id: 'train', label: 'Treino', icon: Zap },
-            { id: 'duels', label: 'Duelos', icon: Swords },
-            { id: 'lab', label: 'Lab', icon: Shapes },
-            { id: 'profile', label: 'Perfil', icon: User },
-          ].map(tab => {
-            const Icon = tab.icon;
-            const isSel = activeTab === tab.id;
+            {/* Right Metrics, Theme Toggle & Audio Toggle */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {/* Active XP Boost Pill */}
+              {gamState.activeXpBoost && (
+                <XpBoostBadge expiresAt={gamState.activeXpBoost.expiresAt} />
+              )}
 
-            return (
+              {/* Streak Pill (Interactive Button to Open Streak Popover) */}
               <button
-                key={tab.id}
+                type="button"
                 onClick={() => {
-                  setActiveTab(tab.id as any);
                   audioSynth.playKeypressTick();
+                  setIsStreakModalOpen(true);
                 }}
                 style={{
-                  background: 'none',
-                  border: 'none',
                   display: 'flex',
-                  flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '3px',
-                  cursor: 'pointer',
-                  padding: '6px 12px',
-                  borderRadius: '16px',
-                  color: isSel ? '#00F2FE' : '#64748B',
-                  transition: 'all 0.12s'
-                }}
-              >
-                <div style={{
-                  padding: '4px 14px',
+                  gap: '5px',
+                  backgroundColor: 'var(--color-marigold-soft, #FFF0C9)',
+                  border: '1.5px solid var(--color-marigold-bevel, #D49A2E)',
+                  boxShadow: '0 2px 0 var(--color-marigold-bevel, #D49A2E)',
                   borderRadius: '12px',
-                  backgroundColor: isSel ? 'rgba(0, 242, 254, 0.15)' : 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <Icon size={20} strokeWidth={isSel ? 2.6 : 1.8} />
-                </div>
-                <span style={{ fontSize: '0.68rem', fontWeight: isSel ? 800 : 500 }}>
-                  {tab.label}
-                </span>
+                  padding: '4px 9px',
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  color: 'var(--color-ink, #202522)',
+                  cursor: 'pointer',
+                  outline: 'none',
+                }}
+                title="Ver detalhes da sua ofensiva"
+                aria-label="Ver detalhes da sua ofensiva"
+              >
+                <Flame size={14} color="var(--color-marigold-bevel, #D49A2E)" fill="var(--color-marigold, #F2B84B)" />
+                <span className="font-mono-tabular">{streak}</span>
               </button>
-            );
-          })}
-        </nav>
+
+              {/* Discovery Stars Pill */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                backgroundColor: 'var(--color-verdigris-soft, #DCEBE5)',
+                border: '1.5px solid var(--color-verdigris-bevel, #104E42)',
+                boxShadow: '0 2px 0 var(--color-verdigris-bevel, #104E42)',
+                borderRadius: '12px',
+                padding: '4px 9px',
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                color: 'var(--color-ink, #202522)'
+              }}>
+                <Star size={13} color="var(--color-verdigris-bevel, #104E42)" fill="var(--color-verdigris, #176B5B)" />
+                <span className="font-mono-tabular">{stars}</span>
+              </div>
+
+              <ThemeToggle />
+
+              {/* Audio Mute Button (Tactile 3D Neutral Button) */}
+              <button
+                type="button"
+                onClick={toggleSound}
+                className="aura-3d-btn aura-3d-btn--neutral aura-3d-btn--icon-sm"
+                style={{
+                  color: isMuted ? 'var(--color-text-muted, #8A938E)' : 'var(--color-verdigris, #176B5B)',
+                  cursor: 'pointer'
+                }}
+                title={isMuted ? 'Ativar Áudio' : 'Desativar Áudio'}
+                aria-label={isMuted ? 'Ativar Áudio' : 'Desativar Áudio'}
+              >
+                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </button>
+            </div>
+          </header>
+        )}
+
+        {/* Viewport Content */}
+        <main style={{
+          flex: 1,
+          overflowY: 'auto',
+          backgroundColor: route.type === 'track' ? 'var(--color-track-bg, #EFE7D5)' : 'var(--color-bg-base, #F7F4EA)',
+        }}>
+          {route.type === 'lesson' && (
+            <DuolingoLessonView
+              nodeId={route.nodeId}
+              onClose={() => navigateTo('/track')}
+              onFinish={(stats) => {
+                gamificationEngine.recordLessonCompletion(
+                  stats.xpEarned,
+                  stats.accuracy,
+                  route.nodeId,
+                  stats.stars
+                );
+                navigateTo('/track');
+              }}
+            />
+          )}
+          {route.type === 'track' && (
+            <TrackView onStartLesson={(nodeId) => navigateTo(`/lesson/${nodeId}`)} />
+          )}
+          {route.type === 'train' && (
+            <TrainHubView onStartLesson={(nodeId) => navigateTo(`/lesson/${nodeId}`)} />
+          )}
+          {route.type === 'duels' && <DuelHubView />}
+          {route.type === 'profile' && <ProfileHubView />}
+        </main>
+
+        {/* Editorial Tactile Bottom Tab Bar (escondido durante a lição) */}
+        {!isLesson && (
+          <nav style={{
+            position: 'fixed',
+            bottom: 0,
+            width: '100%',
+            maxWidth: '430px',
+            height: '68px',
+            backgroundColor: 'var(--color-bg-surface, #FFFDF6)',
+            borderTop: '1px solid var(--color-border-subtle, #D9D5C8)',
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            padding: '0 8px',
+            zIndex: 50,
+            boxSizing: 'border-box'
+          }}>
+            {[
+              { id: 'track', label: 'Trilha', icon: Compass, path: '/track' },
+              { id: 'train', label: 'Treino', icon: Zap, path: '/train' },
+              { id: 'duels', label: 'Duelos', icon: Swords, path: '/duels' },
+              { id: 'profile', label: 'Perfil', icon: User, path: '/profile' },
+            ].map(tab => {
+              const Icon = tab.icon;
+              const isSel = route.type === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => {
+                    navigateTo(tab.path);
+                    audioSynth.playKeypressTick();
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '3px',
+                    cursor: 'pointer',
+                    padding: '4px 8px',
+                    color: isSel ? 'var(--color-verdigris, #176B5B)' : 'var(--color-ink-secondary, #5C645F)',
+                    transition: 'all 0.12s ease'
+                  }}
+                >
+                  <div style={{
+                    padding: '4px 14px',
+                    borderRadius: '12px',
+                    backgroundColor: isSel ? 'var(--color-verdigris-soft, #DCEBE5)' : 'transparent',
+                    border: isSel ? '1.5px solid var(--color-verdigris-bevel, #104E42)' : '1.5px solid transparent',
+                    boxShadow: isSel ? '0 2px 0 var(--color-verdigris-bevel, #104E42)' : 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transform: isSel ? 'translateY(-1px)' : 'none',
+                    transition: 'all 0.12s ease'
+                  }}>
+                    <Icon
+                      size={19}
+                      strokeWidth={isSel ? 2.6 : 1.9}
+                      color={isSel ? 'var(--color-verdigris, #176B5B)' : 'var(--color-ink-secondary, #5C645F)'}
+                    />
+                  </div>
+                  <span style={{
+                    fontSize: '0.68rem',
+                    fontWeight: isSel ? 800 : 600,
+                    fontFamily: 'var(--font-display, "Plus Jakarta Sans", sans-serif)'
+                  }}>
+                    {tab.label}
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
+        )}
+
+        {/* Gamification Streak & Wager Modal */}
+        <StreakPopoverModal
+          isOpen={isStreakModalOpen}
+          onClose={() => setIsStreakModalOpen(false)}
+          streakState={gamState.streak}
+          starsCount={gamState.stars}
+          onBuyFreeze={() => gamificationEngine.buyStreakFreeze(100)}
+          onPlaceWager={(days, bet) => gamificationEngine.placeStreakWager(days, bet)}
+          onSolveRescueTask={() => gamificationEngine.completeRescueStep()}
+        />
+
+        {/* Day 1 & Milestone Achievement Celebratory Modal */}
+        <AchievementUnlockModal
+          achievement={gamState.recentlyUnlockedAchievement}
+          onClose={() => gamificationEngine.dismissAchievementModal()}
+        />
+
+        {/* Humanized Aura Mascot Nudge Toast */}
+        <AuraNudgeToast
+          nudge={gamState.activeNudge}
+          onDismiss={() => gamificationEngine.dismissNudge()}
+          onAction={(targetRoute) => navigateTo('/' + targetRoute)}
+        />
       </div>
     </div>
   );

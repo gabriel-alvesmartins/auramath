@@ -10,9 +10,30 @@
   ],
   "scripts": {
     "dev": "vite",
-    "test": "npm run test --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present && npm run test:e2e",
+    "test:e2e": "node --experimental-strip-types --test test/e2e/*.test.mjs",
+    "build": "npm run build --workspaces --if-present && vite build",
+    "build:web": "vite build",
+    "lint": "npm run lint --workspaces --if-present",
+    "prepare": "git config core.hooksPath .githooks 2>nul || true",
+    "mascot:vectorize": "python scripts/vectorize-mascot.py",
+    "spec:check": "node scripts/spec-compliance.mjs",
+    "spec:sync": "node scripts/sync-github-backlog.mjs"
+  },
+  "dependencies": {
+    "canvas-confetti": "^1.9.2",
+    "esbuild": "^0.28.2",
+    "lucide-react": "^0.344.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.2.0"
   },
   "keywords": [
     "mental-math",

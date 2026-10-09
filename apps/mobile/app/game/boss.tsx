@@ -5,9 +5,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, radii, typography, glows } from '../../../../src/theme/tokens';
 import { BOSS_LIST, BossData, generateQuestion, Question } from '@auramath/engine';
-import { Numpad } from '../../../../src/components/Numpad';
-import { EquationDisplay } from '../../../../src/components/EquationDisplay';
-import { AuraMascot } from '../../../../src/components/AuraMascot';
+import { Numpad } from '../../src/components/Numpad';
+import { EquationDisplay } from '../../src/components/EquationDisplay';
+import { AuraMascot } from '../../src/components/AuraMascot';
 
 export default function BossBattleScreen() {
   const router = useRouter();
@@ -224,15 +224,15 @@ export default function BossBattleScreen() {
       <Modal visible={isVictory} transparent animationType="fade">
         <View style={styles.overlay}>
           <View style={styles.victoryCard}>
-            <Text style={styles.victoryIcon}>👑</Text>
-            <Text style={styles.victoryTitle}>CHEFE DERROTADO!</Text>
+            <Text style={styles.victoryIcon}>🎓</Text>
+            <Text style={styles.victoryTitle}>MAESTRIA COMPROVADA!</Text>
             <Text style={styles.victorySub}>
-              Você dominou as técnicas do Grau {boss.grade} e subjugou {boss.name}!
+              Você dominou as técnicas do Grau {boss.grade}: {boss.name}!
             </Text>
 
             <View style={styles.rewardCard}>
-              <Text style={styles.rewardTag}>NOVA SKIN DESBLOQUEADA</Text>
-              <Text style={styles.rewardName}>Cosmético Raro de Aura</Text>
+              <Text style={styles.rewardTag}>NOVO SELO DE MAESTRIA</Text>
+              <Text style={styles.rewardName}>Certificado de Domínio Estrutural (+250 XP)</Text>
             </View>
 
             <TouchableOpacity
@@ -241,7 +241,7 @@ export default function BossBattleScreen() {
                 router.replace({
                   pathname: '/game/result',
                   params: {
-                    mode: `Chefe: ${boss.name}`,
+                    mode: `Maestria: ${boss.name}`,
                     score: 3500,
                     accuracy: 100,
                     total: 8,
@@ -251,7 +251,7 @@ export default function BossBattleScreen() {
                 });
               }}
             >
-              <Text style={styles.continueBtnText}>REIVINDICAR RECOMPENSA ➔</Text>
+              <Text style={styles.continueBtnText}>REIVINDICAR SELO ➔</Text>
             </TouchableOpacity>
           </View>
         </View>
