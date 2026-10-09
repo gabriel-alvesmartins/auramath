@@ -38,11 +38,11 @@ jobs:
       - name: Run Spec-Compliance Verification
         run: npm run spec:check
 
-      - name: Run E2E Test Suite
-        run: npm run test:e2e
-
       - name: Build engine and web application
         run: npm run build
+
+      - name: Run E2E Test Suite
+        run: npm run test:e2e
 
       - name: Copy 404 fallback for SPA routing
         run: cp dist/index.html dist/404.html
