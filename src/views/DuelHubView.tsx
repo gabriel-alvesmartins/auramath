@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Swords, Calendar, Crown, Trophy, Check, X, Sparkles, User, Clock,
   ArrowRight, ArrowLeft, Shield, Zap, ChevronRight, Play, Lightbulb, Share2,
@@ -11,6 +11,9 @@ import { Aura3DButton } from '../components/tactile';
 import { AuraMascotWeb } from '../components/AuraMascotWeb';
 import { LeagueLeaderboardView } from '../components/gamification';
 import { gamificationEngine } from '../services/gamificationEngine';
+import { eloEngine, RANK_TIERS, EloMatchResult } from '../services/eloEngine';
+import { ghostMatchmaker, GhostOpponent } from '../services/ghostMatchmaker';
+import { useAuth } from '../contexts/AuthContext';
 
 export type DuelSubMode = 'live' | 'daily' | 'split' | 'mastery';
 
@@ -284,6 +287,61 @@ export function DuelHubView() {
             Escolha uma modalidade de confronto abaixo para conferir as regras e iniciar a disputa.
           </p>
         </div>
+
+        {/* Real Elo & Rank Badge */}
+        {(() => {
+          const currentElo = eloEngine.getRating();
+          const currentRank = eloEngine.getRankForRating(currentElo);
+          return (
+            <div
+              style={{
+                backgroundColor: currentRank.softColor,
+                border: `1.5px solid ${currentRank.borderColor}`,
+                borderRadius: '16px',
+                padding: '12px 16px',
+                marginBottom: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '10px',
+                    backgroundColor: currentRank.color,
+                    color: '#FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 900,
+                    fontSize: '0.85rem',
+                  }}
+                >
+                  {currentRank.romanNumeral}
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--color-text-primary, #202522)' }}>
+                    {currentRank.title}
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--color-ink-secondary, #5C645F)' }}>
+                    {eloEngine.getMatchesPlayed()} confrontos computados
+                  </div>
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span
+                  className="font-mono-tabular"
+                  style={{ fontSize: '1.05rem', fontWeight: 900, color: currentRank.color }}
+                >
+                  {currentElo} ELO
+                </span>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Stack of Horizontal Mode Buttons (Menu com botões um abaixo do outro) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -658,6 +716,11 @@ export function DuelHubView() {
 // 1. LIVE COGNITIVE DUEL (FIGMA SCREEN 1:2834)
 // ============================================================================
 function LiveDuelComponent({ onReturn }: { onReturn?: () => void }) {
+  const { user } = useAuth();
+  const [playerRating, setPlayerRating] = useState(() => eloEngine.getRating());
+  const [opponent, setOpponent] = useState<GhostOpponent>(() =>
+    ghostMatchmaker.createCalibratedBot(eloEngine.getRating(), 5)
+  );
   const [round, setRound] = useState(1);
   const totalRounds = 5;
   const [playerScore, setPlayerScore] = useState(0);
@@ -665,6 +728,17 @@ function LiveDuelComponent({ onReturn }: { onReturn?: () => void }) {
   const [selectedOpt, setSelectedOpt] = useState<number | null>(null);
   const [matchOver, setMatchOver] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [matchOutcomeResult, setMatchOutcomeResult] = useState<EloMatchResult | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    ghostMatchmaker.findOpponent(eloEngine.getRating(), 5).then((opp) => {
+      if (isMounted) setOpponent(opp);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Dynamic question with options
   const [currentChallenge, setCurrentChallenge] = useState(() => {
@@ -689,8 +763,16 @@ function LiveDuelComponent({ onReturn }: { onReturn?: () => void }) {
 
     if (opt === currentChallenge.answer) {
       audioSynth.playSuccessNote(playerScore + 1);
-      setPlayerScore((prev) => prev + 1);
-      if (playerScore + 1 >= 3) {
+      const nextScore = playerScore + 1;
+      setPlayerScore(nextScore);
+
+      if (nextScore >= 3 || round >= totalRounds) {
+        const res = eloEngine.recordMatchOutcome(1, opponent.elo, 1.15);
+        setPlayerRating(res.newRating);
+        setMatchOutcomeResult(res);
+        if (!user.isGuest && user.id) {
+          ghostMatchmaker.saveGhostRun(user.id, res.newRating, nextScore * 100, 12000, opponent.timeline);
+        }
         setTimeout(() => {
           setMatchOver(true);
           confetti({ particleCount: 45, spread: 60 });
@@ -702,10 +784,21 @@ function LiveDuelComponent({ onReturn }: { onReturn?: () => void }) {
       }
     } else {
       audioSynth.playErrorSoftRelease();
-      setOpponentScore((prev) => prev + 1);
-      setTimeout(() => {
-        advanceRound();
-      }, 800);
+      const nextOppScore = opponentScore + 1;
+      setOpponentScore(nextOppScore);
+
+      if (nextOppScore >= 3 || round >= totalRounds) {
+        const res = eloEngine.recordMatchOutcome(0, opponent.elo);
+        setPlayerRating(res.newRating);
+        setMatchOutcomeResult(res);
+        setTimeout(() => {
+          setMatchOver(true);
+        }, 500);
+      } else {
+        setTimeout(() => {
+          advanceRound();
+        }, 800);
+      }
     }
   };
 
@@ -736,6 +829,10 @@ function LiveDuelComponent({ onReturn }: { onReturn?: () => void }) {
     setSelectedOpt(null);
     setShowHint(false);
     setMatchOver(false);
+    setMatchOutcomeResult(null);
+    const curElo = eloEngine.getRating();
+    setPlayerRating(curElo);
+    ghostMatchmaker.findOpponent(curElo, 5).then(setOpponent);
   };
 
   return (
@@ -799,7 +896,7 @@ function LiveDuelComponent({ onReturn }: { onReturn?: () => void }) {
               Rodada {round} de {totalRounds}
             </span>
             <span className="font-mono-tabular" style={{ fontSize: '0.72rem', color: 'var(--color-ink-secondary, #5C645F)', fontWeight: 600 }}>
-              ELO 1.420
+              ELO {playerRating} vs {opponent.elo}
             </span>
           </div>
           <span style={{ fontSize: '0.72rem', fontStyle: 'italic', color: 'var(--color-verdigris, #176B5B)', fontWeight: 600 }}>
@@ -858,14 +955,14 @@ function LiveDuelComponent({ onReturn }: { onReturn?: () => void }) {
                   boxShadow: '0 2px 0 var(--color-verdigris-bevel, #104E42)',
                 }}
               >
-                V
+                {user.profile?.display_name ? user.profile.display_name.charAt(0).toUpperCase() : 'V'}
               </div>
               <div>
                 <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--color-text-primary, #202522)' }}>
-                  Você (Guilherme)
+                  Você {user.profile?.display_name ? `(${user.profile.display_name})` : ''}
                 </div>
                 <div style={{ fontSize: '0.68rem', fontStyle: 'italic', color: 'var(--color-ink-secondary, #5C645F)' }}>
-                  Grau IV · Olho Perceptivo
+                  {eloEngine.getRankForRating(playerRating).title} · {playerRating} ELO
                 </div>
               </div>
             </div>
@@ -919,10 +1016,10 @@ function LiveDuelComponent({ onReturn }: { onReturn?: () => void }) {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', marginBottom: '4px' }}>
               <div>
                 <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--color-text-primary, #202522)' }}>
-                  Sofia M. (USP)
+                  {opponent.name}
                 </div>
                 <div style={{ fontSize: '0.68rem', fontStyle: 'italic', color: 'var(--color-ink-secondary, #5C645F)' }}>
-                  Grau IV · Analista
+                  {eloEngine.getRankForRating(opponent.elo).title} · {opponent.elo} ELO
                 </div>
               </div>
               <div
@@ -930,7 +1027,7 @@ function LiveDuelComponent({ onReturn }: { onReturn?: () => void }) {
                   width: '36px',
                   height: '36px',
                   borderRadius: '50%',
-                  backgroundColor: 'var(--color-iris, #6E5AA6)',
+                  backgroundColor: opponent.avatarColor,
                   color: '#FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
@@ -938,10 +1035,10 @@ function LiveDuelComponent({ onReturn }: { onReturn?: () => void }) {
                   fontWeight: 900,
                   fontSize: '0.9rem',
                   border: '2px solid #FFFFFF',
-                  boxShadow: '0 2px 0 #5B488C',
+                  boxShadow: `0 2px 0 ${opponent.avatarColor}`,
                 }}
               >
-                S
+                {opponent.avatarLetter}
               </div>
             </div>
 
@@ -1128,12 +1225,36 @@ function LiveDuelComponent({ onReturn }: { onReturn?: () => void }) {
               textAlign: 'center',
             }}
           >
-            <Trophy size={48} color="var(--color-marigold, #F2B84B)" style={{ margin: '0 auto 12px' }} />
+            <Trophy size={48} color={playerScore >= opponentScore ? "var(--color-marigold, #F2B84B)" : "var(--color-ink-secondary, #5C645F)"} style={{ margin: '0 auto 12px' }} />
             <h2 style={{ fontSize: '1.5rem', fontWeight: 900, margin: '0 0 6px', color: 'var(--color-text-primary, #202522)' }}>
-              Vitória por Antecipação!
+              {playerScore >= opponentScore ? 'Vitória por Antecipação!' : 'Confronto Finalizado'}
             </h2>
             <p style={{ fontSize: '0.84rem', color: 'var(--color-ink-secondary, #5C645F)', margin: '0 0 16px' }}>
-              Você reconheceu os padrões com 100% de precisão e conquistou <strong>+45 ELO Cognitivo</strong>.
+              {playerScore >= opponentScore ? (
+                <>
+                  Você reconheceu os padrões com precisão e conquistou{' '}
+                  <strong style={{ color: 'var(--color-verdigris, #176B5B)' }}>
+                    +{matchOutcomeResult?.delta ?? 24} ELO Cognitivo
+                  </strong>
+                  . Novo Elo:{' '}
+                  <span className="font-mono-tabular" style={{ fontWeight: 800 }}>
+                    {matchOutcomeResult?.newRating ?? playerRating}
+                  </span>
+                  .
+                </>
+              ) : (
+                <>
+                  O oponente foi mais veloz nesta rodada.{' '}
+                  <strong style={{ color: 'var(--color-coral, #E76F61)' }}>
+                    {matchOutcomeResult?.delta ?? -12} ELO
+                  </strong>
+                  . Novo Elo:{' '}
+                  <span className="font-mono-tabular" style={{ fontWeight: 800 }}>
+                    {matchOutcomeResult?.newRating ?? playerRating}
+                  </span>
+                  . Continue treinando!
+                </>
+              )}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

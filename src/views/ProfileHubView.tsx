@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Sparkles, Users, Lock, Check, TrendingUp, Compass, Award, Shield, Eye, Brain, Zap, Clock } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Sparkles, Users, Lock, Check, TrendingUp, Compass, Award, Shield, Eye, Brain, Zap, Clock, AlertTriangle } from 'lucide-react';
 import { MOCK_USER_PROFILE, MASTERY_BADGES, MOCK_CLASSROOMS } from '../engine';
 import { audioSynth } from '../services/audioSynth';
-import { Aura3DButton, CognitiveRadarChart } from '../components/tactile';
+import { Aura3DButton, CognitiveRadarChart, CognitiveRadarData } from '../components/tactile';
 import { AuraMascotWeb } from '../components/AuraMascotWeb';
 import { gamificationEngine } from '../services/gamificationEngine';
+import { useAuth } from '../contexts/AuthContext';
+import { telemetryTracker } from '../services/telemetryTracker';
+import { eloEngine } from '../services/eloEngine';
 
 export function ProfileHubView() {
-  const profile = MOCK_USER_PROFILE;
-  const { radar } = profile;
+  const { user, openAuthModal, signOut } = useAuth();
   const classroom = MOCK_CLASSROOMS[0];
   const [vol, setVol] = useState(80);
   const [gamState, setGamState] = useState(() => gamificationEngine.getState());
@@ -19,44 +21,60 @@ export function ProfileHubView() {
     });
   }, []);
 
+  const realScores = useMemo(() => telemetryTracker.getCognitiveRadar(), []);
+  const archetype = useMemo(() => telemetryTracker.getArchetype(), []);
+  const diagnostic = useMemo(() => telemetryTracker.getDiagnosticReport(), []);
+  const currentElo = user.profile?.elo || eloEngine.getRating();
+  const currentRank = eloEngine.getRankForRating(currentElo);
+
+  const radarData: CognitiveRadarData = {
+    speedScore: realScores.speed,
+    fermiScore: realScores.fermi,
+    flexibilityScore: realScores.flexibility,
+    staminaScore: realScores.stamina,
+    memoryScore: realScores.memory,
+    archetypeTitle: archetype.title,
+    archetypeDescription: archetype.description,
+  };
+
   const dimensionCards = [
     {
       title: 'Velocidade de Decomposição',
-      score: radar.speedScore,
+      score: radarData.speedScore,
       icon: Zap,
-      status: 'Dominado',
+      status: radarData.speedScore >= 70 ? 'Dominado' : 'Em Treino',
       color: 'var(--color-verdigris, #176B5B)',
       description: 'Eliminação do transporte algorítmico tradicional somando e decompondo da esquerda para a direita.',
     },
     {
       title: 'Flexibilidade Algébrica',
-      score: radar.flexibilityScore,
+      score: radarData.flexibilityScore,
       icon: Compass,
-      status: 'Dominado',
+      status: radarData.flexibilityScore >= 70 ? 'Dominado' : 'Em Expansão',
       color: 'var(--color-iris, #6E5AA6)',
       description: 'Detecção imediata de simetrias ocultas, produtos notáveis e atalhos de base 50 e 100.',
     },
     {
       title: 'Estimativa de Fermi',
-      score: radar.fermiScore,
+      score: radarData.fermiScore,
       icon: Eye,
-      status: 'Em Expansão',
+      status: radarData.fermiScore >= 70 ? 'Dominado' : 'Em Expansão',
       color: 'var(--color-marigold, #F2B84B)',
       description: 'Percepção instantânea da ordem de grandeza antes de executar qualquer conta mecânica.',
     },
     {
       title: 'Resistência & Tenacidade',
-      score: radar.staminaScore,
+      score: radarData.staminaScore,
       icon: Shield,
-      status: 'Dominado',
+      status: radarData.staminaScore >= 70 ? 'Dominado' : 'Em Treino',
       color: 'var(--color-verdigris, #176B5B)',
       description: 'Estabilidade de foco sob ritmo acelerado e manutenção de acurácia em sessões longas.',
     },
     {
       title: 'Memória de Trabalho',
-      score: radar.memoryScore,
+      score: radarData.memoryScore,
       icon: Brain,
-      status: 'Em Expansão',
+      status: radarData.memoryScore >= 70 ? 'Dominado' : 'Em Expansão',
       color: 'var(--color-coral, #E76F61)',
       description: 'Retenção transitória de sub-resultados sem necessidade de papel, anotações ou rascunho.',
     },
@@ -137,6 +155,79 @@ export function ProfileHubView() {
         </p>
       </div>
 
+      {/* Account Status & Cloud Sync Banner */}
+      {user.isGuest ? (
+        <div
+          style={{
+            backgroundColor: 'var(--color-bg-surface, #FFFDF6)',
+            border: '1.5px solid var(--color-marigold, #F2B84B)',
+            boxShadow: '0 3px 0 var(--color-marigold-bevel, #D49A2E)',
+            borderRadius: '16px',
+            padding: '12px 14px',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <div>
+            <div style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-ink, #202522)' }}>
+              Caderno em Modo Convidado
+            </div>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-ink-secondary, #5C645F)', lineHeight: 1.3 }}>
+              Insights salvos neste navegador. Conecte sua conta para sincronizar no banco de dados.
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              audioSynth.playKeypressTick();
+              openAuthModal();
+            }}
+            className="aura-3d-btn aura-3d-btn--marigold"
+            style={{ padding: '6px 12px', fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap', cursor: 'pointer' }}
+          >
+            Entrar / Salvar
+          </button>
+        </div>
+      ) : (
+        <div
+          style={{
+            backgroundColor: 'var(--color-verdigris-soft, #DCEBE5)',
+            border: '1.5px solid var(--color-verdigris, #176B5B)',
+            boxShadow: '0 3px 0 var(--color-verdigris-bevel, #104E42)',
+            borderRadius: '16px',
+            padding: '12px 14px',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <div>
+            <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--color-verdigris, #176B5B)' }}>
+              ✦ {user.profile?.display_name || user.email}
+            </div>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-ink-secondary, #5C645F)' }}>
+              @{user.profile?.username || 'caderno'} · ELO: <strong>{user.profile?.elo || 1200}</strong> · Sincronizado
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              audioSynth.playKeypressTick();
+              signOut();
+            }}
+            className="aura-3d-btn aura-3d-btn--paper"
+            style={{ padding: '5px 10px', fontSize: '0.68rem', fontWeight: 700, cursor: 'pointer' }}
+          >
+            Sair
+          </button>
+        </div>
+      )}
+
       {/* 2. Score Card & Aura Mascot Presentation (Figma 1:2576) */}
       <div
         style={{
@@ -173,7 +264,7 @@ export function ProfileHubView() {
                 position: 'absolute',
                 bottom: '-6px',
                 padding: '2px 8px',
-                backgroundColor: 'var(--color-iris, #6E5AA6)',
+                backgroundColor: currentRank.color,
                 color: '#FFFFFF',
                 borderRadius: '8px',
                 fontSize: '0.62rem',
@@ -183,7 +274,7 @@ export function ProfileHubView() {
                 border: '1px solid #FFFFFF',
               }}
             >
-              Grau IV
+              {currentRank.romanNumeral} · {currentRank.title}
             </div>
           </div>
 
@@ -198,7 +289,7 @@ export function ProfileHubView() {
                 marginBottom: '2px',
               }}
             >
-              ÍNDICE MEI (MATHEMATICAL EYE)
+              ELO COGNITIVO REAL
             </div>
 
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
@@ -212,20 +303,20 @@ export function ProfileHubView() {
                   lineHeight: 1,
                 }}
               >
-                842
+                {currentElo}
               </span>
               <span
                 style={{
                   fontSize: '0.72rem',
                   fontWeight: 800,
-                  color: 'var(--color-verdigris, #176B5B)',
-                  backgroundColor: 'var(--color-verdigris-soft, #DCEBE5)',
+                  color: currentRank.color,
+                  backgroundColor: currentRank.softColor,
                   padding: '2px 8px',
                   borderRadius: '10px',
-                  border: '1px solid var(--color-verdigris-bevel, #104E42)',
+                  border: `1px solid ${currentRank.borderColor}`,
                 }}
               >
-                Top 4% Global
+                Divisão {currentRank.romanNumeral}
               </span>
             </div>
 
@@ -241,7 +332,7 @@ export function ProfileHubView() {
               }}
             >
               <TrendingUp size={13} color="var(--color-verdigris, #176B5B)" />
-              <strong style={{ color: 'var(--color-text-primary, #202522)' }}>+38 pts</strong> neste ciclo · 42 axiomas consolidados
+              <strong style={{ color: 'var(--color-text-primary, #202522)' }}>{eloEngine.getMatchesPlayed()} partidas</strong> registradas · K-{eloEngine.getAdaptiveKFactor(eloEngine.getMatchesPlayed(), currentElo)}
             </div>
           </div>
         </div>
@@ -260,9 +351,9 @@ export function ProfileHubView() {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ color: 'var(--color-marigold, #F2B84B)', fontSize: '0.8rem' }}>●</span>
+            <span style={{ color: currentRank.color, fontSize: '0.8rem' }}>●</span>
             <span style={{ fontWeight: 700, color: 'var(--color-text-primary, #202522)' }}>
-              Prisma Síntese: Visão Espacial Ativa
+              Arquétipo: {archetype.title}
             </span>
           </div>
           <span
@@ -327,7 +418,7 @@ export function ProfileHubView() {
         {/* Embedded Cognitive Radar Chart with polar coordinates */}
         {/* <polygon points="..." /> */}
         <div style={{ display: 'flex', justifyContent: 'center', margin: '4px 0 16px' }}>
-          <CognitiveRadarChart radar={profile.radar} size={250} />
+          <CognitiveRadarChart radar={radarData} size={250} />
         </div>
 
         {/* Dimension Breakdown Cards */}
@@ -400,6 +491,155 @@ export function ProfileHubView() {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* 3. Diagnóstico Pedagógico: Fortalezas & Pontos Cegos (Telemetria Real) */}
+      <div
+        style={{
+          backgroundColor: 'var(--color-bg-surface, #FFFDF6)',
+          border: '1.5px solid var(--color-border-subtle, #D9D5C8)',
+          boxShadow: '0 4px 0 var(--color-border-bold, #C2BDAE)',
+          borderRadius: '24px',
+          padding: '20px 16px',
+          marginBottom: '16px',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+          <h3
+            style={{
+              fontSize: '1.05rem',
+              fontWeight: 800,
+              margin: 0,
+              color: 'var(--color-text-primary, #202522)',
+              fontFamily: 'var(--font-display, "Plus Jakarta Sans", sans-serif)',
+            }}
+          >
+            Diagnóstico Pedagógico
+          </h3>
+          <span
+            style={{
+              fontSize: '0.66rem',
+              fontWeight: 800,
+              color: 'var(--color-verdigris, #176B5B)',
+              backgroundColor: 'var(--color-verdigris-soft, #DCEBE5)',
+              border: '1px solid var(--color-verdigris, #176B5B)',
+              padding: '2px 8px',
+              borderRadius: '10px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+            }}
+          >
+            MÉTRICAS REAIS
+          </span>
+        </div>
+        <p
+          style={{
+            fontSize: '0.76rem',
+            color: 'var(--color-ink-secondary, #5C645F)',
+            margin: '0 0 16px',
+            lineHeight: 1.4,
+          }}
+        >
+          Estratificação por tempo de reação (1º toque) e tempo de execução final, detectando padrões dominados e zonas de hesitação.
+        </p>
+
+        {/* Fortalezas (Pontos Fortes) */}
+        <div style={{ marginBottom: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--color-verdigris, #176B5B)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              ✦ Fortalezas Consolidadas
+            </span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {diagnostic.strengths.length > 0 ? (
+              diagnostic.strengths.map((item) => (
+                <div
+                  key={item.techniqueId}
+                  style={{
+                    backgroundColor: 'var(--color-verdigris-soft, #DCEBE5)',
+                    border: '1px solid var(--color-verdigris, #176B5B)',
+                    borderRadius: '14px',
+                    padding: '10px 12px',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--color-verdigris, #176B5B)' }}>
+                      {item.techniqueName}
+                    </span>
+                    <span className="font-mono-tabular" style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-verdigris, #176B5B)' }}>
+                      {item.overallAccuracy}% acerto · {(item.avgLatencyMs / 1000).toFixed(1)}s
+                    </span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--color-ink-secondary, #5C645F)', lineHeight: 1.35 }}>
+                    Alta fluidez e precisão detectadas nesta técnica.
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div style={{ fontSize: '0.74rem', color: 'var(--color-ink-secondary, #5C645F)', fontStyle: 'italic' }}>
+                Continue resolvendo desafios para mapear suas fortalezas.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Pontos Cegos (Blind Spots) */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--color-coral, #E76F61)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              ⚠ Pontos Cegos & Recomendações
+            </span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {diagnostic.blindSpots.length > 0 ? (
+              diagnostic.blindSpots.map((item) => (
+                <div
+                  key={item.techniqueId}
+                  style={{
+                    backgroundColor: 'var(--color-coral-soft, #F8DED9)',
+                    border: '1px solid var(--color-coral, #E76F61)',
+                    borderRadius: '14px',
+                    padding: '10px 12px',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--color-coral, #E76F61)' }}>
+                      {item.techniqueName}
+                    </span>
+                    <span className="font-mono-tabular" style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-coral, #E76F61)' }}>
+                      {item.overallAccuracy}% acerto · {(item.avgLatencyMs / 1000).toFixed(1)}s
+                    </span>
+                  </div>
+                  <p style={{ margin: '0 0 8px', fontSize: '0.72rem', color: 'var(--color-ink-secondary, #5C645F)', lineHeight: 1.35 }}>
+                    {item.blindSpotReason || 'Zona de hesitação ou inconsistência de cálculo.'}
+                  </p>
+                  {item.suggestedDrill && (
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        padding: '4px 8px',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid var(--color-coral, #E76F61)',
+                        borderRadius: '8px',
+                        fontSize: '0.68rem',
+                        fontWeight: 800,
+                        color: 'var(--color-coral, #E76F61)',
+                      }}
+                    >
+                      ⚡ Drill de 2 min: {item.suggestedDrill}
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div style={{ fontSize: '0.74rem', color: 'var(--color-ink-secondary, #5C645F)', fontStyle: 'italic' }}>
+                Nenhum ponto cego crítico detectado até o momento!
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

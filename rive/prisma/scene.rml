@@ -1,0 +1,509 @@
+<Rive version="1" kind="fragment">
+    <Artboard defaultStateMachineId="0:10" styleId="0:5" width="500" height="500" name="PrismaMascot" id="0:2">
+        <LayoutComponentStyle name="Artboard Style" id="0:5"/>
+
+        <!-- Root Node for Mascot Body -->
+        <Node x="240" y="260" name="PrismaRoot" id="0:100">
+
+            <!-- 1. FRONT-MOST: Eureka Sparkles Overlay -->
+            <Node x="80" y="-120" opacity="0" scaleX="0.5" scaleY="0.5" name="EurekaSparkles" id="0:110">
+                <Shape name="MainStar" id="0:111">
+                    <Rectangle width="32" height="32" rotation="0.785398" originX="0.5" originY="0.5" name="StarDiamond"/>
+                    <Fill name="StarFill">
+                        <SolidColor colorValue="FFF1AF32" name="GoldStar"/>
+                    </Fill>
+                </Shape>
+                <Shape x="38" y="26" name="SmallStar" id="0:112">
+                    <Rectangle width="18" height="18" rotation="0.785398" originX="0.5" originY="0.5" name="StarDiamond2"/>
+                    <Fill name="StarFill2">
+                        <SolidColor colorValue="FFFFE082" name="PaleGoldStar"/>
+                    </Fill>
+                </Shape>
+                <Shape x="-30" y="35" name="MicroStar" id="0:113">
+                    <Rectangle width="12" height="12" rotation="0.785398" originX="0.5" originY="0.5" name="StarDiamond3"/>
+                    <Fill name="StarFill3">
+                        <SolidColor colorValue="FFFFFFFF" name="WhiteStar"/>
+                    </Fill>
+                </Shape>
+            </Node>
+
+            <!-- 2. Set Square (Esquadro 30°-60°-90° ambarino em destaque) -->
+            <Node x="85" y="20" rotation="0.4" name="SetSquareGroup" id="0:120">
+                <Shape name="SquareInnerHole" id="0:122">
+                    <Triangle width="32" height="48" originX="0.5" originY="0.5" name="InnerTri"/>
+                    <Fill name="HoleFill">
+                        <SolidColor colorValue="FF203734" name="CutoutColor"/>
+                    </Fill>
+                </Shape>
+                <Shape name="SquareOuter" id="0:121">
+                    <Triangle width="80" height="115" originX="0.5" originY="0.5" name="OuterTri"/>
+                    <Fill name="SquareFill">
+                        <SolidColor colorValue="FFF1AF32" name="GoldSquare"/>
+                    </Fill>
+                    <Stroke thickness="4" join="round" cap="round" name="SquareBorder">
+                        <SolidColor colorValue="FFFFDF79" name="BrightBorder"/>
+                    </Stroke>
+                </Shape>
+            </Node>
+
+            <!-- 3. Front Paws Holding Square -->
+            <Shape x="62" y="38" name="FrontPaws" id="0:160">
+                <Rectangle width="34" height="20" cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="4" cornerRadiusBR="4" originX="0.5" originY="0.5" name="PawPath"/>
+                <Fill name="PawFill">
+                    <SolidColor colorValue="FF203734" name="DarkTealColor"/>
+                </Fill>
+            </Shape>
+
+            <!-- 4. Head Assembly (Features on top, Base head at bottom) -->
+            <Node x="35" y="-55" name="HeadAssembly" id="0:150">
+
+                <!-- 4A. Right Eye (Prominent Front Turret) -->
+                <Node x="22" y="-22" name="RightEyeTurret" id="0:141">
+                    <!-- Eye Highlights (Gleam) -->
+                    <Shape x="4" y="-5" name="RightGleam" id="0:1415">
+                        <Ellipse width="9" height="9" originX="0.5" originY="0.5" name="GleamPath"/>
+                        <Fill name="GleamFill"><SolidColor colorValue="FFFFFFFF" name="White"/></Fill>
+                    </Shape>
+                    <Shape x="-3" y="4" name="RightGleamSub" id="0:1416">
+                        <Ellipse width="4" height="4" originX="0.5" originY="0.5" name="GleamSubPath"/>
+                        <Fill name="GleamSubFill"><SolidColor colorValue="FFFFFFFF" name="White"/></Fill>
+                    </Shape>
+                    <!-- Pupil -->
+                    <Shape x="5" y="0" name="RightPupil" id="0:1414">
+                        <Ellipse width="20" height="20" originX="0.5" originY="0.5" name="PupilPath"/>
+                        <Fill name="PupilFill"><SolidColor colorValue="FF1C2C27" name="DarkPupil"/></Fill>
+                    </Shape>
+                    <!-- Iris -->
+                    <Shape x="3" y="0" name="RightIris" id="0:1413">
+                        <Ellipse width="34" height="34" originX="0.5" originY="0.5" name="IrisPath"/>
+                        <Fill name="IrisFill"><SolidColor colorValue="FFF1AF32" name="AmberGold"/></Fill>
+                    </Shape>
+                    <!-- Sclera -->
+                    <Shape name="RightSclera" id="0:1412">
+                        <Ellipse width="52" height="52" originX="0.5" originY="0.5" name="ScleraPath"/>
+                        <Fill name="ScleraFill"><SolidColor colorValue="FFFFFDF6" name="Ivory"/></Fill>
+                    </Shape>
+                    <!-- Eye Socket Turret -->
+                    <Shape name="RightSocket" id="0:1411">
+                        <Ellipse width="64" height="64" originX="0.5" originY="0.5" name="SocketPath"/>
+                        <Fill name="SocketFill"><SolidColor colorValue="FF203734" name="DarkTeal"/></Fill>
+                        <Stroke thickness="4" name="SocketStroke"><SolidColor colorValue="FF378E79" name="Teal"/></Stroke>
+                    </Shape>
+                </Node>
+
+                <!-- 4B. Left Eye (Back Turret, peeking from crown) -->
+                <Node x="-25" y="-38" name="LeftEyeTurret" id="0:142">
+                    <Shape x="-3" y="-3" name="LeftGleam" id="0:1425">
+                        <Ellipse width="6" height="6" originX="0.5" originY="0.5" name="GleamPath"/>
+                        <Fill name="GleamFill"><SolidColor colorValue="FFFFFFFF" name="White"/></Fill>
+                    </Shape>
+                    <Shape x="-1" y="0" name="LeftPupil" id="0:1424">
+                        <Ellipse width="15" height="15" originX="0.5" originY="0.5" name="PupilPath"/>
+                        <Fill name="PupilFill"><SolidColor colorValue="FF1C2C27" name="DarkPupil"/></Fill>
+                    </Shape>
+                    <Shape x="-1" y="0" name="LeftIris" id="0:1423">
+                        <Ellipse width="26" height="26" originX="0.5" originY="0.5" name="IrisPath"/>
+                        <Fill name="IrisFill"><SolidColor colorValue="FFF1AF32" name="AmberGold"/></Fill>
+                    </Shape>
+                    <Shape name="LeftSclera" id="0:1422">
+                        <Ellipse width="40" height="40" originX="0.5" originY="0.5" name="ScleraPath"/>
+                        <Fill name="ScleraFill"><SolidColor colorValue="FFFFFDF6" name="Ivory"/></Fill>
+                    </Shape>
+                    <Shape name="LeftSocket" id="0:1421">
+                        <Ellipse width="50" height="50" originX="0.5" originY="0.5" name="SocketPath"/>
+                        <Fill name="SocketFill"><SolidColor colorValue="FF203734" name="DarkTeal"/></Fill>
+                    </Shape>
+                </Node>
+
+                <!-- 4C. Cheerful Smile & Cute Snout Details -->
+                <Shape x="50" y="24" name="Smile" id="0:153">
+                    <Rectangle width="26" height="8" cornerRadiusBL="7" cornerRadiusBR="7" originX="0.5" originY="0.5" name="MouthPath"/>
+                    <Fill name="MouthFill">
+                        <SolidColor colorValue="FF203734" name="DarkMouth"/>
+                    </Fill>
+                </Shape>
+                <Shape x="52" y="16" name="SnoutHighlight" id="0:154">
+                    <Ellipse width="22" height="14" originX="0.5" originY="0.5" name="SnoutHiPath"/>
+                    <Fill name="SnoutHiFill">
+                        <SolidColor colorValue="FFF7D070" name="PaleGoldHi"/>
+                    </Fill>
+                </Shape>
+                <Shape x="45" y="15" name="Snout" id="0:152">
+                    <Ellipse width="58" height="46" originX="0.5" originY="0.5" name="SnoutPath"/>
+                    <Fill name="SnoutFill">
+                        <SolidColor colorValue="FF378E79" name="TealColor"/>
+                    </Fill>
+                    <Stroke thickness="4" join="round" name="SnoutStroke">
+                        <SolidColor colorValue="FF203734" name="DarkContour"/>
+                    </Stroke>
+                </Shape>
+
+                <!-- 4D. Protractor Crest (180° Arch atop crown) -->
+                <Node x="-5" y="-58" name="ProtractorCrest" id="0:130">
+                    <Shape x="-32" y="-12" name="Tick30" id="0:132">
+                        <Rectangle width="3" height="9" originX="0.5" originY="0.5" name="Tick1"/>
+                        <Fill name="TickFill"><SolidColor colorValue="FFFFFFFF" name="WhiteTick"/></Fill>
+                    </Shape>
+                    <Shape x="0" y="-15" name="Tick90" id="0:133">
+                        <Rectangle width="4" height="12" originX="0.5" originY="0.5" name="Tick2"/>
+                        <Fill name="TickFill"><SolidColor colorValue="FFFFFFFF" name="WhiteTick"/></Fill>
+                    </Shape>
+                    <Shape x="32" y="-12" name="Tick150" id="0:134">
+                        <Rectangle width="3" height="9" originX="0.5" originY="0.5" name="Tick3"/>
+                        <Fill name="TickFill"><SolidColor colorValue="FFFFFFFF" name="WhiteTick"/></Fill>
+                    </Shape>
+                    <Shape name="CrestArch" id="0:131">
+                        <Rectangle width="96" height="26" cornerRadiusTL="20" cornerRadiusTR="20" cornerRadiusBL="0" cornerRadiusBR="0" originX="0.5" originY="0.5" name="ArchPlate"/>
+                        <Fill name="ArchFill">
+                            <SolidColor colorValue="FFF1AF32" name="GoldCrest"/>
+                        </Fill>
+                        <Stroke thickness="3.5" join="round" name="ArchStroke">
+                            <SolidColor colorValue="FF203734" name="DarkContour"/>
+                        </Stroke>
+                    </Shape>
+                </Node>
+
+                <!-- 4E. Head Base Contour (At bottom of head assembly) -->
+                <Shape name="HeadMain" id="0:151">
+                    <Ellipse width="130" height="115" originX="0.5" originY="0.5" name="HeadPath"/>
+                    <Fill name="HeadFill">
+                        <SolidColor colorValue="FF378E79" name="TealColor"/>
+                    </Fill>
+                    <Stroke thickness="5" join="round" name="HeadStroke">
+                        <SolidColor colorValue="FF203734" name="DarkContour"/>
+                    </Stroke>
+                </Shape>
+            </Node>
+
+            <!-- 5. Torso & Golden Belly -->
+            <Node x="0" y="20" name="TorsoGroup" id="0:170">
+                <!-- Golden Belly Patch (in front of body) -->
+                <Shape x="22" y="10" name="BellyPatch" id="0:172">
+                    <Ellipse width="108" height="96" originX="0.5" originY="0.5" name="BellyPath"/>
+                    <Fill name="BellyFill">
+                        <SolidColor colorValue="FFF7D070" name="SoftGoldColor"/>
+                    </Fill>
+                    <Stroke thickness="3" join="round" name="BellyStroke">
+                        <SolidColor colorValue="44203734" name="SubtleContour"/>
+                    </Stroke>
+                </Shape>
+                <!-- Body Main Shell (behind belly) -->
+                <Shape name="BodyMain" id="0:171">
+                    <Ellipse width="175" height="150" originX="0.5" originY="0.5" name="BodyPath"/>
+                    <Fill name="BodyFill">
+                        <SolidColor colorValue="FF378E79" name="TealBodyColor"/>
+                    </Fill>
+                    <Stroke thickness="5" join="round" name="BodyOutline">
+                        <SolidColor colorValue="FF203734" name="DarkContour"/>
+                    </Stroke>
+                </Shape>
+            </Node>
+
+            <!-- 6. Hind Foot / Perch Claws -->
+            <Shape x="-45" y="85" name="HindClaws" id="0:180">
+                <Rectangle width="38" height="20" cornerRadiusTL="10" cornerRadiusTR="10" cornerRadiusBL="4" cornerRadiusBR="4" originX="0.5" originY="0.5" name="ClawPath"/>
+                <Fill name="ClawFill">
+                    <SolidColor colorValue="FF203734" name="DarkTealColor"/>
+                </Fill>
+            </Shape>
+
+            <!-- 7. Fibonacci Spiral Tail -->
+            <Node x="-95" y="65" name="SpiralTail" id="0:190">
+                <Shape x="10" y="-4" name="TailSpiralInner" id="0:192">
+                    <Ellipse width="44" height="44" originX="0.5" originY="0.5" name="InnerCoil"/>
+                    <Fill name="CoilFill">
+                        <SolidColor colorValue="FFF1AF32" name="GoldColor"/>
+                    </Fill>
+                    <Stroke thickness="3.5" name="CoilStroke">
+                        <SolidColor colorValue="FF203734" name="DarkTealColor"/>
+                    </Stroke>
+                </Shape>
+                <Shape name="TailBody" id="0:191">
+                    <Ellipse width="76" height="76" originX="0.5" originY="0.5" name="TailOuter"/>
+                    <Fill name="TailFill">
+                        <SolidColor colorValue="FF378E79" name="TealColor"/>
+                    </Fill>
+                    <Stroke thickness="6" join="round" cap="round" name="TailStroke">
+                        <SolidColor colorValue="FF203734" name="DarkTealColor"/>
+                    </Stroke>
+                </Shape>
+            </Node>
+
+            <!-- 8. BACK-MOST: Supernova Solar Halo Ring -->
+            <Node x="0" y="-10" opacity="0" name="SolarHalo" id="0:200">
+                <Shape name="HaloOuterRays" id="0:202">
+                    <Ellipse width="320" height="320" originX="0.5" originY="0.5" name="OuterRingPath"/>
+                    <Stroke thickness="3" join="round" cap="round" name="OuterStroke">
+                        <SolidColor colorValue="88F1AF32" name="GoldAlpha"/>
+                    </Stroke>
+                </Shape>
+                <Shape name="HaloRing" id="0:201">
+                    <Ellipse width="270" height="270" originX="0.5" originY="0.5" name="RingPath"/>
+                    <Stroke thickness="5" join="round" cap="round" name="HaloStroke">
+                        <SolidColor colorValue="FFF1AF32" name="GoldColor"/>
+                    </Stroke>
+                </Shape>
+            </Node>
+
+        </Node>
+
+        <!-- State Machine & Controller -->
+        <StateMachine name="PrismaController" id="0:10">
+            <!-- Numerical State: 0=idle, 1=thinking, 2=eureka, 3=supernova, 4=hint -->
+            <StateMachineNumber name="state" id="0:20"/>
+            <!-- One-shot trigger for instant celebration -->
+            <StateMachineTrigger name="triggerEureka" id="0:21"/>
+
+            <StateMachineLayer name="BaseMotion" id="0:40">
+                <EntryState x="-100" y="0">
+                    <StateTransition stateToId="0:50"/>
+                </EntryState>
+
+                <!-- State 0: Idle -->
+                <AnimationState x="100" y="0" animationId="0:30" id="0:50">
+                    <StateTransition stateToId="0:51" duration="200">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="1"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:52" duration="150">
+                        <TransitionTriggerCondition inputId="0:21"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:52" duration="150">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="2"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:53" duration="250">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="3"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:54" duration="200">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="4"/>
+                    </StateTransition>
+                </AnimationState>
+
+                <!-- State 1: Thinking -->
+                <AnimationState x="320" y="-120" animationId="0:31" id="0:51">
+                    <StateTransition stateToId="0:50" duration="200">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="0"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:52" duration="150">
+                        <TransitionTriggerCondition inputId="0:21"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:52" duration="150">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="2"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:53" duration="250">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="3"/>
+                    </StateTransition>
+                </AnimationState>
+
+                <!-- State 2: Eureka -->
+                <AnimationState x="320" y="0" animationId="0:32" id="0:52">
+                    <StateTransition stateToId="0:50" duration="250" enableExitTime="true" exitTime="90" exitTimeIsPercetange="false">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="0"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:53" duration="200">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="3"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:51" duration="200">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="1"/>
+                    </StateTransition>
+                </AnimationState>
+
+                <!-- State 3: Supernova -->
+                <AnimationState x="320" y="120" animationId="0:33" id="0:53">
+                    <StateTransition stateToId="0:50" duration="300">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="0"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:52" duration="150">
+                        <TransitionTriggerCondition inputId="0:21"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:52" duration="150">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="2"/>
+                    </StateTransition>
+                </AnimationState>
+
+                <!-- State 4: Hint -->
+                <AnimationState x="100" y="180" animationId="0:34" id="0:54">
+                    <StateTransition stateToId="0:50" duration="200">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="0"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:52" duration="150">
+                        <TransitionTriggerCondition inputId="0:21"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:52" duration="150">
+                        <TransitionNumberCondition inputId="0:20" opValue="equal" value="2"/>
+                    </StateTransition>
+                </AnimationState>
+            </StateMachineLayer>
+        </StateMachine>
+
+        <!-- Animations -->
+
+        <!-- 1. Idle: Thorax breathing + tail wag (loop) -->
+        <LinearAnimation loopValue="loop" fps="60" duration="120" name="idle" id="0:30">
+            <!-- Torso breathing: scaleY and scaleX -->
+            <KeyedObject objectId="0:170">
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="1" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="1.04" frame="60" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="120" interpolationType="linear"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="1" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.98" frame="60" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="120" interpolationType="linear"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <!-- Tail slight gentle curl wag -->
+            <KeyedObject objectId="0:190">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="-0.08" frame="60" interpolationType="linear"/>
+                    <KeyFrameDouble value="0" frame="120" interpolationType="linear"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <!-- Set square subtle resting bob -->
+            <KeyedObject objectId="0:120">
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="20" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="22" frame="60" interpolationType="linear"/>
+                    <KeyFrameDouble value="20" frame="120" interpolationType="linear"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <!-- 2. Thinking: Inquisitive head sway and eye calculation (loop) -->
+        <LinearAnimation loopValue="loop" fps="60" duration="120" name="thinking" id="0:31">
+            <!-- Head assembly tilts inquiringly -->
+            <KeyedObject objectId="0:150">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="-0.09" frame="35" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.07" frame="85" interpolationType="linear"/>
+                    <KeyFrameDouble value="0" frame="120" interpolationType="linear"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <!-- Set square tilting in thought -->
+            <KeyedObject objectId="0:120">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.4" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.25" frame="50" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.5" frame="90" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.4" frame="120" interpolationType="linear"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <!-- 3. Eureka: Elastic jump, squash & stretch, starburst (oneShot) -->
+        <LinearAnimation loopValue="oneShot" fps="60" duration="90" name="eureka" id="0:32">
+            <!-- Whole mascot jumps in Y with squash & stretch -->
+            <KeyedObject objectId="0:100">
+                <!-- Y position -->
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="260" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="268" frame="12" interpolationType="linear"/>
+                    <KeyFrameDouble value="200" frame="38" interpolationType="linear"/>
+                    <KeyFrameDouble value="263" frame="58" interpolationType="linear"/>
+                    <KeyFrameDouble value="257" frame="74" interpolationType="linear"/>
+                    <KeyFrameDouble value="260" frame="90" interpolationType="linear"/>
+                </KeyedProperty>
+                <!-- Scale X (Squash & Stretch) -->
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="1" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="1.15" frame="12" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.90" frame="38" interpolationType="linear"/>
+                    <KeyFrameDouble value="1.08" frame="58" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.98" frame="74" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="90" interpolationType="linear"/>
+                </KeyedProperty>
+                <!-- Scale Y (Squash & Stretch) -->
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="1" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.85" frame="12" interpolationType="linear"/>
+                    <KeyFrameDouble value="1.18" frame="38" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.92" frame="58" interpolationType="linear"/>
+                    <KeyFrameDouble value="1.02" frame="74" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="90" interpolationType="linear"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <!-- Set square brandished triumphantly -->
+            <KeyedObject objectId="0:120">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.4" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.8" frame="38" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.4" frame="90" interpolationType="linear"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <!-- Sparkles burst in celebration -->
+            <KeyedObject objectId="0:110">
+                <KeyedProperty propertyKey="18">
+                    <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="0" frame="15" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="35" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="65" interpolationType="linear"/>
+                    <KeyFrameDouble value="0" frame="90" interpolationType="linear"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="0.3" frame="15" interpolationType="linear"/>
+                    <KeyFrameDouble value="1.3" frame="40" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="70" interpolationType="linear"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="0.3" frame="15" interpolationType="linear"/>
+                    <KeyFrameDouble value="1.3" frame="40" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="70" interpolationType="linear"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <!-- 4. Supernova: 360° spinning solar halo + high energy breathing (loop) -->
+        <LinearAnimation loopValue="loop" fps="60" duration="180" name="supernova" id="0:33">
+            <!-- Solar Halo continuous 360° rotation (2π rad = 6.2831855) -->
+            <KeyedObject objectId="0:200">
+                <KeyedProperty propertyKey="18">
+                    <KeyFrameDouble value="0.95" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.95" frame="180" interpolationType="linear"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="6.2831855" frame="180" interpolationType="linear"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="1" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="1.06" frame="90" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="180" interpolationType="linear"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="1" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="1.06" frame="90" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="180" interpolationType="linear"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <!-- Quick energetic chest pulsation -->
+            <KeyedObject objectId="0:170">
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="1" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="1.05" frame="45" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="90" interpolationType="linear"/>
+                    <KeyFrameDouble value="1.05" frame="135" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="180" interpolationType="linear"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <!-- 5. Hint: Set square pointing forward with pulse (loop) -->
+        <LinearAnimation loopValue="loop" fps="60" duration="90" name="hint" id="0:34">
+            <KeyedObject objectId="0:120">
+                <KeyedProperty propertyKey="13">
+                    <KeyFrameDouble value="85" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="102" frame="45" interpolationType="linear"/>
+                    <KeyFrameDouble value="85" frame="90" interpolationType="linear"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.4" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.6" frame="45" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.4" frame="90" interpolationType="linear"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+    </Artboard>
+</Rive>

@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS profiles (
     aura_level INT DEFAULT 1 CHECK (aura_level >= 1),
     current_streak_days INT DEFAULT 0 CHECK (current_streak_days >= 0),
     highest_blitz_score INT DEFAULT 0 CHECK (highest_blitz_score >= 0),
+    elo INT DEFAULT 1200 CHECK (elo >= 0),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -73,7 +74,18 @@ CREATE TABLE IF NOT EXISTS user_unlocked_badges (
     UNIQUE (user_id, badge_id)
 );
 
--- 2.4 Cognitive Radar History (DNA Matemático)
+-- 2.4 User Achievements (Marcos Cognitivos)
+CREATE TABLE IF NOT EXISTS user_achievements (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    achievement_id TEXT NOT NULL,
+    unlocked BOOLEAN DEFAULT TRUE,
+    progress INT DEFAULT 1,
+    unlocked_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (user_id, achievement_id)
+);
+
+-- 2.5 Cognitive Radar History (DNA Matemático)
 CREATE TABLE IF NOT EXISTS cognitive_radars (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -206,6 +218,8 @@ CREATE TABLE IF NOT EXISTS assignment_submissions (
 CREATE INDEX IF NOT EXISTS idx_profiles_username ON profiles(username);
 CREATE INDEX IF NOT EXISTS idx_profiles_role ON profiles(role);
 CREATE INDEX IF NOT EXISTS idx_profiles_total_xp ON profiles(total_xp DESC);
+CREATE INDEX IF NOT EXISTS idx_profiles_elo ON profiles(elo DESC);
+CREATE INDEX IF NOT EXISTS idx_user_achievements_user ON user_achievements(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_node_progress_user ON user_node_progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_node_progress_node ON user_node_progress(node_id);
 CREATE INDEX IF NOT EXISTS idx_match_records_user ON match_records(user_id, created_at DESC);
@@ -229,6 +243,7 @@ ALTER TABLE mastery_badges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_node_progress ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_unlocked_badges ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_achievements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cognitive_radars ENABLE ROW LEVEL SECURITY;
 ALTER TABLE match_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ghost_runs ENABLE ROW LEVEL SECURITY;
@@ -310,7 +325,24 @@ CREATE POLICY "Users can unlock badges"
     TO authenticated
     WITH CHECK (auth.uid() = user_id);
 
--- 6.5 Cognitive Radars
+-- 6.5 User Achievements
+CREATE POLICY "Users can view their unlocked achievements"
+    ON user_achievements FOR SELECT
+    TO authenticated
+    USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert achievements"
+    ON user_achievements FOR INSERT
+    TO authenticated
+    WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update achievements"
+    ON user_achievements FOR UPDATE
+    TO authenticated
+    USING (auth.uid() = user_id)
+    WITH CHECK (auth.uid() = user_id);
+
+-- 6.6 Cognitive Radars
 CREATE POLICY "Users can view cognitive radars"
     ON cognitive_radars FOR SELECT
     TO authenticated
@@ -543,7 +575,8 @@ BEGIN
         total_xp,
         aura_level,
         current_streak_days,
-        highest_blitz_score
+        highest_blitz_score,
+        elo
     )
     VALUES (
         NEW.id,
@@ -554,7 +587,8 @@ BEGIN
         0,
         1,
         0,
-        0
+        0,
+        1200
     )
     ON CONFLICT (id) DO NOTHING;
 

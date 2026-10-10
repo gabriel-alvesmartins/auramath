@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-10-09T23:15:25.717Z",
+  "generatedAt": "2026-10-10T21:42:36.321Z",
   "complianceRate": "100%",
   "summary": {
-    "total": 11,
-    "compliant": 8,
+    "total": 13,
+    "compliant": 10,
     "future": 3,
     "drift": 0
   },
@@ -106,6 +106,24 @@
       "status": "compliant",
       "details": "Tokens táteis do Rebrand 01.1 aplicados uniformemente eliminando pretos cósmicos.",
       "evidence": "Cores Verdigris, Marigold, Coral e Paper ativas."
+    },
+    {
+      "id": "prisma-mascot-ecosystem",
+      "domain": "Gamificação Sensorial",
+      "title": "Mascote Oficial Prisma (6 Estados e Anatomia Geometrizada)",
+      "specRef": "openspec/specs/sensory-gamification/spec.md",
+      "status": "compliant",
+      "details": "Todos os 6 SVGs canônicos ativos em /public/mascot/, com anatomia geométrica e micro-animações CSS.",
+      "evidence": "PrismaMascotWeb.tsx ativo nas telas, 6 SVGs e registry tipado com 100% de cobertura."
+    },
+    {
+      "id": "vectorize-mascot-pipeline",
+      "domain": "Pipeline de Animação",
+      "title": "Pipeline de Vetorização (VTracer) & Motor Rive Nativo (.riv)",
+      "specRef": "openspec/specs/mascot-animation-pipeline/spec.md",
+      "status": "compliant",
+      "details": "VTracer configurado, Rive CLI v1.5.1 integrado, prisma.riv (~4.9 KB) compilado e PrismaMascotRive.tsx ativo.",
+      "evidence": "public/mascot/prisma.riv compilado via RML, PrismaController State Machine e PrismaMascotRive.tsx operantes."
     }
   ]
 }

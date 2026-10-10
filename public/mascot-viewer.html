@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prisma Mascote — Estúdio de Animações e Vetorização | AuraMath</title>
+  <script src="vendor/rive/rive.js"></script>
   <style>
     :root {
       --bg-canvas: #FAF8F5;
@@ -853,6 +854,9 @@
     <button class="nav-tab-btn" onclick="switchMainTab('tab-pipeline-vector', this)">
       <span>⚡</span> 3. Pipeline de Vetorização Automática
     </button>
+    <button class="nav-tab-btn" onclick="switchMainTab('tab-rive-player', this)">
+      <span>🦎</span> 4. Rive Runtime Interativo (.riv)
+    </button>
   </nav>
 
   <main>
@@ -1241,6 +1245,110 @@
       </div>
     </section>
 
+    <!-- ==================================================================== -->
+    <!-- TAB 4: RIVE RUNTIME INTERATIVO (.RIV)                                -->
+    <!-- ==================================================================== -->
+    <section id="tab-rive-player" class="tab-section">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <h2>🦎 Prisma no Rive Runtime Nativo (Canvas WebGL / WebAssembly)</h2>
+            <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+              Renderização vetorial contínua a 60 FPS diretamente de <code>public/mascot/prisma.riv</code> (~4.9 KB) compilado via Rive CLI (RML).
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="trigger-action-btn" onclick="triggerRiveEureka()">
+              <span>🚀</span> Disparar Trigger Eureka
+            </button>
+          </div>
+        </div>
+
+        <div class="live-studio-layout">
+          <!-- Palco Rive Canvas -->
+          <div class="prisma-live-stage" id="rive-live-stage" style="background: #19201E; border-radius: 18px; border: 2px solid #273833;">
+            <div style="position: absolute; top: 16px; left: 16px; font-size: 11px; font-weight: 800; color: #F1AF32; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 6px; letter-spacing: 0.5px;">
+              RIVE ENGINE • STATE MACHINE: PrismaController
+            </div>
+            
+            <div style="position: relative; width: 300px; height: 300px; display: flex; align-items: center; justify-content: center;">
+              <canvas id="rive-canvas" width="500" height="500" style="width: 300px; height: 300px;"></canvas>
+            </div>
+
+            <div id="rive-status-tag" style="margin-top: 14px; font-size: 13px; font-weight: 700; color: #FFF; background: rgba(255,255,255,0.12); padding: 6px 16px; border-radius: 999px;">
+              Estado Ativo: <span id="rive-active-state-text" style="color: #F1AF32;">idle (state = 0)</span>
+            </div>
+          </div>
+
+          <!-- Controles da State Machine -->
+          <div class="studio-controls-panel">
+            <div class="control-group">
+              <label class="control-label">Mudar Estado no PrismaController (Input: state)</label>
+              <div class="state-btn-grid">
+                <button class="state-btn active" id="btn-rive-idle" onclick="setRiveState(0, 'idle', this)">
+                  <span class="icon">😴</span>
+                  <div class="state-info">
+                    <span class="name">0. Idle</span>
+                    <span class="desc">Tórax respirando + cauda</span>
+                  </div>
+                </button>
+                <button class="state-btn" id="btn-rive-thinking" onclick="setRiveState(1, 'thinking', this)">
+                  <span class="icon">🤔</span>
+                  <div class="state-info">
+                    <span class="name">1. Thinking</span>
+                    <span class="desc">Balanço investigativo 120f</span>
+                  </div>
+                </button>
+                <button class="state-btn" id="btn-rive-eureka" onclick="setRiveState(2, 'eureka', this)">
+                  <span class="icon">💡</span>
+                  <div class="state-info">
+                    <span class="name">2. Eureka</span>
+                    <span class="desc">Salto squash & stretch + estrelas</span>
+                  </div>
+                </button>
+                <button class="state-btn" id="btn-rive-supernova" onclick="setRiveState(3, 'supernova', this)">
+                  <span class="icon">🌟</span>
+                  <div class="state-info">
+                    <span class="name">3. Supernova</span>
+                    <span class="desc">Auréola solar 360° contínua</span>
+                  </div>
+                </button>
+                <button class="state-btn" id="btn-rive-hint" onclick="setRiveState(4, 'hint', this)">
+                  <span class="icon">✨</span>
+                  <div class="state-info">
+                    <span class="name">4. Hint</span>
+                    <span class="desc">Esquadro apontando foco</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <div class="control-group" style="margin-top: 18px;">
+              <label class="control-label">Benefícios da Engine Rive Nativa</label>
+              <div style="background: #F8F9FA; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 14px; font-size: 13px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="font-weight: 700;">Tamanho do Ativo (.riv):</span>
+                  <span style="color: var(--brand-teal); font-weight: 800;">4.9 KB (Leve & compacto)</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="font-weight: 700;">Taxa de Quadros (FPS):</span>
+                  <span style="color: #2E7D32; font-weight: 700;">60 FPS (Aceleração por Hardware)</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="font-weight: 700;">State Machine:</span>
+                  <span style="color: #1C2C27; font-weight: 700;">PrismaController (1 layer, 5 estados)</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="font-weight: 700;">Fallback Automático:</span>
+                  <span style="color: #2E7D32; font-weight: 700;">PrismaMascotWeb (100% SVG)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <script>
@@ -1257,6 +1365,16 @@
 
       document.getElementById(tabId).classList.add('active');
       btnElem.classList.add('active');
+
+      if (tabId === 'tab-rive-player') {
+        if (!riveInstance) {
+          initRivePlayer();
+        } else if (riveInstance.resizeDrawingSurfaceToCanvas) {
+          requestAnimationFrame(() => {
+            riveInstance.resizeDrawingSurfaceToCanvas();
+          });
+        }
+      }
     }
 
     // Configuração de Estados do Estúdio Vivo
@@ -1459,8 +1577,79 @@
       });
     }
 
+    // =========================================================================
+    // Rive Runtime Nativo (Canvas WebGL / WebAssembly)
+    // =========================================================================
+    let riveInstance = null;
+    let riveStateInput = null;
+    let riveTriggerEureka = null;
+
+    function initRivePlayer() {
+      const canvas = document.getElementById('rive-canvas');
+      if (!canvas || !window.rive) return;
+
+      try {
+        riveInstance = new rive.Rive({
+          src: 'mascot/prisma.riv',
+          canvas: canvas,
+          autoplay: true,
+          artboard: 'PrismaMascot',
+          stateMachine: 'PrismaController',
+          layout: new rive.Layout({
+            fit: rive.Fit.Contain,
+            alignment: rive.Alignment.Center,
+          }),
+          onLoad: () => {
+            console.log('Rive prisma.riv carregado com sucesso!');
+            const inputs = riveInstance.stateMachineInputs('PrismaController');
+            if (inputs) {
+              riveStateInput = inputs.find(i => i.name === 'state');
+              riveTriggerEureka = inputs.find(i => i.name === 'triggerEureka');
+            }
+          },
+          onLoadError: (err) => {
+            console.error('Erro ao carregar Rive:', err);
+            const tag = document.getElementById('rive-active-state-text');
+            if (tag) tag.textContent = 'Erro ao carregar .riv (fallback disponível)';
+          }
+        });
+      } catch (e) {
+        console.error('Falha ao instanciar Rive:', e);
+      }
+    }
+
+    function setRiveState(stateNum, stateName, btnElem) {
+      if (riveStateInput) {
+        riveStateInput.value = stateNum;
+      }
+      if (stateNum === 2 && riveTriggerEureka) {
+        riveTriggerEureka.fire();
+      }
+
+      document.querySelectorAll('#tab-rive-player .state-btn').forEach(b => b.classList.remove('active'));
+      if (btnElem) btnElem.classList.add('active');
+
+      const tag = document.getElementById('rive-active-state-text');
+      if (tag) {
+        tag.textContent = `${stateName} (state = ${stateNum})`;
+      }
+    }
+
+    function triggerRiveEureka() {
+      if (riveTriggerEureka) {
+        riveTriggerEureka.fire();
+      }
+      if (riveStateInput) {
+        riveStateInput.value = 2;
+      }
+      const eurekaBtn = document.getElementById('btn-rive-eureka');
+      if (eurekaBtn) setRiveState(2, 'eureka', eurekaBtn);
+    }
+
     // Leitura de parâmetros de URL para controle direto e screenshots
     window.addEventListener('DOMContentLoaded', () => {
+      initRivePlayer();
+
       const params = new URLSearchParams(window.location.search);
       const stateParam = params.get('state');
       const sizeParam = params.get('size');
@@ -1481,6 +1670,9 @@
       } else if (tabParam === 'pipeline') {
         const btn = document.querySelectorAll('.nav-tab-btn')[2];
         switchMainTab('tab-pipeline-vector', btn);
+      } else if (tabParam === 'rive') {
+        const btn = document.querySelectorAll('.nav-tab-btn')[3];
+        switchMainTab('tab-rive-player', btn);
       }
     });
   </script>

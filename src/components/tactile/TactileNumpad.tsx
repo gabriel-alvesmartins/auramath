@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Delete } from 'lucide-react';
 import { audioSynth } from '../../services/audioSynth';
 import { Aura3DButton } from './Aura3DButton';
+import { telemetryTracker } from '../../services/telemetryTracker';
 
 export interface TactileNumpadProps {
   onInput: (digit: string) => void;
@@ -73,6 +74,7 @@ export const TactileNumpad: React.FC<TactileNumpadProps> = ({
       if (e.key >= '0' && e.key <= '9') {
         e.preventDefault();
         audioSynth.playKeypressTick();
+        telemetryTracker.recordFirstInput();
         onInput(e.key);
         setActiveKeyId(e.key);
         setTimeout(() => setActiveKeyId(null), 100);
@@ -112,6 +114,7 @@ export const TactileNumpad: React.FC<TactileNumpadProps> = ({
     audioSynth.playKeypressTick();
 
     if (key.type === 'digit' && key.label) {
+      telemetryTracker.recordFirstInput();
       onInput(key.label);
     } else if (key.type === 'clear') {
       onClear();

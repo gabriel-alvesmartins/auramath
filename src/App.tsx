@@ -18,6 +18,8 @@ import {
   AchievementUnlockModal,
   AuraNudgeToast,
 } from './components/gamification';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthModal } from './components/auth/AuthModal';
 
 export type AppRoute =
   | { type: 'track' }
@@ -61,7 +63,8 @@ function parseRoute(): AppRoute {
   return { type: 'track' };
 }
 
-export default function App() {
+function AppContent() {
+  const { user, openAuthModal } = useAuth();
   const [route, setRoute] = useState<AppRoute>(parseRoute);
   const [isMuted, setIsMuted] = useState(false);
   const [gamState, setGamState] = useState(gamificationEngine.getState());
@@ -310,6 +313,41 @@ export default function App() {
 
               <ThemeToggle />
 
+              {/* User Account / Auth Modal Trigger */}
+              <button
+                type="button"
+                onClick={() => {
+                  audioSynth.playKeypressTick();
+                  openAuthModal();
+                }}
+                className="aura-3d-btn aura-3d-btn--paper aura-3d-btn--icon-sm"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: user.isGuest ? 'var(--color-ink-secondary, #5C645F)' : 'var(--color-verdigris, #176B5B)',
+                  position: 'relative',
+                }}
+                title={user.isGuest ? 'Convidado (Clique para Entrar)' : `Conectado como ${user.profile?.display_name || 'Usuário'}`}
+                aria-label="Conta e Autenticação"
+              >
+                <User size={16} />
+                {!user.isGuest && (
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: '3px',
+                      right: '3px',
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--color-verdigris, #176B5B)',
+                    }}
+                  />
+                )}
+              </button>
+
               {/* Audio Mute Button (Tactile 3D Neutral Button) */}
               <button
                 type="button"
@@ -460,7 +498,18 @@ export default function App() {
           onDismiss={() => gamificationEngine.dismissNudge()}
           onAction={(targetRoute) => navigateTo('/' + targetRoute)}
         />
+
+        {/* Tactile Editorial Auth Modal */}
+        <AuthModal />
       </div>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }

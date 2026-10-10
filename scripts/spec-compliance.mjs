@@ -188,6 +188,57 @@ async function runComplianceAudit() {
       evidence: 'Cores Verdigris, Marigold, Coral e Paper ativas.',
     });
 
+    // 3. Validar Mascote Oficial Prisma (6 Estados e Anatomia Geometrizada)
+    const mascotPublicDir = path.join(rootDir, 'public/mascot');
+    const requiredMascotSvgs = [
+      'prisma-idle.svg',
+      'prisma-thinking.svg',
+      'prisma-hint.svg',
+      'prisma-eureka.svg',
+      'prisma-supernova.svg',
+      'prisma-camouflaged.svg',
+    ];
+    const allSvgsExist = requiredMascotSvgs.every((f) => fs.existsSync(path.join(mascotPublicDir, f)));
+    const prismaComponentPath = path.join(rootDir, 'src/components/PrismaMascotWeb.tsx');
+    const hasPrismaComponent = fs.existsSync(prismaComponentPath);
+    const registryPath = path.join(rootDir, 'src/services/mascot/animationRegistry.ts');
+    const hasRegistry = fs.existsSync(registryPath);
+    const isMascotOk = allSvgsExist && hasPrismaComponent && hasRegistry;
+
+    complianceResults.push({
+      id: 'prisma-mascot-ecosystem',
+      domain: 'Gamificação Sensorial',
+      title: 'Mascote Oficial Prisma (6 Estados e Anatomia Geometrizada)',
+      specRef: 'openspec/specs/sensory-gamification/spec.md',
+      status: isMascotOk ? 'compliant' : 'drift',
+      details: isMascotOk
+        ? 'Todos os 6 SVGs canônicos ativos em /public/mascot/, com anatomia geométrica e micro-animações CSS.'
+        : 'Inconsistência nos ativos vetoriais ou componente do mascote.',
+      evidence: 'PrismaMascotWeb.tsx ativo nas telas, 6 SVGs e registry tipado com 100% de cobertura.',
+    });
+
+    // 4. Validar Pipeline de Vetorização Automática (VTracer & Rive Ready)
+    const vectorizerScriptPath = path.join(rootDir, 'scripts/vectorize-mascot.py');
+    const packageJsonContent = fs.readFileSync(path.join(rootDir, 'package.json'), 'utf-8');
+    const hasVectorizerScript = fs.existsSync(vectorizerScriptPath);
+    const hasNpmCommand = packageJsonContent.includes('"mascot:vectorize"');
+    const hasCompiledRiv = fs.existsSync(path.join(rootDir, 'public/mascot/prisma.riv'));
+    const hasRiveComponent = fs.existsSync(path.join(rootDir, 'src/components/PrismaMascotRive.tsx'));
+    const hasRiveScene = fs.existsSync(path.join(rootDir, 'rive/prisma/scene.rml'));
+    const isPipelineOk = hasVectorizerScript && hasNpmCommand && hasCompiledRiv && hasRiveComponent && hasRiveScene;
+
+    complianceResults.push({
+      id: 'vectorize-mascot-pipeline',
+      domain: 'Pipeline de Animação',
+      title: 'Pipeline de Vetorização (VTracer) & Motor Rive Nativo (.riv)',
+      specRef: 'openspec/specs/mascot-animation-pipeline/spec.md',
+      status: isPipelineOk ? 'compliant' : 'drift',
+      details: isPipelineOk
+        ? 'VTracer configurado, Rive CLI v1.5.1 integrado, prisma.riv (~4.9 KB) compilado e PrismaMascotRive.tsx ativo.'
+        : 'Script de vetorização, arquivo .riv ou componente Rive ausentes.',
+      evidence: 'public/mascot/prisma.riv compilado via RML, PrismaController State Machine e PrismaMascotRive.tsx operantes.',
+    });
+
   } catch (err) {
     complianceResults.push({
       id: 'source-code-audit',

@@ -1,0 +1,84 @@
+<Rive version="1" kind="fragment">
+    <ImageAsset file="layer_body.png" name="body" id="0:100"/>
+    <ImageAsset file="layer_pupils.png" name="pupils" id="0:101"/>
+    <ImageAsset file="layer_arm.png" name="arm" id="0:102"/>
+
+    <Artboard defaultStateMachineId="0:10" styleId="0:5" width="1024" height="1024" name="PrismaMascot" id="0:2">
+        <LayoutComponentStyle name="Artboard Style" id="0:5"/>
+
+        <!-- Root Node centered on 1024x1024 artboard -->
+        <Node x="512" y="512" name="PrismaRoot" id="0:20">
+
+            <!-- FRONT-MOST (1): Arm holding Set Square (pivots at shoulder) -->
+            <!-- In 1024x1024 coordinates, shoulder pivot is at (748, 600) -->
+            <!-- Relative to PrismaRoot at (512, 512), local pivot is at (236, 88) -->
+            <Node x="236" y="88" name="ArmShoulderPivot" id="0:50">
+                <Image x="-236" y="-88" originX="0.5" originY="0.5" assetId="0:102" name="ArmImage" id="0:51"/>
+            </Node>
+
+            <!-- MIDDLE (2): Pupils (curious look / tracking) -->
+            <Node x="0" y="0" name="PupilsGroup" id="0:40">
+                <Image originX="0.5" originY="0.5" assetId="0:101" name="PupilsImage" id="0:41"/>
+            </Node>
+
+            <!-- BACK-MOST (3): Body Base (breathes with subtle scaleY) -->
+            <Node x="0" y="0" name="BodyGroup" id="0:30">
+                <Image originX="0.5" originY="0.5" assetId="0:100" name="BodyImage" id="0:31"/>
+            </Node>
+
+        </Node>
+
+        <!-- State Machine with Idle Animation -->
+        <StateMachine name="PrismaState" id="0:10">
+            <StateMachineLayer name="BaseLayer" id="0:11">
+                <EntryState>
+                    <StateTransition stateToId="0:12"/>
+                </EntryState>
+                <AnimationState animationId="0:60" id="0:12"/>
+            </StateMachineLayer>
+        </StateMachine>
+
+        <!-- Smooth Idle Breathing & Arm Sway Animation -->
+        <LinearAnimation loopValue="loop" duration="120" name="Idle" id="0:60">
+            <!-- Body Breathing: subtle squash and stretch -->
+            <KeyedObject objectId="0:30">
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.018" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="0.992" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- Arm Sway: gentle rotation around shoulder -->
+            <KeyedObject objectId="0:50">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-0.07" interpolationType="1" frame="55"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- Pupils: subtle curious shift -->
+            <KeyedObject objectId="0:40">
+                <KeyedProperty propertyKey="13">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="6.0" interpolationType="1" frame="40"/>
+                    <KeyFrameDouble value="6.0" interpolationType="1" frame="70"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-4.0" interpolationType="1" frame="40"/>
+                    <KeyFrameDouble value="-4.0" interpolationType="1" frame="70"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+    </Artboard>
+</Rive>

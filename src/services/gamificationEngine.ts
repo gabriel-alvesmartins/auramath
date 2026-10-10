@@ -19,6 +19,7 @@ import {
   AURA_NUDGES,
   formatISODate,
 } from '../engine';
+import { cloudSync } from './cloudSync';
 
 const STORAGE_KEY = 'auramath-gamification-v1';
 
@@ -179,6 +180,23 @@ class GamificationEngine {
     }
 
     this.saveState();
+
+    const authUserId = cloudSync.getAuthenticatedUserId();
+    if (authUserId) {
+      cloudSync.syncNodeProgress(
+        authUserId,
+        nodeId,
+        finalStars,
+        Math.max(existing?.bestAccuracy || 0, accuracy),
+        2100,
+        formatISODate()
+      );
+      cloudSync.syncProfileStats(authUserId, {
+        totalXp: this.state.xp,
+        currentStreakDays: this.state.streak.current,
+      });
+    }
+
     return true;
   }
 
@@ -189,6 +207,13 @@ class GamificationEngine {
   public isNodeUnlocked(nodeId: string, prerequisites: string[] = []): boolean {
     if (!prerequisites || prerequisites.length === 0) return true;
     return prerequisites.every((preId) => Boolean(this.state.nodeProgress[preId]?.completed));
+  }
+
+  public unlockMasteryBadge(badgeId: string): void {
+    const authUserId = cloudSync.getAuthenticatedUserId();
+    if (authUserId) {
+      cloudSync.syncBadge(authUserId, badgeId, formatISODate());
+    }
   }
 
   // --- Lesson Finished Handler ---
@@ -275,6 +300,36 @@ class GamificationEngine {
     this.state.recentlyUnlockedAchievement = newlyUnlocked;
 
     this.saveState();
+
+    const authUserId = cloudSync.getAuthenticatedUserId();
+    if (authUserId) {
+      if (nodeId && accuracy >= 80) {
+        const prog = this.state.nodeProgress[nodeId];
+        if (prog) {
+          cloudSync.syncNodeProgress(
+            authUserId,
+            nodeId,
+            prog.stars,
+            prog.bestAccuracy,
+            2100,
+            prog.completedAt
+          );
+        }
+      }
+      if (newlyUnlocked) {
+        const achToSync: AchievementItem = newlyUnlocked;
+        cloudSync.syncAchievement(
+          authUserId,
+          achToSync.id,
+          achToSync.progress || 1,
+          achToSync.unlockedAt
+        );
+      }
+      cloudSync.syncProfileStats(authUserId, {
+        totalXp: this.state.xp,
+        currentStreakDays: nextStreak.current,
+      });
+    }
 
     return {
       awardedXp,

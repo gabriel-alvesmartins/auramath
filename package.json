@@ -21,6 +21,8 @@
     "spec:sync": "node scripts/sync-github-backlog.mjs"
   },
   "dependencies": {
+    "@rive-app/react-canvas": "^4.36.0",
+    "@supabase/supabase-js": "^2.117.3",
     "canvas-confetti": "^1.9.2",
     "esbuild": "^0.28.2",
     "lucide-react": "^0.344.0",

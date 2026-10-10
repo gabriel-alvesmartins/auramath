@@ -1,24 +1,24 @@
-﻿## Purpose
+## Purpose
 
 O sistema de gamificação sensorial orquestra o feedback audiovisual e tátil em tempo real para maximizar o engajamento cognitivo, dopamina e prazer no cálculo mental, combinando animações fluidas a 60/120 FPS, sonoplastia em escala pentatônica musical harmônica, vibração háptica escalar e o mascote reativo "Aura".
 
 ## Requirements
 
-### Requirement: Mascote Reativo Interativo "Aura"
-O sistema SHALL exibir em destaque o mascote "Aura", construído em SVG vetorial por camadas com núcleo bioluminescente, cuja renderização gráfica e postura visual reagem dinamicamente aos eventos de acerto, sequências de combo, velocidade de resposta e erros do usuário através de 5 níveis de transcendência energética.
+### Requirement: Mascote Reativo Interativo "Prisma"
+O sistema SHALL exibir em destaque o mascote oficial "Prisma, o Camaleão Geômetra", construído em SVG vetorial de alta precisão com crista de transferidor graduada de 180°, esquadro triangular de acrílico 30°-60°-90° e cauda em espiral áurea de Fibonacci, cuja postura visual e micro-animações reagem dinamicamente aos eventos de cálculo, acerto, sequências de combo e reflexão através de 6 estados emocionais canônicos (`idle`, `thinking`, `hint`, `eureka`, `supernova`, `camouflaged`).
 
 #### Scenario: Evolução do mascote durante sequência de combo (5 Níveis)
 - **WHEN** o usuário atinge os patamares de combo de 1, 5, 10, 20 e 35 acertos consecutivos
-- **THEN** o mascote "Aura" SHALL transitar visualmente pelos 5 estados progressivos:
-  1. *Spark (Combo 1-4):* Flutuação senoidal suave, respiração zen e notas isoladas.
-  2. *Surge (Combo 5-9):* Asas de plasma laterais, pulsação acelerada e eco espacial.
-  3. *Overdrive (Combo 10-19):* Anéis giroscópicos em rotação, trilha de after-image e aberração cromática.
-  4. *Supernova (Combo 20-34):* Olhos com brilho estelar, portal de geometria sagrada e starfield warp.
-  5. *Singularity / Godmode (Combo 35+):* Disco de acreção prismático, micro hit-stop de 2 quadros (16ms) em cada acerto e partículas cósmicas radiantes.
+- **THEN** o mascote "Prisma" SHALL transitar visualmente pelas reações progressivas correspondentes:
+  1. *Nível 1 (Combo 1-4):* Postura `idle` com respiração peitoral suave (`scaleY`), piscar periódico (4s) e olhar atento aos ângulos da questão.
+  2. *Nível 2 (Combo 5-9):* Sorriso confiante, leve inclinação com o esquadro em prontidão e início de brilho áureo sutil.
+  3. *Nível 3 (Combo 10-19):* Olhar entusiasmado e aura luminescente dourada (`drop-shadow`) reforçada pelo filtro de combo.
+  4. *Nível 4 (Combo 20-34):* Estado `eureka` vibrante com salto elástico com amortecimento (*squash & stretch*).
+  5. *Nível 5 (Combo 35+):* Estado `supernova` pleno, com auréola solar geométrica de 360° em rotação contínua e confetes poligonais em órbita.
 
 #### Scenario: Descompressão suave ao errar
 - **WHEN** o usuário erra uma questão durante qualquer patamar de combo
-- **THEN** o sistema SHALL dissipar a energia acumulada em partículas lentas com um suspiro acústico suave (sem sons punitivos ou sirenes de alarme estridentes), e o mascote SHALL adotar postura empática indicando a decomposição correta.
+- **THEN** o sistema SHALL dissipar a energia acumulada sem sons estridentes ou punições agressivas, e o mascote SHALL adotar postura empática `thinking` ou `hint`, apontando o esquadro e incentivando a visualização da simetria oculta através do balão editorial ("Não calcule. Veja!").
 
 ### Requirement: Pedagogia Cinética de Decomposição Numérica
 A interface visual SHALL renderizar as operações matemáticas não como texto estático, mas como partículas numéricas cinéticas animadas da esquerda para a direita, demonstrando visualmente os algoritmos cognitivos de decomposição.

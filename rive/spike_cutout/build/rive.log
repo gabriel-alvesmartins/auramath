@@ -1,0 +1,107 @@
+[23:47:05.929] rive  verified (0 bytes, 49ms, 0 errors, 0 warnings)
+[23:48:07.854] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 29ms, 0 errors, 0 warnings)
+[23:49:07.318] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 39ms, 0 errors, 0 warnings)
+[23:49:07.334] rive  showing PrismaMascot [1/1]
+[23:49:07.334] rive  viewport 1024x1024 @1x
+[23:49:07.962] rive  wrote scratch/spike_a_frame0.png
+[23:49:08.559] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 34ms, 0 errors, 0 warnings)
+[23:49:08.571] rive  showing PrismaMascot [1/1]
+[23:49:08.571] rive  viewport 1024x1024 @1x
+[23:49:09.136] rive  wrote scratch/spike_a_frame30.png
+[23:49:09.656] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 33ms, 0 errors, 0 warnings)
+[23:49:09.666] rive  showing PrismaMascot [1/1]
+[23:49:09.666] rive  viewport 1024x1024 @1x
+[23:49:10.216] rive  wrote scratch/spike_a_frame60.png
+[23:53:13.182] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 25ms, 0 errors, 0 warnings)
+[23:53:13.615] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 31ms, 0 errors, 0 warnings)
+[23:53:13.622] rive  showing PrismaMascot [1/1]
+[23:53:13.622] rive  viewport 1024x1024 @1x
+[23:53:14.168] rive  wrote scratch/spike_a_frame0.png
+[23:53:14.677] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 30ms, 0 errors, 0 warnings)
+[23:53:14.684] rive  showing PrismaMascot [1/1]
+[23:53:14.684] rive  viewport 1024x1024 @1x
+[23:53:15.249] rive  wrote scratch/spike_a_frame45.png
+[23:53:15.772] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 26ms, 0 errors, 0 warnings)
+[23:53:15.781] rive  showing PrismaMascot [1/1]
+[23:53:15.781] rive  viewport 1024x1024 @1x
+[23:53:16.350] rive  wrote scratch/spike_a_frame90.png
+[23:57:25.757] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 35ms, 0 errors, 0 warnings)
+[23:57:25.768] rive  showing PrismaMascot [1/1]
+[23:57:25.768] rive  viewport 1024x1024 @1x
+[23:57:26.334] rive  wrote scratch/frame_000.png
+[23:57:26.914] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 30ms, 0 errors, 0 warnings)
+[23:57:26.924] rive  showing PrismaMascot [1/1]
+[23:57:26.924] rive  viewport 1024x1024 @1x
+[23:57:27.491] rive  wrote scratch/frame_006.png
+[23:57:28.039] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 24ms, 0 errors, 0 warnings)
+[23:57:28.049] rive  showing PrismaMascot [1/1]
+[23:57:28.049] rive  viewport 1024x1024 @1x
+[23:57:28.612] rive  wrote scratch/frame_012.png
+[23:57:29.143] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 26ms, 0 errors, 0 warnings)
+[23:57:29.154] rive  showing PrismaMascot [1/1]
+[23:57:29.154] rive  viewport 1024x1024 @1x
+[23:57:29.716] rive  wrote scratch/frame_018.png
+[23:57:30.255] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 35ms, 0 errors, 0 warnings)
+[23:57:30.266] rive  showing PrismaMascot [1/1]
+[23:57:30.266] rive  viewport 1024x1024 @1x
+[23:57:30.825] rive  wrote scratch/frame_024.png
+[23:57:31.382] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 33ms, 0 errors, 0 warnings)
+[23:57:31.392] rive  showing PrismaMascot [1/1]
+[23:57:31.392] rive  viewport 1024x1024 @1x
+[23:57:31.966] rive  wrote scratch/frame_030.png
+[23:57:32.496] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 25ms, 0 errors, 0 warnings)
+[23:57:32.507] rive  showing PrismaMascot [1/1]
+[23:57:32.507] rive  viewport 1024x1024 @1x
+[23:57:33.074] rive  wrote scratch/frame_036.png
+[23:57:33.653] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 37ms, 0 errors, 0 warnings)
+[23:57:33.664] rive  showing PrismaMascot [1/1]
+[23:57:33.664] rive  viewport 1024x1024 @1x
+[23:57:34.225] rive  wrote scratch/frame_042.png
+[23:57:34.773] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 39ms, 0 errors, 0 warnings)
+[23:57:34.784] rive  showing PrismaMascot [1/1]
+[23:57:34.784] rive  viewport 1024x1024 @1x
+[23:57:35.510] rive  wrote scratch/frame_048.png
+[23:57:36.896] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 34ms, 0 errors, 0 warnings)
+[23:57:36.906] rive  showing PrismaMascot [1/1]
+[23:57:36.906] rive  viewport 1024x1024 @1x
+[23:57:37.493] rive  wrote scratch/frame_054.png
+[23:57:38.040] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 34ms, 0 errors, 0 warnings)
+[23:57:38.048] rive  showing PrismaMascot [1/1]
+[23:57:38.048] rive  viewport 1024x1024 @1x
+[23:57:38.612] rive  wrote scratch/frame_060.png
+[23:57:39.148] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 28ms, 0 errors, 0 warnings)
+[23:57:39.155] rive  showing PrismaMascot [1/1]
+[23:57:39.155] rive  viewport 1024x1024 @1x
+[23:57:39.718] rive  wrote scratch/frame_066.png
+[23:57:40.255] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 33ms, 0 errors, 0 warnings)
+[23:57:40.262] rive  showing PrismaMascot [1/1]
+[23:57:40.262] rive  viewport 1024x1024 @1x
+[23:57:40.827] rive  wrote scratch/frame_072.png
+[23:57:41.399] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 28ms, 0 errors, 0 warnings)
+[23:57:41.406] rive  showing PrismaMascot [1/1]
+[23:57:41.406] rive  viewport 1024x1024 @1x
+[23:57:41.979] rive  wrote scratch/frame_078.png
+[23:57:42.526] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 22ms, 0 errors, 0 warnings)
+[23:57:42.533] rive  showing PrismaMascot [1/1]
+[23:57:42.533] rive  viewport 1024x1024 @1x
+[23:57:43.098] rive  wrote scratch/frame_084.png
+[23:57:43.639] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 28ms, 0 errors, 0 warnings)
+[23:57:43.646] rive  showing PrismaMascot [1/1]
+[23:57:43.646] rive  viewport 1024x1024 @1x
+[23:57:44.212] rive  wrote scratch/frame_090.png
+[23:57:44.751] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 29ms, 0 errors, 0 warnings)
+[23:57:44.757] rive  showing PrismaMascot [1/1]
+[23:57:44.758] rive  viewport 1024x1024 @1x
+[23:57:45.314] rive  wrote scratch/frame_096.png
+[23:57:45.868] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 23ms, 0 errors, 0 warnings)
+[23:57:45.875] rive  showing PrismaMascot [1/1]
+[23:57:45.875] rive  viewport 1024x1024 @1x
+[23:57:46.441] rive  wrote scratch/frame_102.png
+[23:57:46.982] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 25ms, 0 errors, 0 warnings)
+[23:57:46.989] rive  showing PrismaMascot [1/1]
+[23:57:46.989] rive  viewport 1024x1024 @1x
+[23:57:47.565] rive  wrote scratch/frame_108.png
+[23:57:48.109] rive  built rive/spike_cutout/build/prisma_spike_a.riv (672785 bytes, 31ms, 0 errors, 0 warnings)
+[23:57:48.116] rive  showing PrismaMascot [1/1]
+[23:57:48.116] rive  viewport 1024x1024 @1x
+[23:57:48.672] rive  wrote scratch/frame_114.png

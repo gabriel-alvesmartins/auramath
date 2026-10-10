@@ -30,9 +30,10 @@ web-build/
 .env.test.local
 .env.production.local
 
-# OS files
+# OS & Temp files
 .DS_Store
 Thumbs.db
+*.baixados
 
 # IDE & Editor
 .vscode/

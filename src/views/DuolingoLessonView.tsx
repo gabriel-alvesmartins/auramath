@@ -26,6 +26,7 @@ import {
 } from '../engine';
 import { audioSynth } from '../services/audioSynth';
 import { gamificationEngine } from '../services/gamificationEngine';
+import { telemetryTracker } from '../services/telemetryTracker';
 import { Aura3DButton } from '../components/tactile/Aura3DButton';
 import { StatCard3D } from '../components/tactile/StatCard3D';
 import { FeedbackDrawer } from '../components/tactile/FeedbackDrawer';
@@ -138,6 +139,16 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
     technique: node.technique || 'Fator 5',
     hint: 'Decomponha os fatores mentalmente.',
   };
+
+  useEffect(() => {
+    if (lessonStep === 'drill') {
+      telemetryTracker.startQuestion(
+        currentQ.id || `${node.id}_${currentIndex}`,
+        node.technique || 'ADD_LEFT_RIGHT',
+        selectedDifficulty
+      );
+    }
+  }, [lessonStep, currentIndex, currentQ?.id, node.id, node.technique, selectedDifficulty]);
 
   // ============================================================================
   // Step 1: Transition Theory -> Scaffolding
@@ -264,8 +275,12 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
   const handleVerify = useCallback(() => {
     if (!inputVal || drawerStatus !== null) return;
     const num = parseInt(inputVal, 10);
+    const isCorrect = num === currentQ.answer;
 
-    if (num === currentQ.answer) {
+    // Record high-resolution 2-phase cognitive telemetry
+    telemetryTracker.completeQuestion(inputVal, String(currentQ.answer), isCorrect);
+
+    if (isCorrect) {
       const newCombo = combo + 1;
       setCombo(newCombo);
       setCorrectFirstTry((prev) => prev + 1);

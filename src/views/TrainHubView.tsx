@@ -19,6 +19,7 @@ import { AuraAvatar } from '../components/AuraAvatar';
 import { Aura3DButton, TactileNumpad } from '../components/tactile';
 import { AuraTutorCard } from '../components/editorial';
 import { audioSynth } from '../services/audioSynth';
+import { telemetryTracker } from '../services/telemetryTracker';
 
 export type TrainingSubMode = 'arena' | 'pattern' | 'blitz' | 'sudden' | 'anzan' | 'zen';
 
@@ -270,6 +271,12 @@ export function TrainHubView({ onStartLesson }: TrainHubViewProps = {}) {
     return () => clearInterval(timer);
   }, [activeMode, isGameOver, q]);
 
+  useEffect(() => {
+    if (activeMode && activeMode !== 'pattern' && q) {
+      telemetryTracker.startQuestion(q.id || 'train_q', q.technique || 'ADD_LEFT_RIGHT', 2);
+    }
+  }, [activeMode, q]);
+
   const handlePatternSelect = (opt: PatternOption) => {
     if (selectedOptionId) return;
     setSelectedOptionId(opt.id);
@@ -306,7 +313,10 @@ export function TrainHubView({ onStartLesson }: TrainHubViewProps = {}) {
   const handleSubmit = () => {
     if (!inputVal) return;
     const numericAns = parseInt(inputVal, 10);
-    if (numericAns === q.answer) {
+    const isCorrect = numericAns === q.answer;
+    telemetryTracker.completeQuestion(inputVal, String(q.answer), isCorrect);
+
+    if (isCorrect) {
       const nextStreak = streak + 1;
       setStreak(nextStreak);
       setScore(prev => prev + 100 * Math.min(nextStreak, 5));
