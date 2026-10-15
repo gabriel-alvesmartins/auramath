@@ -1254,25 +1254,33 @@
           <div>
             <h2>🦎 Prisma no Rive Runtime Nativo (Canvas WebGL / WebAssembly)</h2>
             <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
-              Renderização vetorial contínua a 60 FPS diretamente de <code>public/mascot/prisma.riv</code> (~4.9 KB) compilado via Rive CLI (RML).
+              Renderização vetorial contínua a 60/120 FPS com State Machines contextuais e fallback automático para SVG.
             </div>
           </div>
-          <div style="display: flex; gap: 8px;">
-            <button class="trigger-action-btn" onclick="triggerRiveEureka()">
-              <span>🚀</span> Disparar Trigger Eureka
-            </button>
+          <div style="display: flex; gap: 8px;" id="rive-header-actions">
+            <!-- Contextual trigger buttons rendered dynamically -->
           </div>
+        </div>
+
+        <!-- Seletor de Contextos Rive Híbridos -->
+        <div style="display: flex; gap: 8px; margin: 16px 0 20px 0; background: #F2ECE0; padding: 6px; border-radius: 12px; border: 1.5px solid var(--border-color);">
+          <button id="btn-ctx-lesson" class="nav-tab-btn active" style="flex: 1; padding: 10px 14px; font-size: 13px; font-weight: 800; border-radius: 8px;" onclick="switchRiveContext('lesson', this)">
+            📚 1. Contexto Lição (prisma-lesson.riv • ~48.5 KB)
+          </button>
+          <button id="btn-ctx-standalone" class="nav-tab-btn" style="flex: 1; padding: 10px 14px; font-size: 13px; font-weight: 800; border-radius: 8px;" onclick="switchRiveContext('standalone', this)">
+            🦎 2. Standalone Geral (prisma.riv • ~4.9 KB)
+          </button>
         </div>
 
         <div class="live-studio-layout">
           <!-- Palco Rive Canvas -->
           <div class="prisma-live-stage" id="rive-live-stage" style="background: #19201E; border-radius: 18px; border: 2px solid #273833;">
-            <div style="position: absolute; top: 16px; left: 16px; font-size: 11px; font-weight: 800; color: #F1AF32; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 6px; letter-spacing: 0.5px;">
-              RIVE ENGINE • STATE MACHINE: PrismaController
+            <div id="rive-badge-label" style="position: absolute; top: 16px; left: 16px; font-size: 11px; font-weight: 800; color: #F1AF32; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 6px; letter-spacing: 0.5px;">
+              RIVE ENGINE • STATE MACHINE: PrismaLessonController
             </div>
             
             <div style="position: relative; width: 300px; height: 300px; display: flex; align-items: center; justify-content: center;">
-              <canvas id="rive-canvas" width="500" height="500" style="width: 300px; height: 300px;"></canvas>
+              <canvas id="rive-canvas" width="512" height="512" style="width: 300px; height: 300px;"></canvas>
             </div>
 
             <div id="rive-status-tag" style="margin-top: 14px; font-size: 13px; font-weight: 700; color: #FFF; background: rgba(255,255,255,0.12); padding: 6px 16px; border-radius: 999px;">
@@ -1283,61 +1291,47 @@
           <!-- Controles da State Machine -->
           <div class="studio-controls-panel">
             <div class="control-group">
-              <label class="control-label">Mudar Estado no PrismaController (Input: state)</label>
-              <div class="state-btn-grid">
-                <button class="state-btn active" id="btn-rive-idle" onclick="setRiveState(0, 'idle', this)">
-                  <span class="icon">😴</span>
-                  <div class="state-info">
-                    <span class="name">0. Idle</span>
-                    <span class="desc">Tórax respirando + cauda</span>
-                  </div>
-                </button>
-                <button class="state-btn" id="btn-rive-thinking" onclick="setRiveState(1, 'thinking', this)">
-                  <span class="icon">🤔</span>
-                  <div class="state-info">
-                    <span class="name">1. Thinking</span>
-                    <span class="desc">Balanço investigativo 120f</span>
-                  </div>
-                </button>
-                <button class="state-btn" id="btn-rive-eureka" onclick="setRiveState(2, 'eureka', this)">
-                  <span class="icon">💡</span>
-                  <div class="state-info">
-                    <span class="name">2. Eureka</span>
-                    <span class="desc">Salto squash & stretch + estrelas</span>
-                  </div>
-                </button>
-                <button class="state-btn" id="btn-rive-supernova" onclick="setRiveState(3, 'supernova', this)">
-                  <span class="icon">🌟</span>
-                  <div class="state-info">
-                    <span class="name">3. Supernova</span>
-                    <span class="desc">Auréola solar 360° contínua</span>
-                  </div>
-                </button>
-                <button class="state-btn" id="btn-rive-hint" onclick="setRiveState(4, 'hint', this)">
-                  <span class="icon">✨</span>
-                  <div class="state-info">
-                    <span class="name">4. Hint</span>
-                    <span class="desc">Esquadro apontando foco</span>
-                  </div>
+              <label class="control-label" id="rive-controls-label">Mudar Estado na State Machine (Input: state)</label>
+              <div class="state-btn-grid" id="rive-state-buttons-container">
+                <!-- Injected via JavaScript based on active context -->
+              </div>
+            </div>
+
+            <!-- Controles Especiais de VFX / Adereços -->
+            <div class="control-group" id="rive-vfx-controls" style="margin-top: 18px;">
+              <label class="control-label">Pontos de Ancoragem Modulares (Anchors & VFX)</label>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="trigger-action-btn" id="btn-toggle-math-orbit" onclick="toggleMathOrbit()" style="background: #203734; border: 1.5px solid #378E79; color: #FFF; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;">
+                  🪐 Toggle Órbita Matemática (+, -, ÷, %, ×)
                 </button>
               </div>
             </div>
 
             <div class="control-group" style="margin-top: 18px;">
-              <label class="control-label">Benefícios da Engine Rive Nativa</label>
+              <label class="control-label">Métricas da Arquitetura Híbrida Rive</label>
               <div style="background: #F8F9FA; border: 1.5px solid var(--border-color); border-radius: 12px; padding: 14px; font-size: 13px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                  <span style="font-weight: 700;">Tamanho do Ativo (.riv):</span>
-                  <span style="color: var(--brand-teal); font-weight: 800;">4.9 KB (Leve & compacto)</span>
+                  <span style="font-weight: 700;">Ativo Compilado (.riv):</span>
+                  <span id="metric-riv-size" style="color: var(--brand-teal); font-weight: 800;">48.5 KB (Orçamento &lt; 50 KB atingido)</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                   <span style="font-weight: 700;">Taxa de Quadros (FPS):</span>
-                  <span style="color: #2E7D32; font-weight: 700;">60 FPS (Aceleração por Hardware)</span>
+                  <span style="color: #2E7D32; font-weight: 700;">60/120 FPS (Aceleração por Hardware)</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                   <span style="font-weight: 700;">State Machine:</span>
-                  <span style="color: #1C2C27; font-weight: 700;">PrismaController (1 layer, 5 estados)</span>
+                  <span id="metric-riv-sm" style="color: #1C2C27; font-weight: 700;">PrismaLessonController (4 estados)</span>
                 </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="font-weight: 700;">Fallback Automático:</span>
+                  <span style="color: #2E7D32; font-weight: 700;">PrismaMascotWeb (100% SVG)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
                 <div style="display: flex; justify-content: space-between;">
                   <span style="font-weight: 700;">Fallback Automático:</span>
                   <span style="color: #2E7D32; font-weight: 700;">PrismaMascotWeb (100% SVG)</span>
@@ -1578,33 +1572,119 @@
     }
 
     // =========================================================================
-    // Rive Runtime Nativo (Canvas WebGL / WebAssembly)
+    // Rive Runtime Nativo (Canvas WebGL / WebAssembly) com Contextos Híbridos
     // =========================================================================
     let riveInstance = null;
     let riveStateInput = null;
+    let riveTriggerCorrect = null;
+    let riveTriggerIncorrect = null;
     let riveTriggerEureka = null;
+    let riveMathOrbitInput = null;
+    let currentRiveContext = 'lesson';
 
-    function initRivePlayer() {
+    const RIVE_CONTEXTS = {
+      lesson: {
+        name: 'Contexto Lição',
+        src: 'mascot/prisma-lesson.riv',
+        artboard: 'PrismaLessonArtboard',
+        stateMachine: 'PrismaLessonController',
+        badge: 'RIVE ENGINE • STATE MACHINE: PrismaLessonController',
+        sizeLabel: '48.5 KB (Orçamento < 50 KB atingido)',
+        smLabel: 'PrismaLessonController (4 estados + órbita modular)',
+        states: [
+          { num: 0, name: 'idle', icon: '😴', title: '0. Idle', desc: 'Respiração suave e repouso' },
+          { num: 1, name: 'thinking', icon: '🤔', title: '1. Thinking', desc: 'Tap no queixo + Órbita + ? 3D' },
+          { num: 2, name: 'correct', icon: '🎉', title: '2. Correct', desc: 'Squash & stretch de acerto' },
+          { num: 3, name: 'incorrect', icon: '🤝', title: '3. Incorrect', desc: 'Inclinação empática e encorajadora' }
+        ],
+        headerActions: `
+          <button class="trigger-action-btn" onclick="triggerRiveLessonFeedback('correct')" style="background: #2E7D32; color: #FFF; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer;">
+            <span>✨</span> Trigger Acerto
+          </button>
+          <button class="trigger-action-btn" onclick="triggerRiveLessonFeedback('incorrect')" style="background: #C62828; color: #FFF; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer;">
+            <span>🔄</span> Trigger Erro
+          </button>
+        `
+      },
+      standalone: {
+        name: 'Standalone Geral',
+        src: 'mascot/prisma.riv',
+        artboard: 'PrismaMascot',
+        stateMachine: 'PrismaController',
+        badge: 'RIVE ENGINE • STATE MACHINE: PrismaController',
+        sizeLabel: '4.9 KB (Vetor procedural leve)',
+        smLabel: 'PrismaController (5 estados)',
+        states: [
+          { num: 0, name: 'idle', icon: '😴', title: '0. Idle', desc: 'Tórax respirando + cauda' },
+          { num: 1, name: 'thinking', icon: '🤔', title: '1. Thinking', desc: 'Balanço investigativo 120f' },
+          { num: 2, name: 'eureka', icon: '💡', title: '2. Eureka', desc: 'Salto squash & stretch + estrelas' },
+          { num: 3, name: 'supernova', icon: '🌟', title: '3. Supernova', desc: 'Auréola solar 360° contínua' },
+          { num: 4, name: 'hint', icon: '✨', title: '4. Hint', desc: 'Esquadro apontando foco' }
+        ],
+        headerActions: `
+          <button class="trigger-action-btn" onclick="triggerRiveEureka()" style="background: var(--brand-teal); color: #FFF; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer;">
+            <span>🚀</span> Disparar Trigger Eureka
+          </button>
+        `
+      }
+    };
+
+    function initRivePlayer(contextKey = 'lesson') {
+      currentRiveContext = contextKey;
+      const ctxConfig = RIVE_CONTEXTS[contextKey];
       const canvas = document.getElementById('rive-canvas');
       if (!canvas || !window.rive) return;
 
+      if (riveInstance) {
+        try {
+          riveInstance.cleanup();
+        } catch (_) {}
+        riveInstance = null;
+      }
+
+      // Atualiza interface do estúdio
+      document.getElementById('rive-badge-label').textContent = ctxConfig.badge;
+      document.getElementById('metric-riv-size').textContent = ctxConfig.sizeLabel;
+      document.getElementById('metric-riv-sm').textContent = ctxConfig.smLabel;
+      document.getElementById('rive-header-actions').innerHTML = ctxConfig.headerActions;
+
+      const vfxControls = document.getElementById('rive-vfx-controls');
+      if (vfxControls) {
+        vfxControls.style.display = contextKey === 'lesson' ? 'block' : 'none';
+      }
+
+      // Renderiza botões de estado contextuais
+      const container = document.getElementById('rive-state-buttons-container');
+      container.innerHTML = ctxConfig.states.map((s, idx) => `
+        <button class="state-btn ${idx === 0 ? 'active' : ''}" id="btn-rive-${s.name}" onclick="setRiveState(${s.num}, '${s.name}', this)">
+          <span class="icon">${s.icon}</span>
+          <div class="state-info">
+            <span class="name">${s.title}</span>
+            <span class="desc">${s.desc}</span>
+          </div>
+        </button>
+      `).join('');
+
       try {
         riveInstance = new rive.Rive({
-          src: 'mascot/prisma.riv',
+          src: ctxConfig.src,
           canvas: canvas,
           autoplay: true,
-          artboard: 'PrismaMascot',
-          stateMachine: 'PrismaController',
+          artboard: ctxConfig.artboard,
+          stateMachine: ctxConfig.stateMachine,
           layout: new rive.Layout({
             fit: rive.Fit.Contain,
             alignment: rive.Alignment.Center,
           }),
           onLoad: () => {
-            console.log('Rive prisma.riv carregado com sucesso!');
-            const inputs = riveInstance.stateMachineInputs('PrismaController');
+            console.log(`Rive ${ctxConfig.src} carregado com sucesso!`);
+            const inputs = riveInstance.stateMachineInputs(ctxConfig.stateMachine);
             if (inputs) {
               riveStateInput = inputs.find(i => i.name === 'state');
               riveTriggerEureka = inputs.find(i => i.name === 'triggerEureka');
+              riveTriggerCorrect = inputs.find(i => i.name === 'triggerCorrect');
+              riveTriggerIncorrect = inputs.find(i => i.name === 'triggerIncorrect');
+              riveMathOrbitInput = inputs.find(i => i.name === 'showMathOrbit');
             }
           },
           onLoadError: (err) => {
@@ -1618,12 +1698,22 @@
       }
     }
 
+    function switchRiveContext(contextKey, btnElem) {
+      document.querySelectorAll('#btn-ctx-lesson, #btn-ctx-standalone').forEach(b => b.classList.remove('active'));
+      if (btnElem) btnElem.classList.add('active');
+      initRivePlayer(contextKey);
+    }
+
     function setRiveState(stateNum, stateName, btnElem) {
       if (riveStateInput) {
         riveStateInput.value = stateNum;
       }
-      if (stateNum === 2 && riveTriggerEureka) {
-        riveTriggerEureka.fire();
+      if (stateNum === 2) {
+        if (riveTriggerEureka) riveTriggerEureka.fire();
+        if (riveTriggerCorrect) riveTriggerCorrect.fire();
+      }
+      if (stateNum === 3 && riveTriggerIncorrect) {
+        riveTriggerIncorrect.fire();
       }
 
       document.querySelectorAll('#tab-rive-player .state-btn').forEach(b => b.classList.remove('active'));
@@ -1632,6 +1722,31 @@
       const tag = document.getElementById('rive-active-state-text');
       if (tag) {
         tag.textContent = `${stateName} (state = ${stateNum})`;
+      }
+    }
+
+    function triggerRiveLessonFeedback(type) {
+      if (type === 'correct') {
+        if (riveTriggerCorrect) riveTriggerCorrect.fire();
+        if (riveStateInput) riveStateInput.value = 2;
+        const btn = document.getElementById('btn-rive-correct');
+        if (btn) setRiveState(2, 'correct', btn);
+      } else if (type === 'incorrect') {
+        if (riveTriggerIncorrect) riveTriggerIncorrect.fire();
+        if (riveStateInput) riveStateInput.value = 3;
+        const btn = document.getElementById('btn-rive-incorrect');
+        if (btn) setRiveState(3, 'incorrect', btn);
+      }
+    }
+
+    function toggleMathOrbit() {
+      if (riveMathOrbitInput) {
+        riveMathOrbitInput.value = !riveMathOrbitInput.value;
+        const btn = document.getElementById('btn-toggle-math-orbit');
+        if (btn) {
+          btn.style.background = riveMathOrbitInput.value ? '#176B5B' : '#203734';
+          btn.style.borderColor = riveMathOrbitInput.value ? '#F1AF32' : '#378E79';
+        }
       }
     }
 

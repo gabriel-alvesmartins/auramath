@@ -1,6 +1,8 @@
 /**
  * @auramath/engine - Core mental math and game mechanics
  */
+import { NODE_SCAFFOLDING_REGISTRY } from './scaffoldingRegistry';
+export { NODE_SCAFFOLDING_REGISTRY };
 
 export type GradeLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
@@ -40,6 +42,7 @@ export interface TrackNodeData {
   theory: TheoryStep;
   scaffolding: ScaffoldingTask[];
   sampleEquation: string;
+  legendary?: boolean;
 }
 
 export interface GradeData {
@@ -2593,6 +2596,10 @@ export function generateQuestionsForNode(
 }
 
 export function getNodeScaffoldingTasks(nodeId: string): ScaffoldingTask[] {
+  if (NODE_SCAFFOLDING_REGISTRY[nodeId] && NODE_SCAFFOLDING_REGISTRY[nodeId].length >= 3) {
+    return [...NODE_SCAFFOLDING_REGISTRY[nodeId]];
+  }
+
   let foundNode: TrackNodeData | undefined;
   for (const g of TRACK_GRADES) {
     const n = g.nodes.find((item) => item.id === nodeId);
@@ -2612,7 +2619,7 @@ export function getNodeScaffoldingTasks(nodeId: string): ScaffoldingTask[] {
       template: `${q.equation} = {answer}`,
       blanks: [
         {
-          key: `step_${tasks.length}`,
+          key: 'answer',
           label: `Resultado de ${q.equation}`,
           expected: ans,
         },
@@ -3235,6 +3242,8 @@ export function generatePatternRecognitionQuestion(): PatternRecognitionQuestion
 }
 
 export * from './gamification';
+export * from './diagnostic';
+export * from './interactiveLessons';
 
 // ==========================================
 

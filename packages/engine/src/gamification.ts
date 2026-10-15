@@ -38,6 +38,44 @@ export interface ActiveXpBoost {
   durationMinutes: number;
 }
 
+export type NotebookThemeId = 'papiro' | 'blueprint' | 'obsidian';
+
+export interface NotebookTheme {
+  id: NotebookThemeId;
+  name: string;
+  tagline: string;
+  description: string;
+  isExclusiveFibonacci: boolean;
+  costGems: number;
+  previewBg: string;
+  previewBorder: string;
+  previewGrid: string;
+}
+
+export type ShopCategory = 'fibonacci' | 'streak_protection' | 'xp_boost' | 'themes';
+
+export interface ShopItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  category: ShopCategory;
+  costGems: number;
+  iconName: string;
+  actionType: 'buy_freeze' | 'buy_boost' | 'buy_wager' | 'unlock_theme' | 'open_fibonacci_modal';
+  isEquipped?: boolean;
+  isMaxCapacity?: boolean;
+  isFibonacciExclusive?: boolean;
+}
+
+export interface FibonacciSubscriptionState {
+  isFibonacciMember: boolean;
+  plan: 'annual' | 'monthly' | null;
+  startedAt: string | null;
+  trialEndsAt: string | null;
+  expiresAt: string | null;
+}
+
 export interface DiscoveryChestReward {
   rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
   xp: number;
@@ -578,3 +616,208 @@ export const AURA_NUDGES: AuraNudge[] = [
     actionRoute: 'track',
   },
 ];
+
+// ==========================================
+// 7. EDITORIAL SHOP & AURA FIBONACCI CATALOG
+// ==========================================
+
+export const DEFAULT_NOTEBOOK_THEMES: NotebookTheme[] = [
+  {
+    id: 'papiro',
+    name: 'Papiro Clássico',
+    tagline: 'O caderno milimetrado tradicional de Alexandria',
+    description: 'Tom quente e ancestral sobre pergaminho suave com linhas milimetradas em nanquim sépia.',
+    isExclusiveFibonacci: false,
+    costGems: 0,
+    previewBg: '#F7F4EA',
+    previewBorder: '#D9D5C8',
+    previewGrid: 'rgba(23, 107, 91, 0.08)',
+  },
+  {
+    id: 'blueprint',
+    name: 'Blueprint Geométrico',
+    tagline: 'Precisão técnica de engenharia aeroespacial',
+    description: 'Fundo ciano escuro editorial com malha quadriculada de alta densidade e acentos em giz branco.',
+    isExclusiveFibonacci: true,
+    costGems: 300,
+    previewBg: '#0F2633',
+    previewBorder: '#1F485E',
+    previewGrid: 'rgba(74, 169, 212, 0.15)',
+  },
+  {
+    id: 'obsidian',
+    name: 'Dark Obsidian',
+    tagline: 'Foco noturno imersivo de alto contraste',
+    description: 'Superfície de basalto negro profundo com nós luminescentes em Marigold e esmeralda Verdigris.',
+    isExclusiveFibonacci: true,
+    costGems: 450,
+    previewBg: '#151817',
+    previewBorder: '#29322E',
+    previewGrid: 'rgba(242, 184, 75, 0.12)',
+  },
+];
+
+export const DEFAULT_SHOP_ITEMS: ShopItem[] = [
+  {
+    id: 'shop_streak_freeze',
+    title: 'Bloqueio de Gelo (Streak Freeze)',
+    subtitle: 'Proteção preventiva da sua sequência',
+    description: 'Armazena 1 carga no caderno. Se você passar 24h sem praticar, o gelo é consumido e sua ofensiva permanece intacta.',
+    category: 'streak_protection',
+    costGems: 100,
+    iconName: 'Shield',
+    actionType: 'buy_freeze',
+  },
+  {
+    id: 'shop_xp_boost_15m',
+    title: 'Poção de Foco Mental (2x XP)',
+    subtitle: 'Dobro de experiência por 15 minutos',
+    description: 'Multiplica por 2 todos os pontos de XP obtidos em lições, treinos de velocidade e duelos pelos próximos 15 minutos.',
+    category: 'xp_boost',
+    costGems: 150,
+    iconName: 'Zap',
+    actionType: 'buy_boost',
+  },
+  {
+    id: 'shop_streak_wager_7d',
+    title: 'Contrato de Foco (7 Dias)',
+    subtitle: 'Aposte 50 gemas na sua disciplina',
+    description: 'Mantenha sua ofensiva ativa por 7 dias ininterruptos e receba 100 gemas de volta (retorno de 200%).',
+    category: 'streak_protection',
+    costGems: 50,
+    iconName: 'Flame',
+    actionType: 'buy_wager',
+  },
+  {
+    id: 'shop_fibonacci_tier',
+    title: 'Aura Fibonacci Premium',
+    subtitle: 'A maestria matemática definitiva',
+    description: 'Acesso sem restrições a todos os treinos, Radar Cognitivo completo de 5 eixos, todos os temas de caderno e selo da Espiral Áurea.',
+    category: 'fibonacci',
+    costGems: 0,
+    iconName: 'Sparkles',
+    actionType: 'open_fibonacci_modal',
+    isFibonacciExclusive: true,
+  },
+];
+
+// ==========================================
+// 8. PURE ECONOMY TRANSACTIONS
+// ==========================================
+
+export function buyStreakFreezeItem(
+  currentGems: number,
+  freezesAvailable: number,
+  cost: number = 100
+): {
+  success: boolean;
+  remainingGems: number;
+  newFreezesAvailable: number;
+  error?: string;
+} {
+  if (freezesAvailable >= 2) {
+    return {
+      success: false,
+      remainingGems: currentGems,
+      newFreezesAvailable: freezesAvailable,
+      error: 'Capacidade máxima de 2 bloqueios de gelo já atingida.',
+    };
+  }
+
+  if (currentGems < cost) {
+    return {
+      success: false,
+      remainingGems: currentGems,
+      newFreezesAvailable: freezesAvailable,
+      error: `Saldo insuficiente. Necessário ${cost} gemas (você possui ${currentGems}).`,
+    };
+  }
+
+  return {
+    success: true,
+    remainingGems: currentGems - cost,
+    newFreezesAvailable: freezesAvailable + 1,
+  };
+}
+
+export function buyXpBoostItem(
+  currentGems: number,
+  durationMinutes: number = 15,
+  cost: number = 150
+): {
+  success: boolean;
+  remainingGems: number;
+  boost: ActiveXpBoost | null;
+  error?: string;
+} {
+  if (currentGems < cost) {
+    return {
+      success: false,
+      remainingGems: currentGems,
+      boost: null,
+      error: `Saldo insuficiente. Necessário ${cost} gemas (você possui ${currentGems}).`,
+    };
+  }
+
+  const expiresAt = Date.now() + durationMinutes * 60 * 1000;
+  return {
+    success: true,
+    remainingGems: currentGems - cost,
+    boost: {
+      multiplier: 2,
+      durationMinutes,
+      expiresAt,
+    },
+  };
+}
+
+export function activateFibonacciSubscription(
+  plan: 'annual' | 'monthly' = 'annual',
+  trialDays: number = 7
+): FibonacciSubscriptionState {
+  const now = new Date();
+  const trialEnds = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000);
+  const subscriptionDurationDays = plan === 'annual' ? 365 + trialDays : 30 + trialDays;
+  const expires = new Date(now.getTime() + subscriptionDurationDays * 24 * 60 * 60 * 1000);
+
+  return {
+    isFibonacciMember: true,
+    plan,
+    startedAt: now.toISOString(),
+    trialEndsAt: trialEnds.toISOString(),
+    expiresAt: expires.toISOString(),
+  };
+}
+
+export function setNotebookTheme(
+  themeId: NotebookThemeId,
+  isFibonacciMember: boolean,
+  unlockedThemes: NotebookThemeId[]
+): {
+  success: boolean;
+  activeTheme: NotebookThemeId;
+  error?: string;
+} {
+  const theme = DEFAULT_NOTEBOOK_THEMES.find((t) => t.id === themeId);
+  if (!theme) {
+    return {
+      success: false,
+      activeTheme: 'papiro',
+      error: 'Tema não encontrado no catálogo.',
+    };
+  }
+
+  if (theme.isExclusiveFibonacci && !isFibonacciMember && !unlockedThemes.includes(themeId)) {
+    return {
+      success: false,
+      activeTheme: 'papiro',
+      error: 'Este tema requer assinatura Aura Fibonacci ativa.',
+    };
+  }
+
+  return {
+    success: true,
+    activeTheme: themeId,
+  };
+}
+

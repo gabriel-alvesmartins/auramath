@@ -42,6 +42,7 @@ export interface IAudioSynthesizer {
   playComboMilestone(level: AuraEnergyLevel): void;
   playErrorSoftRelease(): void;
   playKeypressTick(): void;
+  playDirectFrequency(freq: number, duration?: number): void;
   playBossHit(damagePercent?: number): void;
   playVictoryFanfare(): void;
   playChestReward(): void;
@@ -233,6 +234,33 @@ export class AudioSynthesizer implements IAudioSynthesizer {
         noteGain.disconnect();
       } catch {}
     }, (noteDuration + 0.05) * 1000);
+  }
+
+  /**
+   * Plays a direct tone frequency for Sensory Lab and sound design inspection.
+   */
+  public playDirectFrequency(freq: number, duration: number = 0.3): void {
+    if (!this.ensureReady() || !this.ctx || !this.sfxGain) return;
+    const now = this.ctx.currentTime;
+    const noteGain = this.ctx.createGain();
+    noteGain.connect(this.sfxGain);
+    noteGain.gain.setValueAtTime(0.0001, now);
+    noteGain.gain.linearRampToValueAtTime(0.35, now + 0.003);
+    noteGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    const osc = this.ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    osc.connect(noteGain);
+    osc.start(now);
+    osc.stop(now + duration);
+
+    setTimeout(() => {
+      try {
+        osc.disconnect();
+        noteGain.disconnect();
+      } catch {}
+    }, (duration + 0.05) * 1000);
   }
 
   /**

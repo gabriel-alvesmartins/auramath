@@ -1,13 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Swords, Calendar, Crown, Trophy, Check, X, Sparkles, User, Clock,
-  ArrowRight, ArrowLeft, Shield, Zap, ChevronRight, Play, Lightbulb, Share2,
+  ArrowRight, ArrowLeft, Shield, Zap, ChevronRight, Play, Lightbulb, Share2, Flame,
   type LucideIcon
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { generateQuestion, generateDailyQuestions, Question, MASTERY_CHALLENGES } from '../engine';
 import { audioSynth } from '../services/audioSynth';
-import { Aura3DButton } from '../components/tactile';
+import { Aura3DButton, MatchMadnessGrid } from '../components/tactile';
 import { AuraMascotWeb } from '../components/AuraMascotWeb';
 import { LeagueLeaderboardView } from '../components/gamification';
 import { gamificationEngine } from '../services/gamificationEngine';
@@ -15,7 +15,7 @@ import { eloEngine, RANK_TIERS, EloMatchResult } from '../services/eloEngine';
 import { ghostMatchmaker, GhostOpponent } from '../services/ghostMatchmaker';
 import { useAuth } from '../contexts/AuthContext';
 
-export type DuelSubMode = 'live' | 'daily' | 'split' | 'mastery';
+export type DuelSubMode = 'live' | 'daily' | 'split' | 'mastery' | 'match_madness';
 
 interface DuelModeDefinition {
   id: DuelSubMode;
@@ -113,6 +113,26 @@ const DUEL_MODES: DuelModeDefinition[] = [
     ],
     cognitiveSkills: ['Cálculo Estrutural', 'Resolução de Produtos Notáveis', 'Rigor de Prova'],
     pedagogyQuote: 'A matemática atinge seu ápice quando o cálculo mecânico cede lugar à visão direta.',
+  },
+  {
+    id: 'match_madness',
+    title: 'Match Madness',
+    tagline: 'Conecte pares de complementares e produtos sob pressão do relógio.',
+    category: 'Velocidade & Padrões',
+    durationLabel: '45s · Combo Ascendente',
+    icon: Flame,
+    color: 'var(--color-marigold, #F2B84B)',
+    softColor: 'var(--color-marigold-soft, #FFF0C9)',
+    borderColor: '#C79331',
+    description: 'Conecte os 10 blocos na grade de duas colunas encontrando pares complementares de 100, 1000 ou equivalências algébricas antes do tempo esgotar. Cada marco de 5 pares rende bônus de tempo e multiplicador de XP!',
+    rules: [
+      'Grade móvel com 5 pares ativos simultâneos.',
+      'Toque nos dois termos correspondentes para conectá-los.',
+      'A cada 5 pares conectados sem erro: +3 segundos de bônus.',
+      'Multiplicador de combo sobe para 2x e 3x com acertos contínuos.',
+    ],
+    cognitiveSkills: ['Fluência de Complemento', 'Memória de Trabalho', 'Atenção Seletiva'],
+    pedagogyQuote: 'Enxergar complementos de 100 instantaneamente é a base de todo cálculo mental veloz.',
   },
 ];
 
@@ -707,6 +727,16 @@ export function DuelHubView() {
         {activeMode === 'daily' && <DailyChallengeComponent onReturn={handleReturnToMenu} />}
         {activeMode === 'split' && <SplitBattleComponent onReturn={handleReturnToMenu} />}
         {activeMode === 'mastery' && <MasteryChallengeComponent onReturn={handleReturnToMenu} />}
+        {activeMode === 'match_madness' && (
+          <div className="w-full max-w-[430px] mx-auto py-4">
+            <MatchMadnessGrid
+              onClose={handleReturnToMenu}
+              onFinish={(stats) => {
+                gamificationEngine.addXP(stats.xpEarned);
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

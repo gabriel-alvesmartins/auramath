@@ -5,6 +5,10 @@ import type {
   AchievementItem,
   CommunityQuestState,
   AuraNudge,
+  NotebookThemeId,
+  NotebookTheme,
+  ShopItem,
+  FibonacciSubscriptionState,
 } from '../../packages/engine/src/gamification.ts';
 import {
   INITIAL_STREAK_STATE,
@@ -20,6 +24,12 @@ import {
   INITIAL_COMMUNITY_QUEST,
   AURA_NUDGES,
   formatISODate,
+  DEFAULT_NOTEBOOK_THEMES,
+  DEFAULT_SHOP_ITEMS,
+  buyStreakFreezeItem,
+  buyXpBoostItem,
+  activateFibonacciSubscription,
+  setNotebookTheme,
 } from '../../packages/engine/src/gamification.ts';
 import { cloudSync } from './cloudSync.ts';
 
@@ -48,6 +58,7 @@ export interface CircadianChestState {
 export interface GamificationStoreState {
   streak: StreakState;
   stars: number;
+  gems?: number; // Alias for stars (Marigold Gems)
   xp: number;
   weeklyXp: number;
   activeXpBoost: {
@@ -64,14 +75,26 @@ export interface GamificationStoreState {
   activeNudge: AuraNudge | null;
   recentlyUnlockedAchievement: AchievementItem | null;
   nodeProgress: Record<string, TrackNodeProgress>;
+  // Aura Fibonacci & Store State
+  isFibonacciMember: boolean;
+  fibonacciPlan?: 'annual' | 'monthly' | null;
+  fibonacciTrialEndsAt?: string | null;
+  activeTheme: NotebookThemeId;
+  unlockedThemes: NotebookThemeId[];
 }
 
 const DEFAULT_STATE: GamificationStoreState = {
   streak: INITIAL_STREAK_STATE,
   stars: 48,
+  gems: 48,
   xp: 320,
   weeklyXp: 420,
   activeXpBoost: null,
+  isFibonacciMember: false,
+  fibonacciPlan: null,
+  fibonacciTrialEndsAt: null,
+  activeTheme: 'papiro',
+  unlockedThemes: ['papiro'],
   circadianChests: {
     earlyBird: {
       id: 'early_bird',
@@ -493,6 +516,145 @@ class GamificationEngine {
   public dismissAchievementModal(): void {
     this.state.recentlyUnlockedAchievement = null;
     this.saveState();
+  }
+
+  // --- Dev / Cheats Helpers ---
+  public addXp(amount: number = 100): void {
+    this.state.xp += amount;
+    this.state.weeklyXp += amount;
+    this.saveState();
+  }
+
+  public addXP(amount: number = 100): void {
+    this.addXp(amount);
+  }
+
+  public addStars(amount: number = 1): void {
+    this.state.stars += amount;
+    this.state.gems = this.state.stars;
+    this.saveState();
+  }
+
+  public addGems(amount: number = 50): void {
+    this.addStars(amount);
+  }
+
+  public resetHearts(): void {
+    this.saveState();
+  }
+
+  // --- Editorial Shop & Fibonacci Mechanics ---
+  public get gems(): number {
+    return this.state.stars;
+  }
+
+  public getShopCatalog(): ShopItem[] {
+    return DEFAULT_SHOP_ITEMS.map((item) => {
+      if (item.actionType === 'buy_freeze') {
+        const isMax = this.state.streak.freezesAvailable >= 2;
+        return {
+          ...item,
+          isMaxCapacity: isMax,
+          isEquipped: this.state.streak.freezesAvailable > 0,
+        };
+      }
+      if (item.actionType === 'buy_wager') {
+        const isActive = this.state.streak.wager?.status === 'active';
+        return {
+          ...item,
+          isEquipped: isActive,
+        };
+      }
+      if (item.actionType === 'open_fibonacci_modal') {
+        return {
+          ...item,
+          isEquipped: this.state.isFibonacciMember,
+        };
+      }
+      return item;
+    });
+  }
+
+  public getNotebookThemes(): NotebookTheme[] {
+    return DEFAULT_NOTEBOOK_THEMES;
+  }
+
+  public buyShopItem(item: ShopItem): { success: boolean; message: string } {
+    if (item.actionType === 'buy_freeze') {
+      const res = buyStreakFreezeItem(this.state.stars, this.state.streak.freezesAvailable, item.costGems);
+      if (!res.success) {
+        return { success: false, message: res.error || 'Erro ao comprar Bloqueio de Gelo.' };
+      }
+      this.state.stars = res.remainingGems;
+      this.state.gems = res.remainingGems;
+      this.state.streak = {
+        ...this.state.streak,
+        freezesAvailable: res.newFreezesAvailable,
+      };
+      this.saveState();
+      return { success: true, message: `Bloqueio de Gelo equipado! Cargas: ${res.newFreezesAvailable}/2.` };
+    }
+
+    if (item.actionType === 'buy_boost') {
+      return this.activateXpBoost(15, item.costGems);
+    }
+
+    if (item.actionType === 'buy_wager') {
+      const ok = this.placeStreakWager(7, item.costGems || 50);
+      return ok
+        ? { success: true, message: 'Contrato de Foco de 7 dias firmado!' }
+        : { success: false, message: 'Não foi possível firmar o contrato.' };
+    }
+
+    if (item.actionType === 'open_fibonacci_modal') {
+      return { success: true, message: 'Abra o modal de assinatura.' };
+    }
+
+    return { success: false, message: 'Item não reconhecido.' };
+  }
+
+  public activateXpBoost(durationMinutes: number = 15, costGems: number = 150): { success: boolean; message: string } {
+    const res = buyXpBoostItem(this.state.stars, durationMinutes, costGems);
+    if (!res.success || !res.boost) {
+      return { success: false, message: res.error || 'Saldo insuficiente para a Poção de Foco.' };
+    }
+    this.state.stars = res.remainingGems;
+    this.state.gems = res.remainingGems;
+    this.state.activeXpBoost = {
+      multiplier: res.boost.multiplier,
+      expiresAt: res.boost.expiresAt,
+    };
+    this.saveState();
+    return { success: true, message: `Poção de Foco ativada! 2x XP durante ${durationMinutes} minutos.` };
+  }
+
+  public setFibonacciSubscription(plan: 'annual' | 'monthly' = 'annual', trialDays: number = 7): FibonacciSubscriptionState {
+    const sub = activateFibonacciSubscription(plan, trialDays);
+    this.state.isFibonacciMember = true;
+    this.state.fibonacciPlan = plan;
+    this.state.fibonacciTrialEndsAt = sub.trialEndsAt;
+    // Unlock all themes for Fibonacci subscribers
+    const allThemeIds = DEFAULT_NOTEBOOK_THEMES.map((t) => t.id);
+    this.state.unlockedThemes = Array.from(new Set([...this.state.unlockedThemes, ...allThemeIds]));
+    this.saveState();
+    return sub;
+  }
+
+  public cancelFibonacciSubscription(): void {
+    this.state.isFibonacciMember = false;
+    this.state.fibonacciPlan = null;
+    this.state.fibonacciTrialEndsAt = null;
+    this.saveState();
+  }
+
+  public equipTheme(themeId: NotebookThemeId): { success: boolean; message: string } {
+    const res = setNotebookTheme(themeId, this.state.isFibonacciMember, this.state.unlockedThemes);
+    if (!res.success) {
+      return { success: false, message: res.error || 'Não foi possível equipar o tema.' };
+    }
+    this.state.activeTheme = res.activeTheme;
+    this.saveState();
+    return { success: true, message: `Tema ${res.activeTheme} equipado no caderno!` };
   }
 }
 

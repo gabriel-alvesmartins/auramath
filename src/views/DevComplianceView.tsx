@@ -19,13 +19,28 @@ import {
   DifficultyTier
 } from '../engine';
 import { gamificationEngine } from '../services/gamificationEngine';
+import { DiagramStudioTab } from './dev/DiagramStudioTab';
+import { SensoryLabTab } from './dev/SensoryLabTab';
+import { PrismaTheaterTab } from './dev/PrismaTheaterTab';
+import { TimeMachineTab } from './dev/TimeMachineTab';
+import { SaveSlotsTab } from './dev/SaveSlotsTab';
 
 export interface DevComplianceViewProps {
   onReturn?: () => void;
   onStartLesson?: (nodeId: string) => void;
 }
 
-type TabType = 'dashboard' | 'compliance' | 'backlog' | 'curriculum' | 'playground' | 'storage';
+type TabType =
+  | 'dashboard'
+  | 'diagrams'
+  | 'sensory'
+  | 'prisma'
+  | 'timemachine'
+  | 'curriculum'
+  | 'playground'
+  | 'storage'
+  | 'compliance'
+  | 'backlog';
 
 export function DevComplianceView({ onReturn, onStartLesson }: DevComplianceViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
@@ -470,11 +485,15 @@ export function DevComplianceView({ onReturn, onStartLesson }: DevComplianceView
 
             {[
               { id: 'dashboard', label: 'Cockpit & Métricas', icon: LayoutDashboard },
+              { id: 'diagrams', label: 'Diagram Studio ("Veja")', icon: Sparkles },
+              { id: 'sensory', label: 'Sensory Lab (Web Audio)', icon: Zap },
+              { id: 'prisma', label: 'Prisma Theater (Rive/SVG)', icon: Layers },
+              { id: 'timemachine', label: 'Máquina do Tempo & Streaks', icon: Clock },
+              { id: 'curriculum', label: 'Gestão Curricular (7 Graus)', icon: BookOpen },
+              { id: 'playground', label: 'Playground dos Motores', icon: Cpu },
+              { id: 'storage', label: 'Save Slots & Snapshots', icon: Database },
               { id: 'compliance', label: 'Matriz de Specs (Anti-Drift)', icon: ShieldCheck },
               { id: 'backlog', label: 'KanBan & Backlog GH', icon: Kanban },
-              { id: 'curriculum', label: 'Gestão Curricular (32 Nós)', icon: BookOpen },
-              { id: 'playground', label: 'Playground dos Motores', icon: Cpu },
-              { id: 'storage', label: 'LocalStorage & Presets', icon: Database },
             ].map(tab => {
               const Icon = tab.icon;
               const isSelected = activeTab === tab.id;
@@ -729,6 +748,26 @@ export function DevComplianceView({ onReturn, onStartLesson }: DevComplianceView
               </div>
             </div>
           )}
+
+          {/* ================================================================= */}
+          {/* TAB: DIAGRAM STUDIO ("NÃO CALCULE. VEJA")                         */}
+          {/* ================================================================= */}
+          {activeTab === 'diagrams' && <DiagramStudioTab />}
+
+          {/* ================================================================= */}
+          {/* TAB: SENSORY LAB (WEB AUDIO 0MS)                                  */}
+          {/* ================================================================= */}
+          {activeTab === 'sensory' && <SensoryLabTab />}
+
+          {/* ================================================================= */}
+          {/* TAB: PRISMA THEATER (RIVE & SVG)                                  */}
+          {/* ================================================================= */}
+          {activeTab === 'prisma' && <PrismaTheaterTab />}
+
+          {/* ================================================================= */}
+          {/* TAB: MÁQUINA DO TEMPO & RETENÇÃO                                 */}
+          {/* ================================================================= */}
+          {activeTab === 'timemachine' && <TimeMachineTab />}
 
           {/* ================================================================= */}
           {/* TAB 2: MATRIZ DE SPECS (ANTI-DRIFT)                               */}
@@ -1701,9 +1740,10 @@ export function DevComplianceView({ onReturn, onStartLesson }: DevComplianceView
           )}
 
           {/* ================================================================= */}
-          {/* TAB 6: LOCALSTORAGE & PRESETS                                     */}
+          {/* TAB 6: SAVE SLOTS & LOCALSTORAGE                                  */}
           {/* ================================================================= */}
-          {activeTab === 'storage' && (
+          {activeTab === 'storage' && <SaveSlotsTab />}
+          {false && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div>
                 <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 800, color: '#202522' }}>

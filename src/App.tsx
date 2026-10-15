@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Compass, Zap, Swords, Shapes, User, Flame, Star, Volume2, VolumeX,
-  Wifi, Battery, BookOpen
+  Wifi, Battery, BookOpen, Sparkles
 } from 'lucide-react';
 import { audioSynth } from './services/audioSynth';
 import { TrackView } from './views/TrackView';
@@ -10,6 +10,7 @@ import { DuelHubView } from './views/DuelHubView';
 import { ProfileHubView } from './views/ProfileHubView';
 import { DuolingoLessonView } from './views/DuolingoLessonView';
 import { DevComplianceView } from './views/DevComplianceView';
+import { ShopView } from './views/ShopView';
 import { ThemeToggle } from './components/tactile/ThemeToggle';
 import { gamificationEngine } from './services/gamificationEngine';
 import {
@@ -18,15 +19,18 @@ import {
   AchievementUnlockModal,
   AuraNudgeToast,
 } from './components/gamification';
+import { AuraFibonacciModal } from './components/editorial/AuraFibonacciModal';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import { OnboardingFlowView } from './views/onboarding/OnboardingFlowView';
+import { AuraDevHud } from './components/dev/AuraDevHud';
 
 export type AppRoute =
   | { type: 'track' }
   | { type: 'train' }
   | { type: 'duels' }
   | { type: 'profile' }
+  | { type: 'shop' }
   | { type: 'lesson'; nodeId: string }
   | { type: 'onboarding' }
   | { type: 'dev' };
@@ -49,6 +53,9 @@ function parseRoute(): AppRoute {
   }
   if (segment === 'onboarding' || segment.startsWith('onboarding/')) {
     return { type: 'onboarding' };
+  }
+  if (segment === 'shop' || segment.startsWith('shop/')) {
+    return { type: 'shop' };
   }
   if (segment.startsWith('lesson/')) {
     const nodeId = segment.slice('lesson/'.length).trim();
@@ -85,10 +92,33 @@ function AppContent() {
   const [isMuted, setIsMuted] = useState(false);
   const [gamState, setGamState] = useState(gamificationEngine.getState());
   const [isStreakModalOpen, setIsStreakModalOpen] = useState(false);
+  const [isFibonacciModalOpen, setIsFibonacciModalOpen] = useState(false);
 
   const streak = gamState.streak.current;
   const stars = gamState.stars;
   const xp = gamState.xp;
+
+  const themeCssVars = React.useMemo(() => {
+    if (gamState.activeTheme === 'blueprint') {
+      return {
+        '--color-bg-base': '#0F2633',
+        '--color-track-bg': '#0B1E28',
+        '--color-border-subtle': '#1F485E',
+        '--color-bg-surface': '#143040',
+        '--color-text-primary': '#FFFDF6',
+      } as React.CSSProperties;
+    }
+    if (gamState.activeTheme === 'obsidian') {
+      return {
+        '--color-bg-base': '#151817',
+        '--color-track-bg': '#101312',
+        '--color-border-subtle': '#29322E',
+        '--color-bg-surface': '#1A1E1C',
+        '--color-text-primary': '#FFFDF6',
+      } as React.CSSProperties;
+    }
+    return {} as React.CSSProperties;
+  }, [gamState.activeTheme]);
 
   useEffect(() => {
     const onLocationChange = () => {
@@ -165,18 +195,22 @@ function AppContent() {
       transition: 'background-color 0.2s ease, color 0.2s ease'
     }}>
       {/* Centered Mobile Device Frame */}
-      <div style={{
-        width: '100%',
-        maxWidth: '430px',
-        minHeight: '100vh',
-        backgroundColor: route.type === 'track' ? 'var(--color-track-bg, #EFE7D5)' : 'var(--color-bg-base, #F7F4EA)',
-        borderLeft: '1px solid var(--color-border-subtle, #D9D5C8)',
-        borderRight: '1px solid var(--color-border-subtle, #D9D5C8)',
-        boxShadow: '0 4px 24px rgba(32, 37, 34, 0.08)',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative'
-      }}>
+      <div
+        data-theme={gamState.activeTheme}
+        style={{
+          width: '100%',
+          maxWidth: '430px',
+          minHeight: '100vh',
+          backgroundColor: route.type === 'track' ? 'var(--color-track-bg, #EFE7D5)' : 'var(--color-bg-base, #F7F4EA)',
+          borderLeft: '1px solid var(--color-border-subtle, #D9D5C8)',
+          borderRight: '1px solid var(--color-border-subtle, #D9D5C8)',
+          boxShadow: '0 4px 24px rgba(32, 37, 34, 0.08)',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+          ...themeCssVars,
+        }}
+      >
         {/* iOS Native Status Bar */}
         <div style={{
           height: '44px',
@@ -310,23 +344,64 @@ function AppContent() {
                 <span className="font-mono-tabular">{streak}</span>
               </button>
 
-              {/* Discovery Stars Pill */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                backgroundColor: 'var(--color-verdigris-soft, #DCEBE5)',
-                border: '1.5px solid var(--color-verdigris-bevel, #104E42)',
-                boxShadow: '0 2px 0 var(--color-verdigris-bevel, #104E42)',
-                borderRadius: '12px',
-                padding: '4px 9px',
-                fontSize: '0.78rem',
-                fontWeight: 800,
-                color: 'var(--color-ink, #202522)'
-              }}>
-                <Star size={13} color="var(--color-verdigris-bevel, #104E42)" fill="var(--color-verdigris, #176B5B)" />
+              {/* Discovery Stars & Gems Pill (Interactive Button to Open Shop) */}
+              <button
+                type="button"
+                onClick={() => {
+                  audioSynth.playKeypressTick();
+                  navigateTo('/shop');
+                }}
+                className="aura-3d-btn aura-3d-btn--verdigris"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  backgroundColor: 'var(--color-verdigris-soft, #DCEBE5)',
+                  border: '1.5px solid var(--color-verdigris-bevel, #104E42)',
+                  boxShadow: '0 2px 0 var(--color-verdigris-bevel, #104E42)',
+                  borderRadius: '12px',
+                  padding: '4px 9px',
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  color: 'var(--color-ink, #202522)',
+                  cursor: 'pointer',
+                  outline: 'none',
+                }}
+                title="Loja Editorial e Saldo de Gemas"
+                aria-label="Loja Editorial e Saldo de Gemas"
+              >
+                <Sparkles size={13} color="var(--color-verdigris-bevel, #104E42)" />
                 <span className="font-mono-tabular">{stars}</span>
-              </div>
+              </button>
+
+              {/* Fibonacci Member Badge Pill */}
+              {gamState.isFibonacciMember && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    audioSynth.playKeypressTick();
+                    setIsFibonacciModalOpen(true);
+                  }}
+                  className="aura-3d-btn aura-3d-btn--marigold"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '4px 8px',
+                    borderRadius: '10px',
+                    backgroundColor: 'rgba(242, 184, 75, 0.2)',
+                    border: '1.5px solid var(--color-marigold, #F2B84B)',
+                    boxShadow: '0 2px 0 var(--color-marigold-deep, #A97A1C)',
+                    cursor: 'pointer',
+                  }}
+                  title="Membro Aura Fibonacci Ativo (Ver Benefícios)"
+                  aria-label="Membro Aura Fibonacci Ativo"
+                >
+                  <span style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--color-marigold-deep, #A97A1C)' }}>
+                    φ
+                  </span>
+                </button>
+              )}
 
               <ThemeToggle />
 
@@ -427,6 +502,12 @@ function AppContent() {
           )}
           {route.type === 'duels' && <DuelHubView />}
           {route.type === 'profile' && <ProfileHubView />}
+          {route.type === 'shop' && (
+            <ShopView
+              onOpenFibonacciModal={() => setIsFibonacciModalOpen(true)}
+              onBack={() => navigateTo('/track')}
+            />
+          )}
         </main>
 
         {/* Editorial Tactile Bottom Tab Bar (escondido durante experiências imersivas) */}
@@ -533,6 +614,22 @@ function AppContent() {
 
         {/* Tactile Editorial Auth Modal */}
         <AuthModal />
+
+        {/* Aura Fibonacci Prestige Paywall Modal */}
+        <AuraFibonacciModal
+          isOpen={isFibonacciModalOpen}
+          onClose={() => setIsFibonacciModalOpen(false)}
+          isSubscribed={gamState.isFibonacciMember}
+          onSubscribe={(plan) => {
+            gamificationEngine.setFibonacciSubscription(plan);
+            setIsFibonacciModalOpen(false);
+          }}
+        />
+
+        {/* AuraDev In-Game God Mode HUD (Dev / Test only) */}
+        {(Boolean((import.meta as any)?.env?.DEV) || (typeof window !== 'undefined' && window.location.hash.includes('devhud'))) && (
+          <AuraDevHud onNavigate={(path) => navigateTo(path)} currentRoute={route.type} />
+        )}
       </div>
     </div>
   );

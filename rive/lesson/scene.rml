@@ -1,0 +1,408 @@
+<Rive version="1" kind="fragment">
+    <!-- Image Assets for Prisma Lesson Rig -->
+    <ImageAsset file="assets/layer_body.png" name="body" id="0:100"/>
+    <ImageAsset file="assets/layer_arm.png" name="arm" id="0:101"/>
+    <ImageAsset file="assets/layer_pupil_left.png" name="pupil_left" id="0:102"/>
+    <ImageAsset file="assets/layer_pupil_right.png" name="pupil_right" id="0:103"/>
+    <ImageAsset file="assets/layer_tail.png" name="tail" id="0:104"/>
+    <ImageAsset file="assets/prop_question.png" name="question_prop" id="0:105"/>
+
+    <Artboard defaultStateMachineId="0:10" styleId="0:5" width="512" height="512" name="PrismaLessonArtboard" id="0:2">
+        <LayoutComponentStyle name="Artboard Style" id="0:5"/>
+
+        <!-- Root Node centered on 512x512 artboard -->
+        <Node x="256" y="256" name="PrismaRoot" id="0:20">
+
+            <!-- SKELETAL RIG HIERARCHY (Bones) -->
+            <RootBone x="0" y="0" length="80" rotation="-1.570796" name="SpineRoot" id="0:300">
+                <Bone length="70" rotation="0" name="ChestBone" id="0:301">
+                    <Bone length="60" rotation="0.3" name="HeadBone" id="0:302"/>
+                </Bone>
+                <Bone length="65" rotation="1.8" name="ArmBone" id="0:303"/>
+                <Bone length="75" rotation="-2.5" name="TailBone" id="0:304"/>
+            </RootBone>
+
+            <!-- LAYER 1 (BACK): Tail with Underlap -->
+            <Node x="-120" y="60" name="TailGroup" id="0:25">
+                <Image x="120" y="-60" originX="0.5" originY="0.5" assetId="0:104" name="TailImage" id="0:26"/>
+            </Node>
+
+            <!-- LAYER 2: Body with Head, Monocle, and Solid Scleras -->
+            <Node x="0" y="0" name="BodyGroup" id="0:30">
+                <Image originX="0.5" originY="0.5" assetId="0:100" name="BodyImage" id="0:31"/>
+            </Node>
+
+            <!-- LAYER 3: Independent Pupils -->
+            <!-- 3A. Left Pupil (Monocle eye) -->
+            <Node x="12" y="-88" name="LeftPupilPivot" id="0:40">
+                <Image x="-12" y="88" originX="0.5" originY="0.5" assetId="0:102" name="LeftPupilImage" id="0:41"/>
+            </Node>
+
+            <!-- 3B. Right Pupil (Turret eye) -->
+            <Node x="121" y="-93" name="RightPupilPivot" id="0:45">
+                <Image x="-121" y="93" originX="0.5" originY="0.5" assetId="0:103" name="RightPupilImage" id="0:46"/>
+            </Node>
+
+            <!-- LAYER 4: Arm with Underlap holding Set Square -->
+            <Node x="118" y="44" name="ArmShoulderPivot" id="0:50">
+                <Image x="-118" y="-44" originX="0.5" originY="0.5" assetId="0:101" name="ArmImage" id="0:51"/>
+                <!-- Modular Hand Anchor for tool / accessory attachment -->
+                <Node x="75" y="15" name="Anchor_Hand" id="0:52"/>
+            </Node>
+
+            <!-- LAYER 5 (FRONT): Modular Head Top Anchor (Anchor_HeadTop) -->
+            <Node x="60" y="-165" name="Anchor_HeadTop" id="0:65">
+
+                <!-- 5A: Floating 3D Golden Question Mark Prop -->
+                <Node x="60" y="-5" opacity="0" scaleX="0.55" scaleY="0.55" name="QuestionMarkGroup" id="0:70">
+                    <Image originX="0.5" originY="0.5" assetId="0:105" name="QuestionMarkImage" id="0:71"/>
+                </Node>
+
+                <!-- 5B: Orbiting Mathematical Symbols Ring (+, -, ÷, %, ×) -->
+                <Node x="0" y="0" opacity="0" name="MathOrbitGroup" id="0:200">
+                    <!-- Symbol Plus (+) -->
+                    <Node x="90" y="-20" name="SymbolPlus" id="0:210">
+                        <Shape name="PlusH" id="0:211">
+                            <Rectangle width="14" height="4" cornerRadiusTL="2" cornerRadiusTR="2" cornerRadiusBL="2" cornerRadiusBR="2" originX="0.5" originY="0.5"/>
+                            <Fill name="PlusHFill">
+                                <SolidColor colorValue="FFF1AF32"/>
+                            </Fill>
+                        </Shape>
+                        <Shape name="PlusV" id="0:212">
+                            <Rectangle width="4" height="14" cornerRadiusTL="2" cornerRadiusTR="2" cornerRadiusBL="2" cornerRadiusBR="2" originX="0.5" originY="0.5"/>
+                            <Fill name="PlusVFill">
+                                <SolidColor colorValue="FFF1AF32"/>
+                            </Fill>
+                        </Shape>
+                    </Node>
+
+                    <!-- Symbol Minus (-) -->
+                    <Node x="-95" y="-10" name="SymbolMinus" id="0:220">
+                        <Shape name="MinusBar" id="0:221">
+                            <Rectangle width="13" height="4" cornerRadiusTL="2" cornerRadiusTR="2" cornerRadiusBL="2" cornerRadiusBR="2" originX="0.5" originY="0.5"/>
+                            <Fill name="MinusFill">
+                                <SolidColor colorValue="FFFFD56B"/>
+                            </Fill>
+                        </Shape>
+                    </Node>
+
+                    <!-- Symbol Divide (÷) -->
+                    <Node x="60" y="40" name="SymbolDivide" id="0:230">
+                        <Shape name="DivBar" id="0:231">
+                            <Rectangle width="14" height="3" cornerRadiusTL="1" cornerRadiusTR="1" cornerRadiusBL="1" cornerRadiusBR="1" originX="0.5" originY="0.5"/>
+                            <Fill name="DivFill">
+                                <SolidColor colorValue="FFF1AF32"/>
+                            </Fill>
+                        </Shape>
+                        <Shape y="-6" name="DivDotTop" id="0:232">
+                            <Ellipse width="3.5" height="3.5" originX="0.5" originY="0.5"/>
+                            <Fill name="Dot1Fill">
+                                <SolidColor colorValue="FFF1AF32"/>
+                            </Fill>
+                        </Shape>
+                        <Shape y="6" name="DivDotBot" id="0:233">
+                            <Ellipse width="3.5" height="3.5" originX="0.5" originY="0.5"/>
+                            <Fill name="Dot2Fill">
+                                <SolidColor colorValue="FFF1AF32"/>
+                            </Fill>
+                        </Shape>
+                    </Node>
+
+                    <!-- Symbol Percent (%) -->
+                    <Node x="-70" y="35" name="SymbolPercent" id="0:240">
+                        <Shape name="PercentSlash" id="0:241">
+                            <Rectangle width="15" height="3" rotation="0.785" cornerRadiusTL="1" cornerRadiusTR="1" cornerRadiusBL="1" cornerRadiusBR="1" originX="0.5" originY="0.5"/>
+                            <Fill name="SlashFill">
+                                <SolidColor colorValue="FFFFD56B"/>
+                            </Fill>
+                        </Shape>
+                        <Shape x="-5" y="-5" name="PercentDot1" id="0:242">
+                            <Ellipse width="4" height="4" originX="0.5" originY="0.5"/>
+                            <Fill name="DotP1Fill">
+                                <SolidColor colorValue="FFFFD56B"/>
+                            </Fill>
+                        </Shape>
+                        <Shape x="5" y="5" name="PercentDot2" id="0:243">
+                            <Ellipse width="4" height="4" originX="0.5" originY="0.5"/>
+                            <Fill name="DotP2Fill">
+                                <SolidColor colorValue="FFFFD56B"/>
+                            </Fill>
+                        </Shape>
+                    </Node>
+
+                    <!-- Symbol Multiply (×) -->
+                    <Node x="5" y="-70" name="SymbolMultiply" id="0:250">
+                        <Shape name="MultBar1" id="0:251">
+                            <Rectangle width="13" height="3.5" rotation="0.785398" cornerRadiusTL="1.5" cornerRadiusTR="1.5" cornerRadiusBL="1.5" cornerRadiusBR="1.5" originX="0.5" originY="0.5"/>
+                            <Fill name="MultFill1">
+                                <SolidColor colorValue="FFF1AF32"/>
+                            </Fill>
+                        </Shape>
+                        <Shape name="MultBar2" id="0:252">
+                            <Rectangle width="13" height="3.5" rotation="-0.785398" cornerRadiusTL="1.5" cornerRadiusTR="1.5" cornerRadiusBL="1.5" cornerRadiusBR="1.5" originX="0.5" originY="0.5"/>
+                            <Fill name="MultFill2">
+                                <SolidColor colorValue="FFF1AF32"/>
+                            </Fill>
+                        </Shape>
+                    </Node>
+                </Node>
+            </Node>
+
+        </Node>
+
+        <!-- STATE MACHINE: PrismaLessonController -->
+        <StateMachine name="PrismaLessonController" id="0:10">
+            <!-- Numerical State: 0=idle, 1=thinking, 2=correct, 3=incorrect -->
+            <StateMachineNumber name="state" id="0:21"/>
+            <!-- Direct Triggers for feedback -->
+            <StateMachineTrigger name="triggerCorrect" id="0:22"/>
+            <StateMachineTrigger name="triggerIncorrect" id="0:23"/>
+            <!-- Boolean toggle to force math orbit ring visibility -->
+            <StateMachineBool name="showMathOrbit" id="0:24"/>
+
+            <StateMachineLayer name="MotionLayer" id="0:11">
+                <EntryState x="-100" y="0">
+                    <StateTransition stateToId="0:80"/>
+                </EntryState>
+
+                <!-- 0: IDLE -->
+                <AnimationState x="100" y="0" animationId="0:60" id="0:80">
+                    <StateTransition stateToId="0:81" duration="200">
+                        <TransitionNumberCondition inputId="0:21" opValue="equal" value="1"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:82" duration="150">
+                        <TransitionTriggerCondition inputId="0:22"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:82" duration="150">
+                        <TransitionNumberCondition inputId="0:21" opValue="equal" value="2"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:83" duration="150">
+                        <TransitionTriggerCondition inputId="0:23"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:83" duration="150">
+                        <TransitionNumberCondition inputId="0:21" opValue="equal" value="3"/>
+                    </StateTransition>
+                </AnimationState>
+
+                <!-- 1: THINKING -->
+                <AnimationState x="320" y="-120" animationId="0:61" id="0:81">
+                    <StateTransition stateToId="0:80" duration="200">
+                        <TransitionNumberCondition inputId="0:21" opValue="equal" value="0"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:82" duration="150">
+                        <TransitionTriggerCondition inputId="0:22"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:82" duration="150">
+                        <TransitionNumberCondition inputId="0:21" opValue="equal" value="2"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:83" duration="150">
+                        <TransitionTriggerCondition inputId="0:23"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:83" duration="150">
+                        <TransitionNumberCondition inputId="0:21" opValue="equal" value="3"/>
+                    </StateTransition>
+                </AnimationState>
+
+                <!-- 2: CORRECT (Celebration Nod/Jump) -->
+                <AnimationState x="320" y="0" animationId="0:62" id="0:82">
+                    <StateTransition stateToId="0:80" duration="250" enableExitTime="true" exitTime="90" exitTimeIsPercetange="false">
+                        <TransitionNumberCondition inputId="0:21" opValue="equal" value="0"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:81" duration="200">
+                        <TransitionNumberCondition inputId="0:21" opValue="equal" value="1"/>
+                    </StateTransition>
+                </AnimationState>
+
+                <!-- 3: INCORRECT (Gentle sympathetic shake) -->
+                <AnimationState x="320" y="120" animationId="0:63" id="0:83">
+                    <StateTransition stateToId="0:80" duration="250" enableExitTime="true" exitTime="90" exitTimeIsPercetange="false">
+                        <TransitionNumberCondition inputId="0:21" opValue="equal" value="0"/>
+                    </StateTransition>
+                    <StateTransition stateToId="0:81" duration="200">
+                        <TransitionNumberCondition inputId="0:21" opValue="equal" value="1"/>
+                    </StateTransition>
+                </AnimationState>
+            </StateMachineLayer>
+        </StateMachine>
+
+        <!-- ANIMATIONS -->
+
+        <!-- 1. Idle Breathing Animation (loop, 120 frames) -->
+        <LinearAnimation loopValue="loop" fps="60" duration="120" name="idle" id="0:60">
+            <!-- Torso subtle organic breathing -->
+            <KeyedObject objectId="0:30">
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.025" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="0.99" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- Arm gentle resting sway -->
+            <KeyedObject objectId="0:50">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-0.035" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- Tail subtle resting curl -->
+            <KeyedObject objectId="0:25">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-0.06" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- Props are hidden in Idle -->
+            <KeyedObject objectId="0:70">
+                <KeyedProperty propertyKey="18">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="0:200">
+                <KeyedProperty propertyKey="18">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <!-- 2. Thinking Animation (loop, 120 frames) -->
+        <LinearAnimation loopValue="loop" fps="60" duration="120" name="thinking" id="0:61">
+            <!-- Body inquisitive posture -->
+            <KeyedObject objectId="0:30">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-0.06" interpolationType="1" frame="40"/>
+                    <KeyFrameDouble value="0.04" interpolationType="1" frame="90"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- Arm chin tapping / set square tilt -->
+            <KeyedObject objectId="0:50">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-0.15" interpolationType="1" frame="30"/>
+                    <KeyFrameDouble value="0.05" interpolationType="1" frame="80"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- Pupils looking upward in deep calculation -->
+            <KeyedObject objectId="0:40">
+                <KeyedProperty propertyKey="13">
+                    <KeyFrameDouble value="12.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="16.0" interpolationType="1" frame="40"/>
+                    <KeyFrameDouble value="14.0" interpolationType="1" frame="90"/>
+                    <KeyFrameDouble value="12.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="-88.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-94.0" interpolationType="1" frame="40"/>
+                    <KeyFrameDouble value="-90.0" interpolationType="1" frame="90"/>
+                    <KeyFrameDouble value="-88.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- Question Mark Prop floats and bobs -->
+            <KeyedObject objectId="0:70">
+                <KeyedProperty propertyKey="18">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="-5.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-14.0" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="-5.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- Math Orbit planetary ring spins 360° continuously -->
+            <KeyedObject objectId="0:200">
+                <KeyedProperty propertyKey="18">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="6.2831855" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <!-- 3. Correct Animation (oneShot, 90 frames) -->
+        <LinearAnimation loopValue="oneShot" fps="60" duration="90" name="correct" id="0:62">
+            <!-- Energetic triumphant upward squash & stretch -->
+            <KeyedObject objectId="0:20">
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="256.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="264.0" interpolationType="1" frame="10"/>
+                    <KeyFrameDouble value="220.0" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="258.0" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="256.0" interpolationType="1" frame="90"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <KeyedObject objectId="0:30">
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.12" interpolationType="1" frame="10"/>
+                    <KeyFrameDouble value="0.92" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="1.04" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="90"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="0.88" interpolationType="1" frame="10"/>
+                    <KeyFrameDouble value="1.15" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="0.95" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="90"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- Arm raised in victory gesture -->
+            <KeyedObject objectId="0:50">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-0.4" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="90"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <!-- 4. Incorrect Animation (oneShot, 90 frames) -->
+        <LinearAnimation loopValue="oneShot" fps="60" duration="90" name="incorrect" id="0:63">
+            <!-- Sympathetic side-to-side head shake & recover -->
+            <KeyedObject objectId="0:30">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-0.08" interpolationType="1" frame="15"/>
+                    <KeyFrameDouble value="0.08" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="-0.05" interpolationType="1" frame="55"/>
+                    <KeyFrameDouble value="0.03" interpolationType="1" frame="75"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="90"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- Arm slightly dips in empathy then returns -->
+            <KeyedObject objectId="0:50">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="0.1" interpolationType="1" frame="25"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="90"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+    </Artboard>
+</Rive>

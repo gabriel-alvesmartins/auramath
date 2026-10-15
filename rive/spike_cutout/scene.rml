@@ -1,7 +1,10 @@
 <Rive version="1" kind="fragment">
+    <!-- Image Assets for Cutout Rig -->
     <ImageAsset file="layer_body.png" name="body" id="0:100"/>
-    <ImageAsset file="layer_pupils.png" name="pupils" id="0:101"/>
-    <ImageAsset file="layer_arm.png" name="arm" id="0:102"/>
+    <ImageAsset file="layer_arm.png" name="arm" id="0:101"/>
+    <ImageAsset file="layer_pupil_left.png" name="pupil_left" id="0:102"/>
+    <ImageAsset file="layer_pupil_right.png" name="pupil_right" id="0:103"/>
+    <ImageAsset file="prop_question.png" name="question_prop" id="0:104"/>
 
     <Artboard defaultStateMachineId="0:10" styleId="0:5" width="1024" height="1024" name="PrismaMascot" id="0:2">
         <LayoutComponentStyle name="Artboard Style" id="0:5"/>
@@ -9,38 +12,152 @@
         <!-- Root Node centered on 1024x1024 artboard -->
         <Node x="512" y="512" name="PrismaRoot" id="0:20">
 
-            <!-- FRONT-MOST (1): Arm holding Set Square (pivots at shoulder) -->
-            <!-- In 1024x1024 coordinates, shoulder pivot is at (748, 600) -->
-            <!-- Relative to PrismaRoot at (512, 512), local pivot is at (236, 88) -->
+            <!-- LAYER 1 (FRONT-MOST): Orbiting Mathematical Symbols Ring -->
+            <!-- Scene 2: Símbolos (+, -, ÷, %, ×) orbitam a cabeça de Prisma como anéis planetários -->
+            <Node x="60" y="-330" opacity="0" name="MathOrbitGroup" id="0:200">
+                <!-- Symbol Plus (+) -->
+                <Node x="180" y="-40" name="SymbolPlus" id="0:210">
+                    <Shape name="PlusH" id="0:211">
+                        <Rectangle width="22" height="5" cornerRadiusTL="2" cornerRadiusTR="2" cornerRadiusBL="2" cornerRadiusBR="2" originX="0.5" originY="0.5"/>
+                        <Fill name="PlusHFill">
+                            <SolidColor colorValue="FFF1AF32"/>
+                        </Fill>
+                    </Shape>
+                    <Shape name="PlusV" id="0:212">
+                        <Rectangle width="5" height="22" cornerRadiusTL="2" cornerRadiusTR="2" cornerRadiusBL="2" cornerRadiusBR="2" originX="0.5" originY="0.5"/>
+                        <Fill name="PlusVFill">
+                            <SolidColor colorValue="FFF1AF32"/>
+                        </Fill>
+                    </Shape>
+                </Node>
+
+                <!-- Symbol Minus (-) -->
+                <Node x="-190" y="-20" name="SymbolMinus" id="0:220">
+                    <Shape name="MinusBar" id="0:221">
+                        <Rectangle width="20" height="5" cornerRadiusTL="2" cornerRadiusTR="2" cornerRadiusBL="2" cornerRadiusBR="2" originX="0.5" originY="0.5"/>
+                        <Fill name="MinusFill">
+                            <SolidColor colorValue="FFFFD56B"/>
+                        </Fill>
+                    </Shape>
+                </Node>
+
+                <!-- Symbol Divide (÷) -->
+                <Node x="120" y="80" name="SymbolDivide" id="0:230">
+                    <Shape name="DivBar" id="0:231">
+                        <Rectangle width="22" height="4" cornerRadiusTL="2" cornerRadiusTR="2" cornerRadiusBL="2" cornerRadiusBR="2" originX="0.5" originY="0.5"/>
+                        <Fill name="DivFill">
+                            <SolidColor colorValue="FFF1AF32"/>
+                        </Fill>
+                    </Shape>
+                    <Shape y="-9" name="DivDotTop" id="0:232">
+                        <Ellipse width="5" height="5" originX="0.5" originY="0.5"/>
+                        <Fill name="Dot1Fill">
+                            <SolidColor colorValue="FFF1AF32"/>
+                        </Fill>
+                    </Shape>
+                    <Shape y="9" name="DivDotBot" id="0:233">
+                        <Ellipse width="5" height="5" originX="0.5" originY="0.5"/>
+                        <Fill name="Dot2Fill">
+                            <SolidColor colorValue="FFF1AF32"/>
+                        </Fill>
+                    </Shape>
+                </Node>
+
+                <!-- Symbol Percent (%) -->
+                <Node x="-140" y="70" name="SymbolPercent" id="0:240">
+                    <Shape name="PercentSlash" id="0:241">
+                        <Rectangle width="24" height="4" rotation="0.785" cornerRadiusTL="1" cornerRadiusTR="1" cornerRadiusBL="1" cornerRadiusBR="1" originX="0.5" originY="0.5"/>
+                        <Fill name="SlashFill">
+                            <SolidColor colorValue="FFFFD56B"/>
+                        </Fill>
+                    </Shape>
+                    <Shape x="-8" y="-8" name="PercentDot1" id="0:242">
+                        <Ellipse width="6" height="6" originX="0.5" originY="0.5"/>
+                        <Fill name="DotP1Fill">
+                            <SolidColor colorValue="FFFFD56B"/>
+                        </Fill>
+                    </Shape>
+                    <Shape x="8" y="8" name="PercentDot2" id="0:243">
+                        <Ellipse width="6" height="6" originX="0.5" originY="0.5"/>
+                        <Fill name="DotP2Fill">
+                            <SolidColor colorValue="FFFFD56B"/>
+                        </Fill>
+                    </Shape>
+                </Node>
+
+                <!-- Symbol Multiply (×) -->
+                <Node x="10" y="-140" name="SymbolMultiply" id="0:250">
+                    <Shape name="MultBar1" id="0:251">
+                        <Rectangle width="20" height="5" rotation="0.785398" cornerRadiusTL="2" cornerRadiusTR="2" cornerRadiusBL="2" cornerRadiusBR="2" originX="0.5" originY="0.5"/>
+                        <Fill name="MultFill1">
+                            <SolidColor colorValue="FFF1AF32"/>
+                        </Fill>
+                    </Shape>
+                    <Shape name="MultBar2" id="0:252">
+                        <Rectangle width="20" height="5" rotation="-0.785398" cornerRadiusTL="2" cornerRadiusTR="2" cornerRadiusBL="2" cornerRadiusBR="2" originX="0.5" originY="0.5"/>
+                        <Fill name="MultFill2">
+                            <SolidColor colorValue="FFF1AF32"/>
+                        </Fill>
+                    </Shape>
+                </Node>
+            </Node>
+
+            <!-- LAYER 2: Floating 3D Golden Question Mark Prop -->
+            <!-- Centrado acima da crista direita: (750, 180) -> relativo (238, -332) -->
+            <Node x="238" y="-332" opacity="1" scaleX="0.95" scaleY="0.95" name="QuestionMarkGroup" id="0:70">
+                <Image originX="0.5" originY="0.5" assetId="0:104" name="QuestionMarkImage" id="0:71"/>
+            </Node>
+
+            <!-- LAYER 3: Arm holding Set Square (pivots at shoulder) -->
+            <!-- Shoulder pivot is at (748, 600) -> relative (236, 88) -->
             <Node x="236" y="88" name="ArmShoulderPivot" id="0:50">
-                <Image x="-236" y="-88" originX="0.5" originY="0.5" assetId="0:102" name="ArmImage" id="0:51"/>
+                <Image x="-236" y="-88" originX="0.5" originY="0.5" assetId="0:101" name="ArmImage" id="0:51"/>
             </Node>
 
-            <!-- MIDDLE (2): Pupils (curious look / tracking) -->
-            <Node x="0" y="0" name="PupilsGroup" id="0:40">
-                <Image originX="0.5" originY="0.5" assetId="0:101" name="PupilsImage" id="0:41"/>
+            <!-- LAYER 4: Tiny Playful Tongue Tip (Pokes out playfully during deep thought) -->
+            <!-- Corner of mouth at artboard (495, 435) -> relative (-17, -77) -->
+            <Node x="-17" y="-77" opacity="0" scaleX="0.5" scaleY="0.5" name="PlayfulTongueGroup" id="0:80">
+                <Shape name="TongueShape" id="0:81">
+                    <Ellipse width="22" height="15" rotation="-0.2" originX="0.5" originY="0.5"/>
+                    <Fill name="TongueFill">
+                        <SolidColor colorValue="FFE76363"/>
+                    </Fill>
+                    <Stroke thickness="2" name="TongueStroke">
+                        <SolidColor colorValue="FF203734"/>
+                    </Stroke>
+                </Shape>
             </Node>
 
-            <!-- BACK-MOST (3): Body Base (breathes with subtle scaleY) -->
+            <!-- LAYER 5: Independent Turret Pupils -->
+            <!-- 5A. Left Pupil (Monocle eye): Pivot at (535, 335) -> relative (23, -177) -->
+            <Node x="23" y="-177" name="LeftPupilPivot" id="0:40">
+                <Image x="-23" y="177" originX="0.5" originY="0.5" assetId="0:102" name="LeftPupilImage" id="0:41"/>
+            </Node>
+
+            <!-- 5B. Right Pupil (Turret eye): Pivot at (755, 325) -> relative (243, -187) -->
+            <Node x="243" y="-187" name="RightPupilPivot" id="0:45">
+                <Image x="-243" y="187" originX="0.5" originY="0.5" assetId="0:103" name="RightPupilImage" id="0:46"/>
+            </Node>
+
+            <!-- LAYER 6 (BASE): Body with Head, Monocle, and Pristine Scleras -->
             <Node x="0" y="0" name="BodyGroup" id="0:30">
                 <Image originX="0.5" originY="0.5" assetId="0:100" name="BodyImage" id="0:31"/>
             </Node>
 
         </Node>
 
-        <!-- State Machine with Idle Animation -->
+        <!-- State Machine with Perplexed (A Perplexidade - Prompt Test) as Active State -->
         <StateMachine name="PrismaState" id="0:10">
             <StateMachineLayer name="BaseLayer" id="0:11">
                 <EntryState>
-                    <StateTransition stateToId="0:12"/>
+                    <StateTransition stateToId="0:14"/>
                 </EntryState>
-                <AnimationState animationId="0:60" id="0:12"/>
+                <AnimationState animationId="0:75" id="0:14"/>
             </StateMachineLayer>
         </StateMachine>
 
-        <!-- Smooth Idle Breathing & Arm Sway Animation -->
+        <!-- 1. Idle Breathing Animation (loop) -->
         <LinearAnimation loopValue="loop" duration="120" name="Idle" id="0:60">
-            <!-- Body Breathing: subtle squash and stretch -->
             <KeyedObject objectId="0:30">
                 <KeyedProperty propertyKey="17">
                     <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
@@ -54,30 +171,293 @@
                 </KeyedProperty>
             </KeyedObject>
 
-            <!-- Arm Sway: gentle rotation around shoulder -->
             <KeyedObject objectId="0:50">
                 <KeyedProperty propertyKey="15">
                     <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
-                    <KeyFrameDouble value="-0.07" interpolationType="1" frame="55"/>
+                    <KeyFrameDouble value="-0.04" interpolationType="1" frame="60"/>
                     <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
                 </KeyedProperty>
             </KeyedObject>
 
-            <!-- Pupils: subtle curious shift -->
-            <KeyedObject objectId="0:40">
-                <KeyedProperty propertyKey="13">
+            <KeyedObject objectId="0:70">
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="-332.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-344.0" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="-332.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="0.95" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.02" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="0.95" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="0.95" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.02" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="0.95" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <!-- 2. Thinking & Calculating: Motion Transferred from AI Video Reference -->
+        <!-- Double chin tap + Turret eyes + Orbiting math ring + Playful tongue -->
+        <LinearAnimation loopValue="loop" duration="180" name="Thinking" id="0:65">
+
+            <!-- A. Body Breathing & Contemplative Lean -->
+            <KeyedObject objectId="0:30">
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.015" interpolationType="1" frame="45"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="90"/>
+                    <KeyFrameDouble value="1.02" interpolationType="1" frame="135"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="15">
                     <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
-                    <KeyFrameDouble value="6.0" interpolationType="1" frame="40"/>
-                    <KeyFrameDouble value="6.0" interpolationType="1" frame="70"/>
+                    <KeyFrameDouble value="0.02" interpolationType="1" frame="50"/>
+                    <KeyFrameDouble value="-0.02" interpolationType="1" frame="120"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- B. Arm Chin Tapping: Double rhythmic tap with set-square corner -->
+            <KeyedObject objectId="0:50">
+                <KeyedProperty propertyKey="15">
+                    <!-- Frame 0-20: Rest pose -->
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <!-- Frame 45: TAP 1 - Taps chin rhythmically with corner of set-square -->
+                    <KeyFrameDouble value="-0.26" interpolationType="1" frame="45"/>
+                    <!-- Frame 62: Recoil -->
+                    <KeyFrameDouble value="-0.10" interpolationType="1" frame="62"/>
+                    <!-- Frame 82: TAP 2 - Emphatic second tap in deep calculation -->
+                    <KeyFrameDouble value="-0.30" interpolationType="1" frame="82"/>
+                    <!-- Frame 115: Hold pose at chin in deep thought -->
+                    <KeyFrameDouble value="-0.24" interpolationType="1" frame="115"/>
+                    <!-- Frame 150: Settle back smoothly -->
+                    <KeyFrameDouble value="-0.08" interpolationType="1" frame="150"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- C. Right Turret Eye: Looks upward in concentration at question mark & math symbols -->
+            <KeyedObject objectId="0:45">
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="-187.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-206.0" interpolationType="1" frame="40"/>
+                    <KeyFrameDouble value="-210.0" interpolationType="1" frame="90"/>
+                    <KeyFrameDouble value="-200.0" interpolationType="1" frame="135"/>
+                    <KeyFrameDouble value="-187.0" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="13">
+                    <KeyFrameDouble value="243.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="249.0" interpolationType="1" frame="40"/>
+                    <KeyFrameDouble value="248.0" interpolationType="1" frame="90"/>
+                    <KeyFrameDouble value="245.0" interpolationType="1" frame="135"/>
+                    <KeyFrameDouble value="243.0" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- D. Left Turret Eye (Monocle): Squints inquisitively in calculation -->
+            <KeyedObject objectId="0:40">
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="0.45" interpolationType="1" frame="40"/>
+                    <KeyFrameDouble value="0.40" interpolationType="1" frame="85"/>
+                    <KeyFrameDouble value="0.55" interpolationType="1" frame="130"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.10" interpolationType="1" frame="40"/>
+                    <KeyFrameDouble value="1.15" interpolationType="1" frame="85"/>
+                    <KeyFrameDouble value="1.06" interpolationType="1" frame="130"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- E. Question Mark: Floating, pulsing, glowing warmly -->
+            <KeyedObject objectId="0:70">
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="-332.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-355.0" interpolationType="1" frame="45"/>
+                    <KeyFrameDouble value="-338.0" interpolationType="1" frame="90"/>
+                    <KeyFrameDouble value="-358.0" interpolationType="1" frame="135"/>
+                    <KeyFrameDouble value="-332.0" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="0.95" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.12" interpolationType="1" frame="45"/>
+                    <KeyFrameDouble value="0.96" interpolationType="1" frame="90"/>
+                    <KeyFrameDouble value="1.10" interpolationType="1" frame="135"/>
+                    <KeyFrameDouble value="0.95" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="0.95" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.12" interpolationType="1" frame="45"/>
+                    <KeyFrameDouble value="0.96" interpolationType="1" frame="90"/>
+                    <KeyFrameDouble value="1.10" interpolationType="1" frame="135"/>
+                    <KeyFrameDouble value="0.95" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- F. Mathematical Symbols Ring: Dissolves into planetary orbit around head -->
+            <KeyedObject objectId="0:200">
+                <KeyedProperty propertyKey="18">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="0.3" interpolationType="1" frame="25"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="140"/>
+                    <KeyFrameDouble value="0.2" interpolationType="1" frame="170"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+                <!-- Planetary 360° orbit around head -->
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="3.14159" interpolationType="1" frame="90"/>
+                    <KeyFrameDouble value="6.28318" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="0.85" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.10" interpolationType="1" frame="90"/>
+                    <KeyFrameDouble value="0.85" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="0.85" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.10" interpolationType="1" frame="90"/>
+                    <KeyFrameDouble value="0.85" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- G. Playful Tongue: Pokes out playfully during deep calculation -->
+            <KeyedObject objectId="0:80">
+                <KeyedProperty propertyKey="18">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="30"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="50"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="130"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="160"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="180"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="0.4" interpolationType="1" frame="30"/>
+                    <KeyFrameDouble value="1.1" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="120"/>
+                    <KeyFrameDouble value="0.4" interpolationType="1" frame="160"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="0.4" interpolationType="1" frame="30"/>
+                    <KeyFrameDouble value="1.1" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="120"/>
+                    <KeyFrameDouble value="0.4" interpolationType="1" frame="160"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+        </LinearAnimation>
+
+        <!-- 3. Perplexed: A Perplexidade (Teste via Prompt Puro) -->
+        <!-- Descida da interrogação + Tilt de cabeça + Olhos desincronizados de camaleão + Hesitação com esquadro -->
+        <LinearAnimation loopValue="loop" duration="120" name="Perplexed" id="0:75">
+
+            <!-- A. Ponto de Interrogação 3D Dourado: Desce flutuando suavemente com bounce elástico -->
+            <KeyedObject objectId="0:70">
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="-480.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-322.0" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="-340.0" interpolationType="1" frame="55"/>
+                    <KeyFrameDouble value="-328.0" interpolationType="1" frame="80"/>
+                    <KeyFrameDouble value="-332.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="18">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="20"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="-0.12" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="0.08" interpolationType="1" frame="45"/>
+                    <KeyFrameDouble value="-0.04" interpolationType="1" frame="85"/>
                     <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
                 </KeyedProperty>
-                <KeyedProperty propertyKey="14">
+                <KeyedProperty propertyKey="16">
+                    <KeyFrameDouble value="0.80" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.10" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="0.96" interpolationType="1" frame="70"/>
+                    <KeyFrameDouble value="0.95" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="0.80" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="1.10" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="0.96" interpolationType="1" frame="70"/>
+                    <KeyFrameDouble value="0.95" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- B. Corpo/Cabeça: Tilt de dúvida (inclina 6° para o lado) com sutil squash de surpresa -->
+            <KeyedObject objectId="0:30">
+                <KeyedProperty propertyKey="15">
                     <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
-                    <KeyFrameDouble value="-4.0" interpolationType="1" frame="40"/>
-                    <KeyFrameDouble value="-4.0" interpolationType="1" frame="70"/>
+                    <KeyFrameDouble value="0.09" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="0.11" interpolationType="1" frame="65"/>
+                    <KeyFrameDouble value="0.05" interpolationType="1" frame="95"/>
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="0.98" interpolationType="1" frame="25"/>
+                    <KeyFrameDouble value="1.02" interpolationType="1" frame="60"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- C. Olho Esquerdo (no Monóculo): Desvia para esquerda-baixo e semicerra inquisitivamente -->
+            <KeyedObject objectId="0:40">
+                <KeyedProperty propertyKey="13">
+                    <KeyFrameDouble value="23.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="15.0" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="14.0" interpolationType="1" frame="75"/>
+                    <KeyFrameDouble value="23.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="-177.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-168.0" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="-170.0" interpolationType="1" frame="75"/>
+                    <KeyFrameDouble value="-177.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="0.55" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="0.50" interpolationType="1" frame="75"/>
+                    <KeyFrameDouble value="1.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- D. Olho Direito (Turret Frontal): Desvia no sentido oposto para cima, inspecionando o adereço -->
+            <KeyedObject objectId="0:45">
+                <KeyedProperty propertyKey="13">
+                    <KeyFrameDouble value="243.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="252.0" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="255.0" interpolationType="1" frame="75"/>
+                    <KeyFrameDouble value="243.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="-187.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-208.0" interpolationType="1" frame="35"/>
+                    <KeyFrameDouble value="-212.0" interpolationType="1" frame="75"/>
+                    <KeyFrameDouble value="-187.0" interpolationType="1" frame="120"/>
+                </KeyedProperty>
+            </KeyedObject>
+
+            <!-- E. Braço com Esquadro Único: Sobe a meio caminho e hesita com micro-tremores de dúvida -->
+            <KeyedObject objectId="0:50">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.0" interpolationType="1" frame="0"/>
+                    <KeyFrameDouble value="-0.08" interpolationType="1" frame="30"/>
+                    <KeyFrameDouble value="-0.12" interpolationType="1" frame="50"/>
+                    <KeyFrameDouble value="-0.07" interpolationType="1" frame="70"/>
+                    <KeyFrameDouble value="-0.10" interpolationType="1" frame="90"/>
                     <KeyFrameDouble value="0.0" interpolationType="1" frame="120"/>
                 </KeyedProperty>
             </KeyedObject>
+
         </LinearAnimation>
 
     </Artboard>

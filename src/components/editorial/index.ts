@@ -10,3 +10,5 @@ export * from './DeepeningMiniCard';
 export * from './PositionalJumpDiagram';
 export * from './FactorDualityDiagram';
 export * from './PercentDoubleRuler';
+export * from './AuraFibonacciModal';
+export * from './ActiveXpBoostPill';

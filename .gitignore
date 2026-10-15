@@ -46,3 +46,9 @@ Thumbs.db
 !.agents/skills/
 .codex/
 scratch/
+
+# Large binaries (>100MB) & raw scraper dumps
+DUOLINGO_SCREENS_COMPLETO.pdf
+duolingo_screens_imagens/
+__pycache__/
+*.pyc

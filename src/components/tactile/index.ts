@@ -12,3 +12,5 @@ export * from './TactileNumpad';
 export * from './TrackSerpentineNode';
 export * from './ThemeToggle';
 export * from './CognitiveRadarChart';
+export * from './TapToSplitSlate';
+export * from './MatchMadnessGrid';

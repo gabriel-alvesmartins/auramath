@@ -12,8 +12,10 @@ export interface TrackSerpentineNodeProps {
   isActive?: boolean;
   isCompleted?: boolean;
   stars?: number; // 0 to 3
+  isLegendary?: boolean;
   onClick?: (node: TrackNodeData) => void;
   onStartLesson?: (node: TrackNodeData) => void;
+  onStartLegendary?: (node: TrackNodeData) => void;
   showMascot?: boolean;
   mascotSpeech?: string;
   isPopoverOpen?: boolean;
@@ -39,8 +41,10 @@ export const TrackSerpentineNode: React.FC<TrackSerpentineNodeProps> = ({
   isActive: propIsActive,
   isCompleted: propIsCompleted,
   stars: propStars,
+  isLegendary: propIsLegendary,
   onClick,
   onStartLesson,
+  onStartLegendary,
   showMascot = false,
   mascotSpeech,
   isPopoverOpen: controlledPopoverOpen,
@@ -86,6 +90,10 @@ export const TrackSerpentineNode: React.FC<TrackSerpentineNodeProps> = ({
 
   const handleLaunchLesson = () => {
     handleClosePopover();
+    if (effectiveStars === 3 && onStartLegendary) {
+      onStartLegendary(node);
+      return;
+    }
     if (onStartLesson) {
       onStartLesson(node);
     }
@@ -97,7 +105,7 @@ export const TrackSerpentineNode: React.FC<TrackSerpentineNodeProps> = ({
   const progressRatio = isCompleted ? 1 : effectiveStars > 0 ? effectiveStars / 3 : 0;
   const strokeDashoffset = ringCircumference - ringCircumference * progressRatio;
 
-  const isLegendary = isCompleted && effectiveStars === 3;
+  const isLegendary = propIsLegendary !== undefined ? propIsLegendary : Boolean(node.legendary || (isCompleted && effectiveStars === 3));
 
   // Node Color Schemes (Rebrand 01.1: Verdigris & Marigold)
   const getNodeStyles = () => {
@@ -383,13 +391,19 @@ export const TrackSerpentineNode: React.FC<TrackSerpentineNodeProps> = ({
           </p>
 
           <Aura3DButton
-            variant="verdigris"
+            variant={effectiveStars === 3 ? 'marigold' : 'verdigris'}
             fullWidth
             size="md"
-            icon={<Zap size={16} />}
+            icon={effectiveStars === 3 ? <Crown size={16} /> : <Zap size={16} />}
             onClick={handleLaunchLesson}
           >
-            COMEÇAR (+15 XP)
+            {node.legendary
+              ? 'TREINO LENDÁRIO (+30 XP)'
+              : effectiveStars === 3
+              ? 'DESAFIO LENDÁRIO (+50 XP) 👑'
+              : isCompleted
+              ? 'REVISAR (+15 XP)'
+              : 'COMEÇAR (+15 XP)'}
           </Aura3DButton>
         </div>
       )}

@@ -6,7 +6,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "node --test test/engine.test.mjs"
+    "test": "node --test test/*.test.mjs"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",

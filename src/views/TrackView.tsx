@@ -21,12 +21,13 @@ import { LabView } from './LabView';
 import { gamificationEngine } from '../services/gamificationEngine';
 import { CommunityQuestBanner } from '../components/gamification';
 import { DiscoveryChestReward } from '../engine';
-
+import { LegendaryChallengeView } from './LegendaryChallengeView';
 
 export interface NodeProgressState {
   completed: boolean;
   stars?: number;
   score?: number;
+  legendary?: boolean;
 }
 
 export interface TrackViewProps {
@@ -139,11 +140,22 @@ export const TrackView: React.FC<TrackViewProps> = ({
   const [activeChestReward, setActiveChestReward] = useState<DiscoveryChestReward | null>(null);
   const [bossModalOpen, setBossModalOpen] = useState(false);
   const [selectedBoss, setSelectedBoss] = useState<MasteryChallengeData | null>(null);
+  const [selectedLegendaryNode, setSelectedLegendaryNode] = useState<TrackNodeData | null>(null);
 
   // Persistent / memoized collected chests per grade
   const [collectedChests, setCollectedChests] = useState<Record<number, boolean>>(() => {
     try {
       const saved = localStorage.getItem('auramath-collected-chests');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  // Persistent legendary nodes
+  const [legendaryNodes, setLegendaryNodes] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('auramath_legendary_nodes');
       return saved ? JSON.parse(saved) : {};
     } catch {
       return {};
@@ -168,13 +180,29 @@ export const TrackView: React.FC<TrackViewProps> = ({
     });
   }, []);
 
-  // Effective progress map: uses prop if provided, else gamificationEngine state
+  // Effective progress map: uses prop if provided, else gamificationEngine state + legendary state
   const effectiveProgress: Record<string, NodeProgressState> = useMemo(() => {
-    if (propNodeProgress) {
-      return propNodeProgress;
+    const base = propNodeProgress || gamState.nodeProgress || {};
+    const merged: Record<string, NodeProgressState> = {};
+    for (const [k, v] of Object.entries(base)) {
+      merged[k] = {
+        ...v,
+        legendary: legendaryNodes[k] || v.legendary,
+      };
     }
-    return gamState.nodeProgress || {};
-  }, [propNodeProgress, gamState.nodeProgress]);
+    return merged;
+  }, [propNodeProgress, gamState.nodeProgress, legendaryNodes]);
+
+  const handleLegendarySuccess = (nodeId: string, xpEarned: number) => {
+    audioSynth.playVictoryFanfare();
+    const updated = { ...legendaryNodes, [nodeId]: true };
+    setLegendaryNodes(updated);
+    try {
+      localStorage.setItem('auramath_legendary_nodes', JSON.stringify(updated));
+    } catch {}
+    gamificationEngine.addXP(xpEarned);
+    setSelectedLegendaryNode(null);
+  };
 
   // Player's active in-progress node across the entire curriculum
   const activeNode = useMemo(() => {
@@ -542,12 +570,16 @@ export const TrackView: React.FC<TrackViewProps> = ({
 
                       {/* Canonical 3D Serpentine Node */}
                       <TrackSerpentineNode
-                        node={node}
+                        node={{
+                          ...node,
+                          legendary: effectiveProgress[node.id]?.legendary,
+                        }}
                         index={index}
                         isCurrent={isCurrentActive}
                         isActive={!isNodeLocked || isNodeCompleted}
                         isCompleted={isNodeCompleted}
                         stars={effectiveProgress[node.id]?.stars ?? 0}
+                        isLegendary={effectiveProgress[node.id]?.legendary}
                         isPopoverOpen={activePopoverNodeId === node.id}
                         onClosePopover={() => setActivePopoverNodeId(null)}
                         onClick={(clickedNode) => {
@@ -563,6 +595,10 @@ export const TrackView: React.FC<TrackViewProps> = ({
                         onStartLesson={(targetNode) => {
                           setActivePopoverNodeId(null);
                           onStartLesson(targetNode.id);
+                        }}
+                        onStartLegendary={(legNode) => {
+                          setActivePopoverNodeId(null);
+                          setSelectedLegendaryNode(legNode);
                         }}
                         showMascot={false}
                       />
@@ -1492,6 +1528,14 @@ export const TrackView: React.FC<TrackViewProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {selectedLegendaryNode && (
+        <LegendaryChallengeView
+          node={selectedLegendaryNode}
+          onClose={() => setSelectedLegendaryNode(null)}
+          onSuccess={handleLegendarySuccess}
+        />
       )}
     </div>
   );

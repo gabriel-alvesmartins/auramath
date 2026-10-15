@@ -528,3 +528,61 @@ html[data-theme="dark"] {
   transition: none !important;
 }
 
+/* -------------------------------------------------------------------------- */
+/* 6. Optimized Popover & Modal Animations (Duolingo Tactile Feedback)        */
+/* -------------------------------------------------------------------------- */
+
+@keyframes popoverIn {
+  from {
+    opacity: 0;
+    transform: translate3d(-50%, -6px, 0) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0) scale(1);
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.node-action-popover {
+  animation: popoverIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  transform-origin: top center;
+}
+
+.node-action-popover-caret {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--color-ink, #202522);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.node-action-popover-caret::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: -7px;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 7px solid var(--color-cream, #FFFDF6);
+}
+

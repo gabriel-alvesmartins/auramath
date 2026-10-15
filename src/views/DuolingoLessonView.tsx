@@ -24,6 +24,7 @@ import {
   TrackNodeData,
   ScaffoldingTask,
   DifficultyTier,
+  createTapToSplitExercise,
 } from '../engine';
 import { audioSynth } from '../services/audioSynth';
 import { gamificationEngine } from '../services/gamificationEngine';
@@ -32,6 +33,7 @@ import { Aura3DButton } from '../components/tactile/Aura3DButton';
 import { StatCard3D } from '../components/tactile/StatCard3D';
 import { FeedbackDrawer } from '../components/tactile/FeedbackDrawer';
 import { TactileNumpad } from '../components/tactile/TactileNumpad';
+import { TapToSplitSlate } from '../components/tactile/TapToSplitSlate';
 import { AuraMascotWeb, AuraMascotState } from '../components/AuraMascotWeb';
 import { PrismaMascotWeb } from '../components/PrismaMascotWeb';
 import {
@@ -128,6 +130,7 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [inputVal, setInputVal] = useState('');
   const [drawerStatus, setDrawerStatus] = useState<'correct' | 'incorrect' | null>(null);
+  const [useTapToSplit, setUseTapToSplit] = useState(false);
 
   // Focus Recharge Modal (Zero Hearts)
   const [showRechargeModal, setShowRechargeModal] = useState(false);
@@ -329,6 +332,78 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
     }
   }, [inputVal, currentQ, combo, hearts, drawerStatus]);
 
+  const currentTapExercise = useMemo(() => {
+    if (!currentQ) return createTapToSplitExercise('47_plus_38');
+    const eq = currentQ.equation;
+    const plusMatch = eq.match(/(\d+)\s*\+\s*(\d+)/);
+    if (plusMatch) {
+      const a = parseInt(plusMatch[1], 10);
+      const b = parseInt(plusMatch[2], 10);
+      const aTens = Math.floor(a / 10) * 10;
+      const aUnits = a % 10;
+      const bTens = Math.floor(b / 10) * 10;
+      const bUnits = b % 10;
+
+      return {
+        id: `split_${a}_${b}`,
+        targetEquation: `${a} + ${b}`,
+        instruction: 'Toque nos números para separá-los em dezenas e unidades, depois combine as partes!',
+        finalAnswer: a + b,
+        initialBlocks: [
+          {
+            id: 'b1',
+            value: a,
+            label: String(a),
+            type: 'original' as const,
+            canSplit: a >= 10,
+            splitInto: [
+              { value: aTens, label: String(aTens), type: 'tens' as const },
+              { value: aUnits, label: String(aUnits), type: 'units' as const },
+            ],
+          },
+          {
+            id: 'b2',
+            value: b,
+            label: String(b),
+            type: 'original' as const,
+            canSplit: b >= 10,
+            splitInto: [
+              { value: bTens, label: String(bTens), type: 'tens' as const },
+              { value: bUnits, label: String(bUnits), type: 'units' as const },
+            ],
+          },
+        ],
+        allowedMerges: [
+          { blockAValue: aTens, blockBValue: bTens, resultingValue: aTens + bTens, resultingLabel: String(aTens + bTens) },
+          { blockAValue: aUnits, blockBValue: bUnits, resultingValue: aUnits + bUnits, resultingLabel: String(aUnits + bUnits) },
+          { blockAValue: aTens + bTens, blockBValue: aUnits + bUnits, resultingValue: a + b, resultingLabel: String(a + b) },
+          { blockAValue: a, blockBValue: bTens, resultingValue: a + bTens, resultingLabel: String(a + bTens) },
+          { blockAValue: a + bTens, blockBValue: bUnits, resultingValue: a + b, resultingLabel: String(a + b) },
+        ],
+      };
+    }
+    return createTapToSplitExercise('47_plus_38');
+  }, [currentQ]);
+
+  const handleTapToSplitComplete = useCallback((finalVal: number) => {
+    if (drawerStatus !== null) return;
+    setInputVal(String(finalVal));
+    const isCorrect = finalVal === currentQ.answer;
+    telemetryTracker.completeQuestion(String(finalVal), String(currentQ.answer), isCorrect);
+
+    if (isCorrect) {
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      setCorrectFirstTry((prev) => prev + 1);
+      audioSynth.playSuccessNote(newCombo);
+      setMascotState('happy');
+      setAuraSpeech(
+        newCombo > 2 ? `Incrível! Combo x${newCombo}! Eureka!` : 'Eureka! Não calcule, veja!'
+      );
+      setDrawerStatus('correct');
+    }
+  }, [currentQ, combo, drawerStatus]);
+
   const handleContinue = () => {
     if (hearts <= 0) {
       setDrawerStatus(null);
@@ -421,6 +496,86 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
     correctFirstTry,
     totalQuestions,
     onFinish,
+  ]);
+
+  // In-Game God Mode Event Listener (AuraDevHud)
+  useEffect(() => {
+    const handleDevAction = (e: Event) => {
+      const customEvent = e as CustomEvent<{ action: 'SOLVE_CORRECT' | 'FORCE_WRONG' | 'SKIP_LESSON' }>;
+      const action = customEvent.detail?.action;
+
+      if (action === 'SKIP_LESSON') {
+        setIsVictory(true);
+        audioSynth.playVictoryFanfare();
+        confetti({
+          particleCount: 80,
+          spread: 80,
+          origin: { y: 0.5 },
+          colors: ['#176B5B', '#F2B84B', '#E76F61', '#6E5AA6', '#FFFDF6'],
+        });
+        return;
+      }
+
+      if (lessonStep === 'theory') {
+        handleAdvanceToScaffolding();
+        return;
+      }
+
+      if (lessonStep === 'scaffolding') {
+        handleAdvanceToDrill();
+        return;
+      }
+
+      if (lessonStep === 'drill') {
+        if (drawerStatus !== null) {
+          handleContinue();
+          return;
+        }
+
+        if (action === 'SOLVE_CORRECT') {
+          const ans = String(currentQ.answer);
+          setInputVal(ans);
+          const newCombo = combo + 1;
+          setCombo(newCombo);
+          setCorrectFirstTry((prev) => prev + 1);
+          audioSynth.playSuccessNote(newCombo);
+          setMascotState('happy');
+          setAuraSpeech(
+            newCombo > 2 ? `Incrível! Combo x${newCombo}! Eureka!` : 'Eureka! Não calcule, veja!'
+          );
+          setDrawerStatus('correct');
+          if (newCombo % 2 === 0) {
+            confetti({
+              particleCount: 25,
+              spread: 50,
+              origin: { y: 0.6 },
+              colors: ['#176B5B', '#F2B84B', '#6E5AA6'],
+            });
+          }
+        } else if (action === 'FORCE_WRONG') {
+          const wrongAns = String(currentQ.answer + 7);
+          setInputVal(wrongAns);
+          setHearts((prev) => Math.max(0, prev - 1));
+          setCombo(0);
+          audioSynth.playErrorSoftRelease();
+          setMascotState('thinking');
+          setAuraSpeech(currentQ.hint || 'Veja a decomposição com atenção.');
+          setDrawerStatus('incorrect');
+        }
+      }
+    };
+
+    window.addEventListener('auramath:dev-action', handleDevAction);
+    return () => window.removeEventListener('auramath:dev-action', handleDevAction);
+  }, [
+    lessonStep,
+    drawerStatus,
+    currentQ,
+    combo,
+    hearts,
+    handleAdvanceToScaffolding,
+    handleAdvanceToDrill,
+    handleContinue,
   ]);
 
   // Handle Focus Recharge
@@ -1794,14 +1949,34 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
         )}
 
         {lessonStep === 'drill' && (
-          <TactileNumpad
-            onInput={handleDigit}
-            onDelete={handleDelete}
-            onClear={handleClear}
-            onSubmit={handleVerify}
-            submitLabel="VERIFICAR"
-            disabled={drawerStatus !== null}
-          />
+          <div className="flex flex-col gap-3">
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setUseTapToSplit((prev) => !prev)}
+                className="text-xs font-bold text-[#176B5B] hover:underline flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-[#176B5B]/10 transition-colors"
+                title="Alternar entre Teclado Tátil e Decomposição Cinética"
+              >
+                {useTapToSplit ? '⌨️ Usar Teclado Tátil' : '✂️ Decomposição por Toque (Cinético)'}
+              </button>
+            </div>
+
+            {useTapToSplit ? (
+              <TapToSplitSlate
+                exercise={currentTapExercise}
+                onComplete={handleTapToSplitComplete}
+              />
+            ) : (
+              <TactileNumpad
+                onInput={handleDigit}
+                onDelete={handleDelete}
+                onClear={handleClear}
+                onSubmit={handleVerify}
+                submitLabel="VERIFICAR"
+                disabled={drawerStatus !== null}
+              />
+            )}
+          </div>
         )}
       </div>
 
