@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Play, Lock, Star, X, Zap } from 'lucide-react';
+import { CheckCircle2, Play, Lock, Star, X, Zap, Crown } from 'lucide-react';
 import { TrackNodeData } from '../../engine';
 import { audioSynth } from '../../services/audioSynth';
 import { Aura3DButton } from './Aura3DButton';
@@ -97,14 +97,16 @@ export const TrackSerpentineNode: React.FC<TrackSerpentineNodeProps> = ({
   const progressRatio = isCompleted ? 1 : effectiveStars > 0 ? effectiveStars / 3 : 0;
   const strokeDashoffset = ringCircumference - ringCircumference * progressRatio;
 
+  const isLegendary = isCompleted && effectiveStars === 3;
+
   // Node Color Schemes (Rebrand 01.1: Verdigris & Marigold)
   const getNodeStyles = () => {
     if (isCompleted) {
       return {
         bg: 'var(--color-verdigris, #176B5B)',
-        bevel: 'var(--color-verdigris-bevel, #104E42)',
-        glow: 'none',
-        ringColor: 'var(--color-verdigris, #176B5B)',
+        bevel: isLegendary ? 'var(--color-marigold-bevel, #D49A2E)' : 'var(--color-verdigris-bevel, #104E42)',
+        glow: isLegendary ? '0 0 12px rgba(242, 184, 75, 0.45)' : 'none',
+        ringColor: isLegendary ? 'var(--color-marigold, #F2B84B)' : 'var(--color-verdigris, #176B5B)',
       };
     }
     if (isActive) {
@@ -234,7 +236,11 @@ export const TrackSerpentineNode: React.FC<TrackSerpentineNodeProps> = ({
           }}
         >
           {isCompleted ? (
-            <CheckCircle2 size={36} color="#FFFFFF" strokeWidth={2.8} />
+            isLegendary ? (
+              <Crown size={34} color="#FFF0C9" strokeWidth={2.4} fill="#F2B84B" />
+            ) : (
+              <CheckCircle2 size={36} color="#FFFFFF" strokeWidth={2.8} />
+            )
           ) : isActive ? (
             <Play size={32} color="#FFFFFF" fill="#FFFFFF" style={{ marginLeft: '4px' }} />
           ) : (

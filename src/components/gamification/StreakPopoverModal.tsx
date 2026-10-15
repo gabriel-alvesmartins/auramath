@@ -160,6 +160,32 @@ export const StreakPopoverModal: React.FC<StreakPopoverModalProps> = ({
               ? 'Seu hábito de descoberta diária está ativo e consistente!'
               : 'Comece sua sequência resolvendo um desafio agora!'}
           </p>
+
+          {/* Urgency Alert Banner (Duolingo: "Less than 3 hours to extend your streak!") */}
+          {streakState.current > 0 && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                backgroundColor: 'var(--color-marigold-soft, #FFF0C9)',
+                border: '1px solid var(--color-marigold-bevel, #D49A2E)',
+                color: '#684800',
+                padding: '4px 10px',
+                borderRadius: '8px',
+                fontSize: '0.72rem',
+                fontWeight: 800,
+                marginTop: '8px',
+              }}
+            >
+              <Sparkles size={13} color="#D49A2E" />
+              <span>
+                {new Date().getHours() >= 20
+                  ? `Menos de ${Math.max(1, 24 - new Date().getHours())} horas para estender sua sequência de ${streakState.current} dias!`
+                  : `Mantenha seu foco ativo hoje para estender sua sequência!`}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* 2. Mini Weekly Consistency Dots */}

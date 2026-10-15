@@ -2,6 +2,11 @@ import React from 'react';
 import { Lightbulb, ArrowRight } from 'lucide-react';
 import { Aura3DButton } from '../tactile/Aura3DButton';
 
+export interface MathPathStep {
+  label: string;
+  expression: string;
+}
+
 export interface ActiveDiscoveryCardProps {
   unitLabel?: string;
   statusBadge?: string;
@@ -9,6 +14,7 @@ export interface ActiveDiscoveryCardProps {
   expression?: string;
   targetCategory?: string;
   insightFormula?: string;
+  pathsToTarget?: MathPathStep[];
   onContinue?: () => void;
 }
 
@@ -19,6 +25,7 @@ export const ActiveDiscoveryCard: React.FC<ActiveDiscoveryCardProps> = ({
   expression = '48 × 52',
   targetCategory = 'Produto Notável',
   insightFormula = 'Centro 50 ± 2 → 50² - 2² = 2.496',
+  pathsToTarget,
   onContinue,
 }) => {
   return (
@@ -172,6 +179,39 @@ export const ActiveDiscoveryCard: React.FC<ActiveDiscoveryCardProps> = ({
             </svg>
           </div>
         </div>
+
+        {/* Optional Multi-path decomposition inspired by Duolingo Math */}
+        {pathsToTarget && pathsToTarget.length > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '6px',
+              padding: '6px 0',
+            }}
+          >
+            {pathsToTarget.map((path, pIdx) => (
+              <div
+                key={pIdx}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor: '#FFFDF6',
+                  border: '1px solid #D9D5C8',
+                  borderRadius: '8px',
+                  padding: '3px 8px',
+                  fontSize: '0.72rem',
+                }}
+              >
+                <span style={{ fontWeight: 800, color: '#166A5A' }}>{path.label}:</span>
+                <span className="font-mono-tabular" style={{ fontFamily: 'var(--font-mono, monospace)', fontWeight: 700, color: '#181D1A' }}>
+                  {path.expression}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Tactile Marigold Highlight Band */}
         <div

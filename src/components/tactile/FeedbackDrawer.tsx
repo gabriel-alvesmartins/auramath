@@ -3,10 +3,18 @@ import { CheckCircle2, AlertCircle, Sparkles, Lightbulb, RotateCcw } from 'lucid
 import { Aura3DButton } from './Aura3DButton';
 import { AuraMascotWeb } from '../AuraMascotWeb';
 
+export interface CognitiveScaffoldingStep {
+  stepIndex: number;
+  explanation: string;
+  algebraicHint: string;
+}
+
 export interface FeedbackModuleInfo {
   unit: number;
   moduleTitle: string;
   nodeId: string;
+  scaffoldingSteps?: CognitiveScaffoldingStep[];
+  accuracyBenchmark?: number;
 }
 
 export interface FeedbackDrawerProps {
@@ -174,25 +182,41 @@ export const FeedbackDrawer: React.FC<FeedbackDrawerProps> = ({
             {/* Didactical Shortcut Insight Box */}
             {explanation && (
               <div
+                className="feedback-insight-box"
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
+                  flexDirection: 'column',
+                  gap: '4px',
                   fontSize: '0.82rem',
                   fontWeight: 600,
                   color: isCorrect ? 'var(--color-verdigris, #176B5B)' : 'var(--color-ink, #202522)',
                   backgroundColor: isCorrect ? 'var(--color-verdigris-soft, #DCEBE5)' : 'var(--color-coral-soft, #F8DED9)',
-                  padding: '8px 12px',
-                  borderRadius: '12px',
+                  padding: '10px 14px',
+                  borderRadius: '14px',
                   marginTop: '8px',
-                  lineHeight: 1.35,
+                  lineHeight: 1.4,
                   border: `1px solid ${isCorrect ? 'rgba(23, 107, 91, 0.25)' : 'rgba(231, 111, 97, 0.3)'}`,
                 }}
               >
-                <span style={{ flexShrink: 0, display: 'inline-flex' }}>
-                  {isCorrect ? <Sparkles size={16} /> : <Lightbulb size={16} />}
-                </span>
-                <span>{explanation}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ flexShrink: 0, display: 'inline-flex' }}>
+                    {isCorrect ? <Sparkles size={16} /> : <Lightbulb size={16} />}
+                  </span>
+                  <span style={{ fontSize: '0.70rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    {isCorrect ? 'Simetria Identificada' : 'Atalho Mental (Não calcule. Veja):'}
+                  </span>
+                </div>
+                <div
+                  className="font-mono-tabular"
+                  style={{
+                    fontFamily: 'var(--font-mono, monospace)',
+                    fontSize: '0.90rem',
+                    fontWeight: 700,
+                    paddingLeft: '24px',
+                  }}
+                >
+                  {explanation}
+                </div>
               </div>
             )}
           </div>

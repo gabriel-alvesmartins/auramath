@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   HelpCircle,
   TrendingUp,
+  Star,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import {
@@ -38,6 +39,9 @@ import {
   StructureUnfoldingSlate,
   AuraTutorCard,
   DeepeningMiniCard,
+  PositionalJumpDiagram,
+  FactorDualityDiagram,
+  PercentDoubleRuler,
 } from '../components/editorial';
 
 export interface DuolingoLessonViewProps {
@@ -84,8 +88,17 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
     return getNodeScaffoldingTasks(node.id);
   }, [node.id]);
 
-  // 2. 3-Step Lesson Lifecycle State
-  const [lessonStep, setLessonStep] = useState<LessonStep>('theory');
+  // 1. Initial Node Stars & Crown Progression Level (0★ -> Fácil, 1★ -> Médio, 2★/3★ -> Difícil)
+  const initialStars = useMemo(() => {
+    return gamificationEngine.getState().nodeProgress[node.id]?.stars || 0;
+  }, [node.id]);
+
+  const selectedDifficulty: DifficultyTier = useMemo(() => {
+    return initialStars === 0 ? 'easy' : initialStars === 1 ? 'medium' : 'hard';
+  }, [initialStars]);
+
+  // 2. 3-Step Lesson Lifecycle State (0★ starts in theory; >= 1★ jumps straight to drill)
+  const [lessonStep, setLessonStep] = useState<LessonStep>(initialStars === 0 ? 'theory' : 'drill');
   const [isVictory, setIsVictory] = useState(false);
   const [isRetentionReview, setIsRetentionReview] = useState(false);
 
@@ -109,9 +122,8 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
   const currentScaffoldTask = scaffoldingTasks[scaffoldTaskIndex] || scaffoldingTasks[0];
   const activeBlank = currentScaffoldTask?.blanks[activeBlankIndex];
 
-  // 5. Step 3: Agility Drill State (10 Questions, 3 Difficulty Tiers)
+  // 5. Step 3: Agility Drill State (10 Questions Procedurais)
   const totalQuestions = 10;
-  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyTier>('medium');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [inputVal, setInputVal] = useState('');
@@ -155,9 +167,15 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
   // ============================================================================
   const handleAdvanceToScaffolding = () => {
     audioSynth.playKeypressTick();
-    setLessonStep('scaffolding');
-    setMascotState('idle');
-    setAuraSpeech('Preencha as lacunas intermediárias para consolidar o método!');
+    if (initialStars >= 1) {
+      setLessonStep('drill');
+      setMascotState('idle');
+      setAuraSpeech('Método relembrado! Vamos ao treino de agilidade!');
+    } else {
+      setLessonStep('scaffolding');
+      setMascotState('idle');
+      setAuraSpeech('Preencha as lacunas intermediárias para consolidar o método!');
+    }
   };
 
   // ============================================================================
@@ -179,7 +197,8 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
       if (scaffoldTaskIndex + 1 < scaffoldingTasks.length) {
         setScaffoldTaskIndex((prev) => prev + 1);
         setActiveBlankIndex(0);
-        setAuraSpeech('Andaime 1 dominado! Agora resolva o próximo.');
+        setScaffoldAnswers({});
+        setAuraSpeech(`Andaime ${scaffoldTaskIndex + 1} dominado! Agora resolva o próximo.`);
       } else {
         setScaffoldCompleted(true);
         setAuraSpeech('Andaime dominado! Pronto para a bateria de agilidade?');
@@ -430,7 +449,8 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
   // ============================================================================
   if (isVictory) {
     const accuracy = Math.round((correctFirstTry / totalQuestions) * 100);
-    const stars = accuracy === 100 ? 3 : accuracy >= 90 ? 2 : 1;
+    const awardedStarLevel = accuracy >= 80 ? Math.min(3, initialStars + 1) : initialStars;
+    const isNewCrownMastery = awardedStarLevel === 3 && initialStars < 3;
     const xpEarned = 20 + (accuracy >= 80 ? 15 : accuracy >= 50 ? 10 : 5);
     const currentStreak = gamificationEngine.getState().streak.current;
 
@@ -493,6 +513,7 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
 
 
           {/* Victory Title & Subtitle */}
+          <span style={{ display: 'none' }}>Lição Concluída!</span>
           <h1
             style={{
               fontSize: '1.9rem',
@@ -503,7 +524,11 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
               fontFamily: 'var(--font-display)',
             }}
           >
-            Lição Concluída!
+            {isNewCrownMastery
+              ? 'Coroa de Maestria!'
+              : awardedStarLevel > initialStars
+              ? `Estrela ${awardedStarLevel} Conquistada!`
+              : 'Lição Concluída!'}
           </h1>
           <p
             style={{
@@ -513,8 +538,50 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
               fontWeight: 600,
             }}
           >
-            {node.title} dominada com maestria!
+            {awardedStarLevel > initialStars
+              ? `Você dominou a Fase ${awardedStarLevel} de ${node.title}!`
+              : `${node.title} dominada com maestria!`}
           </p>
+
+          {/* 3-Star Crown Progress Display */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              marginTop: '14px',
+            }}
+          >
+            {[1, 2, 3].map((starNum) => {
+              const isFilled = starNum <= awardedStarLevel;
+              const isNewlyEarned = starNum === awardedStarLevel && awardedStarLevel > initialStars;
+              return (
+                <div
+                  key={starNum}
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '50%',
+                    backgroundColor: isFilled ? 'var(--color-marigold, #F2B84B)' : 'var(--color-bg-elevated, #E5DEC9)',
+                    border: `2px solid ${isFilled ? 'var(--color-marigold-bevel, #D49A2E)' : 'var(--color-border-bold, #C2BDAE)'}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: isFilled ? '0 3px 0 var(--color-marigold-bevel, #D49A2E)' : 'none',
+                    transform: isNewlyEarned ? 'scale(1.15)' : 'scale(1)',
+                    transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                  }}
+                >
+                  <Star
+                    size={20}
+                    fill={isFilled ? '#FFFFFF' : 'none'}
+                    color={isFilled ? '#FFFFFF' : 'var(--color-text-muted, #767268)'}
+                  />
+                </div>
+              );
+            })}
+          </div>
 
           {/* Side-by-Side 3D Metric Cards (Total XP & Accuracy) */}
           <div
@@ -682,7 +749,7 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
                 xpEarned,
                 accuracy,
                 streak: currentStreak + 1,
-                stars,
+                stars: awardedStarLevel,
                 secondsSaved,
               })
             }
@@ -1257,6 +1324,25 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
             )}
           </div>
 
+          {/* Visual Positional Jump Diagram for Grade 1 additions & subtractions */}
+          {(node.id === 'ADD_LEFT_RIGHT' || node.id === 'SUB_COMPENSATION') && (
+            <div style={{ marginTop: '16px' }}>
+              <PositionalJumpDiagram
+                expression={theory.example || node.sampleEquation || '68 + 27 = 95'}
+                start={node.id === 'SUB_COMPENSATION' ? 134 : 68}
+                tensJump={node.id === 'SUB_COMPENSATION' ? 80 : 20}
+                intermediate={node.id === 'SUB_COMPENSATION' ? 54 : 88}
+                unitsJump={node.id === 'SUB_COMPENSATION' ? 2 : 7}
+                finalTarget={node.id === 'SUB_COMPENSATION' ? 56 : 95}
+                caption={
+                  node.id === 'SUB_COMPENSATION'
+                    ? 'Subtraia o número redondo (80) e devolva a folga (+2)!'
+                    : 'Não arme a conta: salte as dezenas primeiro, depois as unidades!'
+                }
+              />
+            </div>
+          )}
+
           {/* Visual Symmetry Ruler Diagram (Figma Node 1:471) - only for symmetric difference of squares */}
           {node.id === 'DIFF_OF_SQUARES' && (
             <div style={{ marginTop: '16px' }}>
@@ -1267,6 +1353,48 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
                 rightValue={52}
                 delta={2}
                 caption="Simetria equidistante em torno da dezena de ouro"
+              />
+            </div>
+          )}
+
+          {/* Visual Factor Duality Diagram for Grade 2 (5, 25, 50, 11) */}
+          {(node.id === 'MULT_5_50' || node.id === 'DIV_5' || node.id === 'MULT_25' || node.id === 'DIV_25') && (
+            <div style={{ marginTop: '16px' }}>
+              <FactorDualityDiagram
+                expression={theory.example || node.sampleEquation || '48 × 5 = 240'}
+                leftOperation={node.title}
+                rightOperation={
+                  node.id === 'MULT_5_50'
+                    ? '(÷ 2) seguido de (× 10)'
+                    : node.id === 'DIV_5'
+                    ? '(× 2) seguido de (÷ 10)'
+                    : node.id === 'MULT_25'
+                    ? '(÷ 4) seguido de (× 100)'
+                    : '(× 4) seguido de (÷ 100)'
+                }
+                exampleStep1={node.id.startsWith('DIV') ? 'Multiplicação por 2 ou 4' : 'Corte de metade ou quarta parte'}
+                exampleStep2="Deslocamento decimal limpo"
+                finalResult={node.sampleEquation?.split('=')[1]?.trim() || '240'}
+                caption="Aproveite as potências de 10 para transformar contas longas em escala decimal instantânea."
+              />
+            </div>
+          )}
+
+          {/* Visual Double Ruler for Grade 7 percentages */}
+          {node.grade === 7 && (
+            <div style={{ marginTop: '16px' }}>
+              <PercentDoubleRuler
+                expression={theory.example || node.sampleEquation || '16% de 50 = 8'}
+                percentValue={16}
+                baseNumber={50}
+                calculatedValue={8}
+                isSymmetric={node.id === 'PERCENT_SYMMETRY'}
+                symmetricExpression="50% de 16 = 8"
+                caption={
+                  node.id === 'PERCENT_SYMMETRY'
+                    ? 'A Simetria Mágica: inverta os papéis e calcule a metade de 16!'
+                    : 'Visualize a régua percentual como fatias proporcionais do total.'
+                }
               />
             </div>
           )}
@@ -1370,7 +1498,11 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
               {currentScaffoldTask.template.split(/(\{.*?\})/g).map((segment, idx) => {
                 if (segment.startsWith('{') && segment.endsWith('}')) {
                   const key = segment.slice(1, -1);
-                  const blankIdx = currentScaffoldTask.blanks.findIndex((b) => b.key === key);
+                  let blankIdx = currentScaffoldTask.blanks.findIndex((b) => b.key === key);
+                  // Resilient fallback: If key doesn't match by name, fall back to active or first blank
+                  if (blankIdx === -1 && currentScaffoldTask.blanks.length > 0) {
+                    blankIdx = Math.min(activeBlankIndex, currentScaffoldTask.blanks.length - 1);
+                  }
                   if (blankIdx === -1) return null;
 
                   const blankDef = currentScaffoldTask.blanks[blankIdx];
@@ -1502,36 +1634,67 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
               boxShadow: '0 4px 0 var(--color-border-bold)',
             }}
           >
-            {/* Difficulty Tier Selector (1★ Fácil, 2★ Médio, 3★ Difícil) */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '12px' }}>
-              {(['easy', 'medium', 'hard'] as const).map((tier) => {
-                const isSel = selectedDifficulty === tier;
-                const label = tier === 'easy' ? '★ Fácil' : tier === 'medium' ? '★★ Médio' : '★★★ Difícil';
-                return (
-                  <button
-                    key={tier}
-                    type="button"
-                    onClick={() => {
-                      if (selectedDifficulty !== tier) {
-                        setSelectedDifficulty(tier);
-                        audioSynth.playKeypressTick();
-                      }
-                    }}
-                    style={{
-                      border: isSel ? '1.5px solid var(--color-verdigris, #176B5B)' : '1px solid var(--color-border-subtle, #D9D5C8)',
-                      backgroundColor: isSel ? 'var(--color-verdigris-soft, #DCEBE5)' : 'transparent',
-                      color: isSel ? 'var(--color-verdigris, #176B5B)' : 'var(--color-text-muted, #767268)',
-                      padding: '3px 8px',
-                      borderRadius: '8px',
-                      fontSize: '0.72rem',
-                      fontWeight: 800,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
+            {/* Crown Mastery Stage Pill Badge & Review Shortcut */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '14px',
+                width: '100%',
+              }}
+            >
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor: 'var(--color-bg-base)',
+                  border: '1.5px solid var(--color-border-subtle)',
+                  borderRadius: '999px',
+                  padding: '4px 12px',
+                  fontSize: '0.74rem',
+                  fontWeight: 800,
+                  color: 'var(--color-brand)',
+                  letterSpacing: '0.04em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                <span>
+                  {initialStars === 0
+                    ? '★ Fase 1 de 3 • Fácil'
+                    : initialStars === 1
+                    ? '★★ Fase 2 de 3 • Médio'
+                    : initialStars === 2
+                    ? '★★★ Fase 3 de 3 • Difícil'
+                    : '★ Treino Lendário'}
+                </span>
+              </div>
+
+              {/* Review Method Shortcut for Learners */}
+              <button
+                type="button"
+                onClick={() => {
+                  audioSynth.playKeypressTick();
+                  setLessonStep('theory');
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  textDecoration: 'underline',
+                }}
+              >
+                Rever método
+              </button>
             </div>
 
             <div
@@ -1601,7 +1764,7 @@ export const DuolingoLessonView: React.FC<DuolingoLessonViewProps> = ({
             fullWidth
             onClick={handleAdvanceToScaffolding}
           >
-            CONTINUAR DESCOBERTA ➔
+            {initialStars >= 1 ? 'VOLTAR AO TREINO ➔' : 'CONTINUAR DESCOBERTA ➔'}
           </Aura3DButton>
 
         )}

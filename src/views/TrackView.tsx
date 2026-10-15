@@ -1102,6 +1102,26 @@ export const TrackView: React.FC<TrackViewProps> = ({
                           Exemplo: {n.sampleEquation}
                         </div>
                       )}
+                      {n.theory?.visualBreakdown?.steps && (
+                        <div
+                          style={{
+                            backgroundColor: 'var(--color-bg-surface)',
+                            border: '1px solid var(--color-border-subtle)',
+                            padding: '8px 10px',
+                            borderRadius: '8px',
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
+                            color: 'var(--color-verdigris, #176B5B)',
+                            marginTop: '6px',
+                            fontFamily: 'var(--font-mono, monospace)',
+                          }}
+                        >
+                          <div style={{ fontSize: '0.66rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', marginBottom: '2px', fontWeight: 800 }}>
+                            Atalho Mental (Não calcule. Veja):
+                          </div>
+                          {n.theory.visualBreakdown.steps.join(' ➔ ')}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

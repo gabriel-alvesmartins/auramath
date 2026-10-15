@@ -7,3 +7,6 @@ export * from './StructureUnfoldingSlate';
 export * from './AuraTutorCard';
 export * from './TrackCurriculumCard';
 export * from './DeepeningMiniCard';
+export * from './PositionalJumpDiagram';
+export * from './FactorDualityDiagram';
+export * from './PercentDoubleRuler';

@@ -20,6 +20,7 @@ import {
 } from './components/gamification';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
+import { OnboardingFlowView } from './views/onboarding/OnboardingFlowView';
 
 export type AppRoute =
   | { type: 'track' }
@@ -27,6 +28,7 @@ export type AppRoute =
   | { type: 'duels' }
   | { type: 'profile' }
   | { type: 'lesson'; nodeId: string }
+  | { type: 'onboarding' }
   | { type: 'dev' };
 
 function parseRoute(): AppRoute {
@@ -45,6 +47,9 @@ function parseRoute(): AppRoute {
   if (segment === 'dev' || segment.startsWith('dev/')) {
     return { type: 'dev' };
   }
+  if (segment === 'onboarding' || segment.startsWith('onboarding/')) {
+    return { type: 'onboarding' };
+  }
   if (segment.startsWith('lesson/')) {
     const nodeId = segment.slice('lesson/'.length).trim();
     if (nodeId) {
@@ -60,6 +65,17 @@ function parseRoute(): AppRoute {
   if (segment === 'profile' || segment.startsWith('profile/')) {
     return { type: 'profile' };
   }
+
+  // Cold load check: First-time visitor goes to onboarding
+  if (!segment || segment === 'track') {
+    try {
+      const onboarded = localStorage.getItem('auramath_onboarded');
+      if (!onboarded) {
+        return { type: 'onboarding' };
+      }
+    } catch {}
+  }
+
   return { type: 'track' };
 }
 
@@ -135,6 +151,7 @@ function AppContent() {
   }
 
   const isLesson = route.type === 'lesson';
+  const isImmersive = isLesson || route.type === 'onboarding';
 
   return (
     <div style={{
@@ -189,8 +206,8 @@ function AppContent() {
           </div>
         </div>
 
-        {/* Mobile App Header (escondido durante a lição imersiva) */}
-        {!isLesson && (
+        {/* Mobile App Header (escondido durante experiências imersivas) */}
+        {!isImmersive && (
           <header style={{
             padding: '8px 16px',
             display: 'flex',
@@ -372,6 +389,17 @@ function AppContent() {
           overflowY: 'auto',
           backgroundColor: route.type === 'track' ? 'var(--color-track-bg, #EFE7D5)' : 'var(--color-bg-base, #F7F4EA)',
         }}>
+          {route.type === 'onboarding' && (
+            <OnboardingFlowView
+              onFinish={(targetNodeId) => {
+                if (targetNodeId) {
+                  navigateTo(`/lesson/${targetNodeId}`);
+                } else {
+                  navigateTo('/track');
+                }
+              }}
+            />
+          )}
           {route.type === 'lesson' && (
             <DuolingoLessonView
               nodeId={route.nodeId}
@@ -383,6 +411,10 @@ function AppContent() {
                   route.nodeId,
                   stats.stars
                 );
+                // Delayed sign-up: save progress to cloud after the first Aha! Moment
+                if (!user) {
+                  openAuthModal();
+                }
                 navigateTo('/track');
               }}
             />
@@ -397,8 +429,8 @@ function AppContent() {
           {route.type === 'profile' && <ProfileHubView />}
         </main>
 
-        {/* Editorial Tactile Bottom Tab Bar (escondido durante a lição) */}
-        {!isLesson && (
+        {/* Editorial Tactile Bottom Tab Bar (escondido durante experiências imersivas) */}
+        {!isImmersive && (
           <nav style={{
             position: 'fixed',
             bottom: 0,

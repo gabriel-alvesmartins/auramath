@@ -42,5 +42,7 @@ Thumbs.db
 *.swo
 
 # Antigravity/Agent artifacts (optional)
+.agents/*
+!.agents/skills/
 .codex/
 scratch/

@@ -1,25 +1,27 @@
-import {
+import type {
   StreakState,
+  DiscoveryChestReward,
+  WeeklyLeagueState,
+  AchievementItem,
+  CommunityQuestState,
+  AuraNudge,
+} from '../../packages/engine/src/gamification.ts';
+import {
   INITIAL_STREAK_STATE,
   evaluateStreakStatus,
   registerDailyActivity,
   buyStreakFreeze as engineBuyStreakFreeze,
   placeStreakWager as enginePlaceStreakWager,
   completeRescueStep as engineCompleteRescueStep,
-  DiscoveryChestReward,
   rollDiscoveryChestReward,
-  WeeklyLeagueState,
   generateWeeklyCohort,
   getLeagueZone,
-  AchievementItem,
   INITIAL_ACHIEVEMENTS,
-  CommunityQuestState,
   INITIAL_COMMUNITY_QUEST,
-  AuraNudge,
   AURA_NUDGES,
   formatISODate,
-} from '../engine';
-import { cloudSync } from './cloudSync';
+} from '../../packages/engine/src/gamification.ts';
+import { cloudSync } from './cloudSync.ts';
 
 const STORAGE_KEY = 'auramath-gamification-v1';
 
@@ -31,6 +33,18 @@ export interface TrackNodeProgress {
   completedAt: string;
 }
 
+export interface CircadianChestState {
+  id: 'early_bird' | 'night_owl';
+  title: string;
+  subtitle: string;
+  availableFromHour: number;
+  availableToHour: number;
+  isUnlocked: boolean;
+  isClaimedToday: boolean;
+  boostMinutes: number;
+  bonusMarigoldGems: number;
+}
+
 export interface GamificationStoreState {
   streak: StreakState;
   stars: number;
@@ -40,6 +54,10 @@ export interface GamificationStoreState {
     multiplier: number;
     expiresAt: number; // timestamp ms
   } | null;
+  circadianChests?: {
+    earlyBird: CircadianChestState;
+    nightOwl: CircadianChestState;
+  };
   league: WeeklyLeagueState;
   achievements: AchievementItem[];
   communityQuest: CommunityQuestState;
@@ -54,6 +72,30 @@ const DEFAULT_STATE: GamificationStoreState = {
   xp: 320,
   weeklyXp: 420,
   activeXpBoost: null,
+  circadianChests: {
+    earlyBird: {
+      id: 'early_bird',
+      title: 'Baú de Foco Matinal',
+      subtitle: 'Disponível das 06:00 às 12:00',
+      availableFromHour: 6,
+      availableToHour: 12,
+      isUnlocked: true,
+      isClaimedToday: false,
+      boostMinutes: 15,
+      bonusMarigoldGems: 25,
+    },
+    nightOwl: {
+      id: 'night_owl',
+      title: 'Baú de Fixação Noturna',
+      subtitle: 'Disponível das 18:00 às 24:00',
+      availableFromHour: 18,
+      availableToHour: 24,
+      isUnlocked: true,
+      isClaimedToday: false,
+      boostMinutes: 15,
+      bonusMarigoldGems: 25,
+    },
+  },
   league: {
     tier: 'papiro',
     tierName: 'Liga Papiro',
@@ -101,6 +143,10 @@ class GamificationEngine {
       return {
         ...DEFAULT_STATE,
         ...parsed,
+        circadianChests: {
+          ...DEFAULT_STATE.circadianChests,
+          ...(parsed.circadianChests || {}),
+        },
         nodeProgress: {
           ...DEFAULT_STATE.nodeProgress,
           ...(parsed.nodeProgress || {}),
@@ -154,12 +200,13 @@ class GamificationEngine {
   }
 
   // --- Track Progression Helpers ---
-  public completeTrackNode(nodeId: string, stars: number = 3, accuracy: number = 100): boolean {
+  public completeTrackNode(nodeId: string, stars?: number, accuracy: number = 100): boolean {
     if (accuracy < 80) return false;
-    const calcStars = Math.min(3, Math.max(1, stars));
     const existing = this.state.nodeProgress[nodeId];
     const prevStars = existing?.stars || 0;
-    const finalStars = Math.max(prevStars, calcStars);
+    const finalStars = stars !== undefined && stars > 0
+      ? Math.min(3, Math.max(prevStars, stars))
+      : Math.min(3, prevStars + 1);
     const starsDiff = Math.max(0, finalStars - prevStars);
 
     this.state.nodeProgress = {
@@ -175,8 +222,6 @@ class GamificationEngine {
 
     if (starsDiff > 0) {
       this.state.stars += starsDiff;
-    } else if (!existing?.completed) {
-      this.state.stars += 3;
     }
 
     this.saveState();
@@ -202,6 +247,36 @@ class GamificationEngine {
 
   public getNodeProgress(nodeId: string): TrackNodeProgress | undefined {
     return this.state.nodeProgress[nodeId];
+  }
+
+  // --- Circadian Chest System (Early Bird & Night Owl) ---
+  public getCircadianChests(): { earlyBird: CircadianChestState; nightOwl: CircadianChestState } {
+    if (!this.state.circadianChests) {
+      this.state.circadianChests = DEFAULT_STATE.circadianChests;
+    }
+    return this.state.circadianChests!;
+  }
+
+  public claimCircadianChest(chestId: 'early_bird' | 'night_owl'): { success: boolean; boostMinutes: number } {
+    const chests = this.getCircadianChests();
+    const chest = chestId === 'early_bird' ? chests.earlyBird : chests.nightOwl;
+    const now = new Date();
+    const currentHour = now.getHours();
+    const inWindow = currentHour >= chest.availableFromHour && currentHour < chest.availableToHour;
+
+    if (!chest.isUnlocked || chest.isClaimedToday || !inWindow) {
+      return { success: false, boostMinutes: 0 };
+    }
+
+    const expiresAt = Date.now() + chest.boostMinutes * 60 * 1000;
+    this.state.activeXpBoost = {
+      multiplier: 2,
+      expiresAt,
+    };
+    this.state.stars += chest.bonusMarigoldGems;
+    chest.isClaimedToday = true;
+    this.saveState();
+    return { success: true, boostMinutes: chest.boostMinutes };
   }
 
   public isNodeUnlocked(nodeId: string, prerequisites: string[] = []): boolean {
@@ -240,12 +315,13 @@ class GamificationEngine {
     this.state.weeklyXp += awardedXp;
     this.state.stars += wagerRewardStars;
 
-    // Node Progress Persistence (Mandatory retention rule: >= 80% to master)
+    // Node Progress Persistence (Crown Star Progression: +1 star per successful tier completion up to 3 stars)
     if (nodeId && accuracy >= 80) {
-      const calcStars = starsEarned > 0 ? starsEarned : accuracy >= 95 ? 3 : accuracy >= 85 ? 2 : 1;
       const existing = this.state.nodeProgress[nodeId];
       const prevStars = existing?.stars || 0;
-      const finalStars = Math.max(prevStars, calcStars);
+      const finalStars = starsEarned > 0
+        ? Math.min(3, Math.max(prevStars, starsEarned))
+        : Math.min(3, prevStars + 1);
       const starsDiff = Math.max(0, finalStars - prevStars);
 
       this.state.nodeProgress = {
@@ -258,7 +334,9 @@ class GamificationEngine {
           completedAt: formatISODate(),
         },
       };
-      this.state.stars += starsDiff > 0 ? starsDiff : (existing?.completed ? 0 : 3);
+      if (starsDiff > 0) {
+        this.state.stars += starsDiff;
+      }
     } else if (!nodeId) {
       this.state.stars += 3;
     }
@@ -298,6 +376,16 @@ class GamificationEngine {
     });
     this.state.achievements = achievements;
     this.state.recentlyUnlockedAchievement = newlyUnlocked;
+
+    // Circadian Chest cross-unlocking (Duolingo bi-daily loop)
+    const currentHour = new Date().getHours();
+    if (this.state.circadianChests) {
+      if (currentHour >= 6 && currentHour < 12) {
+        this.state.circadianChests.nightOwl.isUnlocked = true;
+      } else if (currentHour >= 18 && currentHour < 24) {
+        this.state.circadianChests.earlyBird.isUnlocked = true;
+      }
+    }
 
     this.saveState();
 
