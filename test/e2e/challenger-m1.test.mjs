@@ -168,7 +168,7 @@ describe('Challenger M1: Adversarial Empirical Verification', () => {
     });
 
     test('Cascading Order Invariant: Operational :root block appears AFTER legacy test-contract block', () => {
-      const css = fs.readFileSync(cssPath, 'utf-8');
+      const css = fs.readFileSync(cssPath, 'utf-8').replace(/\r\n/g, '\n');
 
       const legacyIndex = css.indexOf(':root,\n[data-theme="dark"]');
       const operationalIndex = css.indexOf(':root,\nhtml[data-theme="light"]');
