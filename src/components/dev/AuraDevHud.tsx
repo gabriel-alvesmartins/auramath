@@ -21,12 +21,13 @@ export const AuraDevHud: React.FC<AuraDevHudProps> = ({ onNavigate, currentRoute
   const [audioStatus, setAudioStatus] = useState<'active' | 'suspended' | 'muted'>('active');
   const [lastActionToast, setLastActionToast] = useState<string | null>(null);
 
-  // FPS Ticker
+  // FPS Ticker (Only runs when HUD is open to save CPU/GPU cycles)
   const frameCountRef = useRef(0);
   const lastTimeRef = useRef(performance.now());
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (!isOpen) return;
     const loop = (time: number) => {
       frameCountRef.current++;
       if (time - lastTimeRef.current >= 500) {
@@ -41,7 +42,7 @@ export const AuraDevHud: React.FC<AuraDevHudProps> = ({ onNavigate, currentRoute
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [isOpen]);
 
   // Keyboard Shortcut: Ctrl + Shift + D or ~
   useEffect(() => {
@@ -55,8 +56,9 @@ export const AuraDevHud: React.FC<AuraDevHudProps> = ({ onNavigate, currentRoute
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Audio Context Inspector
+  // Audio Context Inspector (Active only when HUD is visible)
   useEffect(() => {
+    if (!isOpen) return;
     const checkAudio = () => {
       if (audioSynth.isMuted()) {
         setAudioStatus('muted');
@@ -64,9 +66,10 @@ export const AuraDevHud: React.FC<AuraDevHudProps> = ({ onNavigate, currentRoute
         setAudioStatus('active');
       }
     };
+    checkAudio();
     const interval = setInterval(checkAudio, 1500);
     return () => clearInterval(interval);
-  }, []);
+  }, [isOpen]);
 
   const triggerToast = (msg: string) => {
     setLastActionToast(msg);
