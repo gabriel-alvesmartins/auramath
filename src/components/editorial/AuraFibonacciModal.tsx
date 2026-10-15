@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Check, Sparkles, Compass, Shield, Palette, Zap } from 'lucide-react';
 import { PrismaMascotWeb } from '../PrismaMascotWeb';
 import { audioSynth } from '../../services/audioSynth';
@@ -10,13 +10,23 @@ export interface AuraFibonacciModalProps {
   isSubscribed?: boolean;
 }
 
-export const AuraFibonacciModal: React.FC<AuraFibonacciModalProps> = ({
+const AuraFibonacciModalComponent: React.FC<AuraFibonacciModalProps> = ({
   isOpen,
   onClose,
   onSubscribe,
   isSubscribed = false,
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<'annual' | 'monthly'>('annual');
+
+  // Keyboard Escape dismissal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -503,3 +513,6 @@ export const AuraFibonacciModal: React.FC<AuraFibonacciModalProps> = ({
     </div>
   );
 };
+
+export const AuraFibonacciModal = React.memo(AuraFibonacciModalComponent);
+export default AuraFibonacciModal;
