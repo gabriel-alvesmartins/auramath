@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Play, Lock, Star, X, Zap, Crown } from 'lucide-react';
 import { TrackNodeData } from '../../engine';
 import { audioSynth } from '../../services/audioSynth';
@@ -34,7 +34,7 @@ export interface TrackSerpentineNodeProps {
  * - Action popover card with title, XP reward, and full-width Aura3DButton to launch lesson
  * - Anchored Mascot Socket for companion Aura floating beside active node
  */
-export const TrackSerpentineNode: React.FC<TrackSerpentineNodeProps> = ({
+const TrackSerpentineNodeComponent: React.FC<TrackSerpentineNodeProps> = ({
   node,
   index = 0,
   isCurrent = false,
@@ -87,6 +87,17 @@ export const TrackSerpentineNode: React.FC<TrackSerpentineNodeProps> = ({
       setInternalPopoverOpen(false);
     }
   };
+
+  useEffect(() => {
+    if (!popoverOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClosePopover();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [popoverOpen]);
 
   const handleLaunchLesson = () => {
     handleClosePopover();
@@ -307,7 +318,23 @@ export const TrackSerpentineNode: React.FC<TrackSerpentineNodeProps> = ({
         {node.title}
       </div>
 
-      {/* 4. Action Popover Card (Duolingo Style) */}
+      {/* Click-outside transparent dismissal backdrop */}
+      {popoverOpen && (
+        <div
+          className="node-popover-backdrop"
+          onClick={handleClosePopover}
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 35,
+            background: 'transparent',
+            cursor: 'default',
+          }}
+        />
+      )}
+
+      {/* 4. Action Popover Card (Duolingo Style - Optimized & Hardware Accelerated) */}
       {popoverOpen && (
         <div
           role="dialog"
@@ -316,23 +343,21 @@ export const TrackSerpentineNode: React.FC<TrackSerpentineNodeProps> = ({
           style={{
             position: 'absolute',
             top: '105px',
+            left: '50%',
+            transform: 'translateX(-50%)',
             backgroundColor: 'var(--color-cream, #FFFDF6)',
             border: '2px solid var(--color-ink, #202522)',
             borderRadius: '20px',
             padding: '16px',
-            width: '260px',
-            boxShadow: '0 8px 0 var(--color-border-bold, #C2BDAE), 0 4px 16px rgba(32, 37, 34, 0.12)',
+            width: '264px',
+            maxWidth: 'min(280px, calc(100vw - 32px))',
+            boxShadow: '0 8px 0 var(--color-border-bold, #C2BDAE), 0 6px 20px rgba(32, 37, 34, 0.14)',
             zIndex: 40,
-            animation: 'popoverIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
             boxSizing: 'border-box',
           }}
         >
-          <style>{`
-            @keyframes popoverIn {
-              from { opacity: 0; transform: scale(0.92); }
-              to { opacity: 1; transform: scale(1); }
-            }
-          `}</style>
+          {/* Duolingo Caret Pointer */}
+          <div className="node-action-popover-caret" aria-hidden="true" />
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
             <div>
@@ -411,4 +436,5 @@ export const TrackSerpentineNode: React.FC<TrackSerpentineNodeProps> = ({
   );
 };
 
+export const TrackSerpentineNode = React.memo(TrackSerpentineNodeComponent);
 export default TrackSerpentineNode;

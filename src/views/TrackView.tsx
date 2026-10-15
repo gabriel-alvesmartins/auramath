@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Sparkles, Star, Lock, Play, ChevronRight, CheckCircle2,
   BookOpen, Brain, Zap, X, Trophy, Flame, Gift, Swords, Crown, Shield, Sliders, Award
@@ -141,6 +141,25 @@ export const TrackView: React.FC<TrackViewProps> = ({
   const [bossModalOpen, setBossModalOpen] = useState(false);
   const [selectedBoss, setSelectedBoss] = useState<MasteryChallengeData | null>(null);
   const [selectedLegendaryNode, setSelectedLegendaryNode] = useState<TrackNodeData | null>(null);
+
+  // Memoized popover & node action handlers (optimizes track re-renders)
+  const handleCloseActivePopover = useCallback(() => {
+    setActivePopoverNodeId(null);
+  }, []);
+
+  const handleNodeClick = useCallback((clickedNode: TrackNodeData) => {
+    setActivePopoverNodeId((prev) => (prev === clickedNode.id ? null : clickedNode.id));
+  }, []);
+
+  const handleStartNodeLesson = useCallback((targetNode: TrackNodeData) => {
+    setActivePopoverNodeId(null);
+    onStartLesson(targetNode.id);
+  }, [onStartLesson]);
+
+  const handleStartNodeLegendary = useCallback((legNode: TrackNodeData) => {
+    setActivePopoverNodeId(null);
+    setSelectedLegendaryNode(legNode);
+  }, []);
 
   // Persistent / memoized collected chests per grade
   const [collectedChests, setCollectedChests] = useState<Record<number, boolean>>(() => {
@@ -289,10 +308,6 @@ export const TrackView: React.FC<TrackViewProps> = ({
         @keyframes mascotFloat {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-7px); }
-        }
-        @keyframes popoverIn {
-          from { opacity: 0; transform: scale(0.92); }
-          to { opacity: 1; transform: scale(1); }
         }
       `}</style>
 
@@ -568,12 +583,9 @@ export const TrackView: React.FC<TrackViewProps> = ({
                         </div>
                       )}
 
-                      {/* Canonical 3D Serpentine Node */}
+                      {/* Canonical 3D Serpentine Node (Optimized with React.memo & Stable Callbacks) */}
                       <TrackSerpentineNode
-                        node={{
-                          ...node,
-                          legendary: effectiveProgress[node.id]?.legendary,
-                        }}
+                        node={node}
                         index={index}
                         isCurrent={isCurrentActive}
                         isActive={!isNodeLocked || isNodeCompleted}
@@ -581,25 +593,10 @@ export const TrackView: React.FC<TrackViewProps> = ({
                         stars={effectiveProgress[node.id]?.stars ?? 0}
                         isLegendary={effectiveProgress[node.id]?.legendary}
                         isPopoverOpen={activePopoverNodeId === node.id}
-                        onClosePopover={() => setActivePopoverNodeId(null)}
-                        onClick={(clickedNode) => {
-                          if (isNodeLocked) {
-                            audioSynth.playErrorSoftRelease();
-                            return;
-                          }
-                          audioSynth.playKeypressTick();
-                          setActivePopoverNodeId((prev) =>
-                            prev === clickedNode.id ? null : clickedNode.id
-                          );
-                        }}
-                        onStartLesson={(targetNode) => {
-                          setActivePopoverNodeId(null);
-                          onStartLesson(targetNode.id);
-                        }}
-                        onStartLegendary={(legNode) => {
-                          setActivePopoverNodeId(null);
-                          setSelectedLegendaryNode(legNode);
-                        }}
+                        onClosePopover={handleCloseActivePopover}
+                        onClick={handleNodeClick}
+                        onStartLesson={handleStartNodeLesson}
+                        onStartLegendary={handleStartNodeLegendary}
                         showMascot={false}
                       />
 

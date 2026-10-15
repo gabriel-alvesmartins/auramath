@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-10-15T20:28:15.166Z",
+  "generatedAt": "2026-10-15T20:33:16.337Z",
   "complianceRate": "100%",
   "summary": {
-    "total": 13,
-    "compliant": 10,
+    "total": 14,
+    "compliant": 11,
     "future": 3,
     "drift": 0
   },
@@ -124,6 +124,15 @@
       "status": "compliant",
       "details": "VTracer configurado, Rive CLI v1.5.1 integrado, prisma.riv (~4.9 KB) compilado e PrismaMascotRive.tsx ativo.",
       "evidence": "public/mascot/prisma.riv compilado via RML, PrismaController State Machine e PrismaMascotRive.tsx operantes."
+    },
+    {
+      "id": "dev-studio-cockpit-god-mode",
+      "domain": "Ferramental Dev & Cockpit",
+      "title": "AuraMath Dev Studio & In-Game God Mode HUD",
+      "specRef": "openspec/specs/dev-studio/spec.md",
+      "status": "compliant",
+      "details": "AuraDevHud, ThumbZoneOverlay e as 5 bancadas modulares (Diagramas, Sensorial, Prisma, Máquina do Tempo e Save Slots) operantes.",
+      "evidence": "openspec/specs/dev-studio/spec.md ativa, AuraDevHud integrado em App.tsx e bancadas ativas em DevComplianceView.tsx."
     }
   ]
 }

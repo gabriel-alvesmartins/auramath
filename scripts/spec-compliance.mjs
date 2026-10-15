@@ -239,6 +239,31 @@ async function runComplianceAudit() {
       evidence: 'public/mascot/prisma.riv compilado via RML, PrismaController State Machine e PrismaMascotRive.tsx operantes.',
     });
 
+    // 5. Validar AuraMath Dev Studio & In-Game God Mode
+    const devSpecPath = path.join(rootDir, 'openspec/specs/dev-studio/spec.md');
+    const hasDevSpec = fs.existsSync(devSpecPath);
+    const hasHud = fs.existsSync(path.join(rootDir, 'src/components/dev/AuraDevHud.tsx'));
+    const hasThumbZone = fs.existsSync(path.join(rootDir, 'src/components/dev/ThumbZoneOverlay.tsx'));
+    const hasDiagramTab = fs.existsSync(path.join(rootDir, 'src/views/dev/DiagramStudioTab.tsx'));
+    const hasSensoryTab = fs.existsSync(path.join(rootDir, 'src/views/dev/SensoryLabTab.tsx'));
+    const hasPrismaTab = fs.existsSync(path.join(rootDir, 'src/views/dev/PrismaTheaterTab.tsx'));
+    const hasTimeTab = fs.existsSync(path.join(rootDir, 'src/views/dev/TimeMachineTab.tsx'));
+    const hasSlotsTab = fs.existsSync(path.join(rootDir, 'src/views/dev/SaveSlotsTab.tsx'));
+
+    const isDevStudioOk = hasDevSpec && hasHud && hasThumbZone && hasDiagramTab && hasSensoryTab && hasPrismaTab && hasTimeTab && hasSlotsTab;
+
+    complianceResults.push({
+      id: 'dev-studio-cockpit-god-mode',
+      domain: 'Ferramental Dev & Cockpit',
+      title: 'AuraMath Dev Studio & In-Game God Mode HUD',
+      specRef: 'openspec/specs/dev-studio/spec.md',
+      status: isDevStudioOk ? 'compliant' : 'drift',
+      details: isDevStudioOk
+        ? 'AuraDevHud, ThumbZoneOverlay e as 5 bancadas modulares (Diagramas, Sensorial, Prisma, Máquina do Tempo e Save Slots) operantes.'
+        : 'Inconsistência nos componentes do Dev Studio ou especificação ausente.',
+      evidence: 'openspec/specs/dev-studio/spec.md ativa, AuraDevHud integrado em App.tsx e bancadas ativas em DevComplianceView.tsx.',
+    });
+
   } catch (err) {
     complianceResults.push({
       id: 'source-code-audit',

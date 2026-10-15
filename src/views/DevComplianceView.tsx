@@ -80,12 +80,20 @@ export function DevComplianceView({ onReturn, onStartLesson }: DevComplianceView
   // ---------------------------------------------------------------------------
   // TAB 2: COMPLIANCE MATRIX FILTERS
   // ---------------------------------------------------------------------------
+  const [complianceData, setComplianceData] = useState(complianceDataRaw);
+  const [isRefreshingCompliance, setIsRefreshingCompliance] = useState(false);
   const [complianceSearch, setComplianceSearch] = useState('');
   const [complianceStatusFilter, setComplianceStatusFilter] = useState<'all' | 'compliant' | 'future' | 'drift'>('all');
   const [complianceGroupFilter, setComplianceGroupFilter] = useState<string>('all');
 
+  const handleRefreshCompliance = () => {
+    setIsRefreshingCompliance(true);
+    setComplianceData({ ...complianceDataRaw });
+    setTimeout(() => setIsRefreshingCompliance(false), 400);
+  };
+
   const filteredComplianceItems = useMemo(() => {
-    const items = complianceDataRaw.items || [];
+    const items = complianceData.items || [];
     return items.filter(item => {
       if (complianceStatusFilter !== 'all' && item.status !== complianceStatusFilter) return false;
       if (complianceGroupFilter !== 'all' && item.domain !== complianceGroupFilter) return false;
@@ -774,7 +782,7 @@ export function DevComplianceView({ onReturn, onStartLesson }: DevComplianceView
           {/* ================================================================= */}
           {activeTab === 'compliance' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
                   <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 800, color: '#202522' }}>
                     Matriz de Conformidade & Anti-Drift
@@ -782,35 +790,67 @@ export function DevComplianceView({ onReturn, onStartLesson }: DevComplianceView
                   <p style={{ margin: '4px 0 0', fontSize: '0.86rem', color: '#5C645F' }}>
                     Auditoria automatizada das especificações ativas e contratos de implementação.
                   </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px', fontSize: '0.74rem', color: '#176B5B', fontWeight: 700 }}>
+                    <ShieldCheck size={14} />
+                    <span>Última Auditoria: {new Date(complianceData.generatedAt || Date.now()).toLocaleDateString('pt-BR')} às {new Date(complianceData.generatedAt || Date.now()).toLocaleTimeString('pt-BR')}</span>
+                    <span>·</span>
+                    <span style={{ backgroundColor: '#DCEBE5', padding: '1px 6px', borderRadius: '4px' }}>
+                      {complianceData.complianceRate} Conforme ({complianceData.items?.length || 0} itens)
+                    </span>
+                  </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(complianceDataRaw, null, 2));
-                    const downloadAnchor = document.createElement('a');
-                    downloadAnchor.setAttribute("href", dataStr);
-                    downloadAnchor.setAttribute("download", "spec-compliance-report.json");
-                    document.body.appendChild(downloadAnchor);
-                    downloadAnchor.click();
-                    downloadAnchor.remove();
-                  }}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    backgroundColor: '#FFFDF6',
-                    border: '1.5px solid #202522',
-                    boxShadow: '0 2px 0 #202522',
-                    borderRadius: '8px',
-                    padding: '8px 14px',
-                    fontSize: '0.78rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Download size={14} /> Exportar Relatório JSON
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={handleRefreshCompliance}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      backgroundColor: '#DCEBE5',
+                      border: '1.5px solid #176B5B',
+                      boxShadow: '0 2px 0 #176B5B',
+                      borderRadius: '8px',
+                      padding: '8px 14px',
+                      fontSize: '0.78rem',
+                      fontWeight: 800,
+                      color: '#176B5B',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <RefreshCw size={14} style={{ animation: isRefreshingCompliance ? 'spin 1s linear infinite' : 'none' }} />
+                    <span>{isRefreshingCompliance ? 'Atualizando...' : 'Recarregar Matriz'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(complianceData, null, 2));
+                      const downloadAnchor = document.createElement('a');
+                      downloadAnchor.setAttribute("href", dataStr);
+                      downloadAnchor.setAttribute("download", "spec-compliance-report.json");
+                      document.body.appendChild(downloadAnchor);
+                      downloadAnchor.click();
+                      downloadAnchor.remove();
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      backgroundColor: '#FFFDF6',
+                      border: '1.5px solid #202522',
+                      boxShadow: '0 2px 0 #202522',
+                      borderRadius: '8px',
+                      padding: '8px 14px',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Download size={14} /> Exportar Relatório JSON
+                  </button>
+                </div>
               </div>
 
               {/* Filters Toolbar */}

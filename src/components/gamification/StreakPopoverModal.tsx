@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Flame, Shield, TrendingUp, Sparkles, X, Check, Award, AlertCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { StreakState, StreakWager } from '../../engine';
@@ -16,7 +16,7 @@ export interface StreakPopoverModalProps {
   onSolveRescueTask: () => void;
 }
 
-export const StreakPopoverModal: React.FC<StreakPopoverModalProps> = ({
+const StreakPopoverModalComponent: React.FC<StreakPopoverModalProps> = ({
   isOpen,
   onClose,
   streakState,
@@ -27,6 +27,33 @@ export const StreakPopoverModal: React.FC<StreakPopoverModalProps> = ({
 }) => {
   const [wagerChoice, setWagerChoice] = useState<7 | 14>(7);
   const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
+  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clean up feedback timer on unmount
+  useEffect(() => {
+    return () => {
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    };
+  }, []);
+
+  // Keyboard Escape dismissal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  const showFeedback = (msg: string, durationMs: number = 3000) => {
+    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    setFeedbackMsg(msg);
+    feedbackTimerRef.current = setTimeout(() => {
+      setFeedbackMsg(null);
+      feedbackTimerRef.current = null;
+    }, durationMs);
+  };
 
   if (!isOpen) return null;
 
@@ -39,12 +66,15 @@ export const StreakPopoverModal: React.FC<StreakPopoverModalProps> = ({
     const ok = onBuyFreeze();
     if (ok) {
       confetti({ particleCount: 30, spread: 60, origin: { y: 0.6 } });
-      setFeedbackMsg('Bloqueio de Ofensiva equipado com sucesso!');
-      setTimeout(() => setFeedbackMsg(null), 3000);
+      showFeedback('Bloqueio de Ofensiva equipado com sucesso!', 3000);
     } else {
       audioSynth.playErrorSoftRelease();
-      setFeedbackMsg(starsCount < 100 ? 'Estrelas insuficientes (requer 100 ✦)' : 'Capacidade máxima de bloqueios atingida (2/2)');
-      setTimeout(() => setFeedbackMsg(null), 3500);
+      showFeedback(
+        starsCount < 100
+          ? 'Estrelas insuficientes (requer 100 ✦)'
+          : 'Capacidade máxima de bloqueios atingida (2/2)',
+        3500
+      );
     }
   };
 
@@ -54,12 +84,10 @@ export const StreakPopoverModal: React.FC<StreakPopoverModalProps> = ({
     const ok = onPlaceWager(wagerChoice, bet);
     if (ok) {
       confetti({ particleCount: 40, spread: 70, origin: { y: 0.6 } });
-      setFeedbackMsg(`Aposta de ${wagerChoice} dias ativada! Boa sorte!`);
-      setTimeout(() => setFeedbackMsg(null), 3000);
+      showFeedback(`Aposta de ${wagerChoice} dias ativada! Boa sorte!`, 3000);
     } else {
       audioSynth.playErrorSoftRelease();
-      setFeedbackMsg('Estrelas insuficientes para esta aposta.');
-      setTimeout(() => setFeedbackMsg(null), 3000);
+      showFeedback('Estrelas insuficientes para esta aposta.', 3000);
     }
   };
 
@@ -96,6 +124,8 @@ export const StreakPopoverModal: React.FC<StreakPopoverModalProps> = ({
           boxShadow: '0 8px 0 var(--color-border-bold, #C2BDAE)',
           boxSizing: 'border-box',
           position: 'relative',
+          animation: 'modalSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+          willChange: 'transform, opacity',
         }}
       >
         {/* Close Button */}
@@ -264,8 +294,7 @@ export const StreakPopoverModal: React.FC<StreakPopoverModalProps> = ({
               fullWidth
               onClick={() => {
                 onSolveRescueTask();
-                setFeedbackMsg('Desafio de resgate avançado com sucesso!');
-                setTimeout(() => setFeedbackMsg(null), 3000);
+                showFeedback('Desafio de resgate avançado com sucesso!', 3000);
               }}
             >
               RESOLVER DESAFIO DE RESGATE
@@ -436,3 +465,6 @@ export const StreakPopoverModal: React.FC<StreakPopoverModalProps> = ({
     </div>
   );
 };
+
+export const StreakPopoverModal = React.memo(StreakPopoverModalComponent);
+export default StreakPopoverModal;
